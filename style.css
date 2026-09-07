@@ -562,6 +562,8 @@ h3 {
 }
 
 .calendar-day {
+  position: relative;
+
   aspect-ratio: 1;
 
   display: flex;
@@ -590,6 +592,47 @@ h3 {
   box-shadow: 0 0 0 3px var(--blue-light);
 }
 
+/*
+  Anneau autour du jour actuellement
+  ouvert sous le calendrier.
+*/
+
+.calendar-day.day-selected {
+  box-shadow: 0 0 0 2px var(--blue-dark);
+}
+
+.calendar-day.today.day-selected {
+  box-shadow: 0 0 0 2px var(--blue-dark), inset 0 0 0 1.5px var(--blue);
+}
+
+/*
+  Point indiquant qu'un journal a été
+  rempli ce jour-là. Bleu foncé par défaut,
+  blanc quand le jour est en surbrillance
+  (habitude réalisée) pour rester visible.
+*/
+
+.calendar-day.has-journal::after {
+  content: "";
+
+  position: absolute;
+  bottom: 5px;
+  left: 50%;
+
+  transform: translateX(-50%);
+
+  width: 5px;
+  height: 5px;
+
+  border-radius: 50%;
+
+  background: var(--blue-dark);
+}
+
+.calendar-day.has-habit.has-journal::after {
+  background: white;
+}
+
 .calendar-legend {
   margin-top: 18px;
 
@@ -607,6 +650,10 @@ h3 {
 
   border-radius: 50%;
   background: var(--blue);
+}
+
+.legend-dot.journal-dot {
+  background: var(--blue-dark);
 }
 
 
@@ -687,6 +734,85 @@ h3 {
 
 
 /* =========================================================
+   JOURNAL DU JOUR SELECTIONNE (page Calendrier)
+   ========================================================= */
+
+.calendar-journal-card {
+  margin-top: 20px;
+}
+
+.calendar-journal-status {
+  margin: -4px 0 16px;
+
+  padding: 11px 13px;
+
+  background: var(--blue-pale);
+
+  border-radius: 13px;
+
+  color: var(--blue-dark);
+}
+
+.mini-feeling-option {
+  width: 100%;
+  min-width: 0;
+  margin-bottom: 0 !important;
+
+  position: relative;
+}
+
+.mini-feeling-option input {
+  position: absolute;
+
+  opacity: 0;
+  pointer-events: none;
+}
+
+.mini-feeling-option span {
+  width: 100%;
+  height: 44px;
+  min-height: 44px;
+
+  padding: 8px 9px;
+
+  display: flex;
+  align-items: center;
+  justify-content: center;
+
+  border: 1px solid var(--border);
+  border-radius: 13px;
+
+  background: #fff;
+  color: var(--text-light);
+
+  font-size: 13px;
+  font-weight: 500;
+
+  line-height: 1.15;
+  text-align: center;
+
+  white-space: normal;
+
+  cursor: pointer;
+
+  transition:
+    background .18s ease,
+    border-color .18s ease,
+    color .18s ease;
+}
+
+.mini-feeling-option input:checked + span {
+  background: var(--blue-light);
+
+  border-color: var(--blue);
+
+  color: var(--blue-dark);
+
+  font-weight: 650;
+}
+
+
+/* =========================================================
    JOURNAL
    ========================================================= */
 
@@ -754,7 +880,8 @@ textarea {
   line-height: 1.6;
 }
 
-#dailyJournal {
+#dailyJournal,
+#calendarJournalText {
   margin-bottom: 18px;
 }
 
