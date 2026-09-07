@@ -190,6 +190,39 @@ const leaveDuo =
   );
 
 
+/* Journal du jour sélectionné dans le calendrier */
+
+const calendarJournalSection =
+  document.getElementById(
+    "calendarJournalSection"
+  );
+
+const calendarJournalTitle =
+  document.getElementById(
+    "calendarJournalTitle"
+  );
+
+const calendarJournalStatus =
+  document.getElementById(
+    "calendarJournalStatus"
+  );
+
+const calendarFeelingGrid =
+  document.getElementById(
+    "calendarFeelingGrid"
+  );
+
+const calendarJournalText =
+  document.getElementById(
+    "calendarJournalText"
+  );
+
+const calendarSaveDaily =
+  document.getElementById(
+    "calendarSaveDaily"
+  );
+
+
 /* =========================================================
    ETAT
    ========================================================= */
@@ -201,11 +234,17 @@ let selectedCalendarHabitId = null;
 let calendarDate = new Date();
 
 /*
-   Date actuellement consultée dans le journal.
-   Par défaut : aujourd'hui.
+   Date actuellement consultée dans le journal
+   de la page Journal. Par défaut : aujourd'hui.
 */
 let selectedJournalDate =
   dateKey(new Date());
+
+/*
+   Date actuellement ouverte sous le calendrier
+   (page Calendrier). null = rien n'est ouvert.
+*/
+let calendarSelectedJournalDate = null;
 
 
 /* =========================================================
@@ -236,6 +275,18 @@ const monthNames = [
   "Octobre",
   "Novembre",
   "Décembre"
+];
+
+
+const feelingOptions = [
+  "Bien",
+  "Calme",
+  "Énergique",
+  "Fier·ère",
+  "Motivé·e",
+  "Fatigué·e",
+  "Stressé·e",
+  "Triste"
 ];
 
 
@@ -338,6 +389,32 @@ function formatShortDate(date) {
     {
       day: "numeric",
       month: "short"
+    }
+  );
+
+}
+
+
+function formatJournalTitle(key) {
+
+  if (
+    key === dateKey(new Date())
+  ) {
+
+    return "Aujourd'hui";
+
+  }
+
+
+  const date =
+    new Date(key + "T00:00:00");
+
+
+  return date.toLocaleDateString(
+    "fr-FR",
+    {
+      day: "numeric",
+      month: "long"
     }
   );
 
@@ -1289,9 +1366,13 @@ function renderCalendar() {
       );
 
 
+    const isSelected =
+      key === calendarSelectedJournalDate;
+
+
     /*
-      On utilise maintenant un bouton
-      pour pouvoir cliquer sur la date.
+      On utilise un bouton pour
+      pouvoir cliquer sur la date.
     */
 
     const cell =
@@ -1316,6 +1397,11 @@ function renderCalendar() {
         hasJournal
           ? " has-journal"
           : ""
+      ) +
+      (
+        isSelected
+          ? " day-selected"
+          : ""
       );
 
 
@@ -1325,28 +1411,20 @@ function renderCalendar() {
 
     /*
       Cliquer sur une date ouvre
-      directement le journal correspondant.
+      son journal juste en dessous
+      du calendrier, sur cette même
+      page.
     */
 
     cell.addEventListener(
       "click",
       () => {
 
-        selectedJournalDate =
-          key;
-
-
-        showPage(
-          "journalPage"
-        );
-
-
-        loadJournals(
+        openCalendarJournal(
           key
         );
 
-
-        updateWeeklyJournalAvailability();
+        renderCalendar();
 
       }
     );
@@ -1399,6 +1477,195 @@ document
 
     }
   );
+
+
+/* =========================================================
+   JOURNAL DU JOUR SELECTIONNE DANS LE CALENDRIER
+   ========================================================= */
+
+function renderCalendarFeelingGrid() {
+
+  calendarFeelingGrid.innerHTML =
+    feelingOptions
+      .map(
+        feeling => `
+
+          <label class="mini-feeling-option">
+
+            <input
+              type="checkbox"
+              value="${escapeHTML(feeling)}"
+            >
+
+            <span>
+              ${escapeHTML(feeling)}
+            </span>
+
+          </label>
+
+        `
+      )
+      .join("");
+
+}
+
+
+function openCalendarJournal(key) {
+
+  calendarSelectedJournalDate =
+    key;
+
+
+  calendarJournalSection.classList.remove(
+    "hidden"
+  );
+
+
+  calendarJournalTitle.textContent =
+    formatJournalTitle(key);
+
+
+  const saved =
+    data.dailyJournal[key];
+
+
+  const hasContent =
+    Boolean(
+      saved &&
+      (
+        saved.text?.trim() ||
+        (
+          saved.feelings &&
+          saved.feelings.length
+        )
+      )
+    );
+
+
+  if (hasContent) {
+
+    calendarJournalStatus.classList.add(
+      "hidden"
+    );
+
+    calendarJournalStatus.textContent =
+      "";
+
+  } else {
+
+    calendarJournalStatus.classList.remove(
+      "hidden"
+    );
+
+    calendarJournalStatus.textContent =
+      "Aucun journal n'a été rempli pour ce jour-là. Tu peux en ajouter un maintenant.";
+
+  }
+
+
+  calendarJournalText.value =
+    saved?.text || "";
+
+
+  document
+    .querySelectorAll(
+      "#calendarFeelingGrid input"
+    )
+    .forEach(
+      input => {
+
+        input.checked =
+          saved?.feelings?.includes(
+            input.value
+          ) || false;
+
+      }
+    );
+
+}
+
+
+calendarSaveDaily.addEventListener(
+  "click",
+  () => {
+
+    if (
+      !calendarSelectedJournalDate
+    ) {
+
+      return;
+
+    }
+
+
+    const feelings =
+      [
+        ...document.querySelectorAll(
+          "#calendarFeelingGrid input:checked"
+        )
+      ].map(
+        input =>
+          input.value
+      );
+
+
+    data.dailyJournal[
+      calendarSelectedJournalDate
+    ] = {
+
+      feelings,
+
+      text:
+        calendarJournalText.value
+
+    };
+
+
+    saveData();
+
+
+    calendarSaveDaily.textContent =
+      "Enregistré ✓";
+
+
+    setTimeout(
+      () => {
+
+        calendarSaveDaily.textContent =
+          "Enregistrer";
+
+      },
+      1500
+    );
+
+
+    calendarJournalStatus.classList.add(
+      "hidden"
+    );
+
+
+    /*
+      Si le journal ouvert dans la page
+      Journal correspond à la même date,
+      on le met aussi à jour.
+    */
+
+    if (
+      calendarSelectedJournalDate ===
+      selectedJournalDate
+    ) {
+
+      loadJournals(
+        selectedJournalDate
+      );
+
+    }
+
+
+    renderCalendar();
+
+  }
+);
 
 
 /* =========================================================
@@ -1527,7 +1794,7 @@ function renderMonthlyRecap() {
 
 
 /* =========================================================
-   JOURNAL QUOTIDIEN
+   JOURNAL QUOTIDIEN (page Journal)
    ========================================================= */
 
 function loadDailyFeelings(
@@ -1761,8 +2028,19 @@ saveDaily.addEventListener(
     /*
       On actualise le calendrier pour
       afficher immédiatement le point
-      indiquant qu'un journal existe.
+      indiquant qu'un journal existe,
+      et le bloc journal du calendrier
+      si la même date y est ouverte.
     */
+
+    if (
+      date === calendarSelectedJournalDate
+    ) {
+
+      openCalendarJournal(date);
+
+    }
+
 
     renderCalendar();
 
@@ -2322,8 +2600,8 @@ function initialize() {
 
 
   /*
-    Le journal commence toujours
-    sur aujourd'hui.
+    Le journal de la page Journal
+    commence toujours sur aujourd'hui.
   */
 
   selectedJournalDate =
@@ -2333,6 +2611,8 @@ function initialize() {
   renderWelcome();
 
   renderChoiceLists();
+
+  renderCalendarFeelingGrid();
 
   renderHabits();
 
