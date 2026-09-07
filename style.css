@@ -633,30 +633,6 @@ h3 {
   background: white;
 }
 
-.calendar-legend {
-  margin-top: 18px;
-
-  display: flex;
-  align-items: center;
-  gap: 8px;
-
-  color: var(--text-light);
-  font-size: 12px;
-}
-
-.legend-dot {
-  width: 12px;
-  height: 12px;
-
-  border-radius: 50%;
-  background: var(--blue);
-}
-
-.legend-dot.journal-dot {
-  background: var(--blue-dark);
-}
-
-
 /* =========================================================
    CALENDRIER — HABITUDES
    ========================================================= */
@@ -1073,6 +1049,127 @@ label textarea {
 .positive-list input {
   margin-bottom: 8px;
   background: white;
+}
+
+
+/* =========================================================
+   HISTORIQUE DES BILANS HEBDOMADAIRES
+   ========================================================= */
+
+.history-card {
+  margin-bottom: 24px;
+}
+
+.weekly-history-list {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+}
+
+.history-item {
+  border: 1px solid var(--border);
+  border-radius: 15px;
+
+  overflow: hidden;
+}
+
+.history-item.open {
+  border-color: var(--blue);
+}
+
+.history-item-header {
+  width: 100%;
+  padding: 13px 15px;
+
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+
+  background: #fbfdff;
+  color: var(--text);
+
+  font-size: 13px;
+  font-weight: 650;
+}
+
+.history-item.open .history-item-header {
+  background: var(--blue-light);
+  color: var(--blue-dark);
+}
+
+.history-chevron {
+  color: var(--text-light);
+  font-size: 16px;
+  font-weight: 400;
+}
+
+.history-item.open .history-chevron {
+  color: var(--blue-dark);
+}
+
+.history-item-body {
+  padding: 15px;
+
+  border-top: 1px solid var(--border);
+}
+
+.history-tags {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 6px;
+
+  margin-bottom: 12px;
+}
+
+.history-tag {
+  padding: 6px 10px;
+
+  border-radius: 999px;
+
+  font-size: 11px;
+  font-weight: 600;
+}
+
+.history-tag.positive {
+  background: #eaf6ef;
+  color: #4d9a70;
+}
+
+.history-tag.negative {
+  background: #fdf1ee;
+  color: #b96b56;
+}
+
+.history-positives {
+  list-style: none;
+  margin-bottom: 12px;
+}
+
+.history-positives li {
+  position: relative;
+
+  padding-left: 16px;
+
+  font-size: 13px;
+  line-height: 1.6;
+}
+
+.history-positives li::before {
+  content: "•";
+
+  position: absolute;
+  left: 0;
+
+  color: var(--blue);
+}
+
+.history-text {
+  font-size: 13px;
+  line-height: 1.6;
+
+  color: var(--text);
+
+  white-space: pre-wrap;
 }
 
 
