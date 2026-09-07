@@ -17,24 +17,33 @@ let data;
 
 try {
   const saved = localStorage.getItem(STORAGE_KEY);
-  data = saved ? JSON.parse(saved) : structuredClone(defaultData);
+
+  data = saved
+    ? JSON.parse(saved)
+    : structuredClone(defaultData);
 } catch (error) {
-  console.error("Erreur lors du chargement des données :", error);
+  console.error("Erreur lors du chargement :", error);
   data = structuredClone(defaultData);
 }
 
-data.habits = Array.isArray(data.habits) ? data.habits : {};
-if (!Array.isArray(data.habits)) data.habits = [];
+/* Sécurisation des données */
+if (!Array.isArray(data.habits)) {
+  data.habits = [];
+}
 
-data.dailyJournal =
-  data.dailyJournal && typeof data.dailyJournal === "object"
-    ? data.dailyJournal
-    : {};
+if (
+  !data.dailyJournal ||
+  typeof data.dailyJournal !== "object"
+) {
+  data.dailyJournal = {};
+}
 
-data.weeklyJournals =
-  data.weeklyJournals && typeof data.weeklyJournals === "object"
-    ? data.weeklyJournals
-    : {};
+if (
+  !data.weeklyJournals ||
+  typeof data.weeklyJournals !== "object"
+) {
+  data.weeklyJournals = {};
+}
 
 /* =========================================================
    SAUVEGARDE
@@ -47,49 +56,31 @@ function saveData() {
       JSON.stringify(data)
     );
   } catch (error) {
-    console.error(
-      "Impossible de sauvegarder les données :",
-      error
-    );
+    console.error("Erreur de sauvegarde :", error);
   }
 }
 
 /* =========================================================
-   ELEMENTS
+   ELEMENTS HTML
 ========================================================= */
 
 const pages = document.querySelectorAll(".page");
 const navItems = document.querySelectorAll(".nav-item");
 
-const settingsBtn =
-  document.getElementById("settingsBtn");
+const settingsBtn = document.getElementById("settingsBtn");
 
-const addHabitBtn =
-  document.getElementById("addHabitBtn");
+const addHabitBtn = document.getElementById("addHabitBtn");
+const habitModal = document.getElementById("habitModal");
+const closeModal = document.getElementById("closeModal");
+const habitName = document.getElementById("habitName");
+const saveHabitBtn = document.getElementById("saveHabit");
+const goalButtons = document.querySelectorAll(
+  ".goal-options button"
+);
 
-const habitModal =
-  document.getElementById("habitModal");
-
-const closeModal =
-  document.getElementById("closeModal");
-
-const habitName =
-  document.getElementById("habitName");
-
-const saveHabitBtn =
-  document.getElementById("saveHabit");
-
-const goalButtons =
-  document.querySelectorAll(".goal-options button");
-
-const habitsList =
-  document.getElementById("habitsList");
-
-const weekDates =
-  document.getElementById("weekDates");
-
-const welcomeName =
-  document.getElementById("welcomeName");
+const habitsList = document.getElementById("habitsList");
+const weekDates = document.getElementById("weekDates");
+const welcomeName = document.getElementById("welcomeName");
 
 const calendarTitle =
   document.getElementById("calendarTitle");
@@ -222,19 +213,10 @@ function getMonday(date = new Date()) {
   const d = new Date(date);
   const day = d.getDay();
 
-  const diff =
-    day === 0
-      ? -6
-      : 1 - day;
+  const diff = day === 0 ? -6 : 1 - day;
 
   d.setDate(d.getDate() + diff);
-
-  d.setHours(
-    0,
-    0,
-    0,
-    0
-  );
+  d.setHours(0, 0, 0, 0);
 
   return d;
 }
@@ -243,9 +225,7 @@ function getSunday(date = new Date()) {
   const monday = getMonday(date);
   const sunday = new Date(monday);
 
-  sunday.setDate(
-    monday.getDate() + 6
-  );
+  sunday.setDate(monday.getDate() + 6);
 
   return sunday;
 }
@@ -307,8 +287,7 @@ function showPage(pageId) {
 
   if (pageId === "settingsPage") {
     if (userName) {
-      userName.value =
-        data.userName || "";
+      userName.value = data.userName || "";
     }
 
     renderDuo();
@@ -316,30 +295,19 @@ function showPage(pageId) {
 }
 
 navItems.forEach(item => {
-  item.addEventListener(
-    "click",
-    () => {
-      if (
-        item.dataset.page === "journalPage"
-      ) {
-        selectedJournalDate =
-          dateKey(new Date());
-      }
-
-      showPage(
-        item.dataset.page
-      );
+  item.addEventListener("click", () => {
+    if (item.dataset.page === "journalPage") {
+      selectedJournalDate = dateKey(new Date());
     }
-  );
+
+    showPage(item.dataset.page);
+  });
 });
 
 if (settingsBtn) {
-  settingsBtn.addEventListener(
-    "click",
-    () => {
-      showPage("settingsPage");
-    }
-  );
+  settingsBtn.addEventListener("click", () => {
+    showPage("settingsPage");
+  });
 }
 
 /* =========================================================
@@ -347,29 +315,20 @@ if (settingsBtn) {
 ========================================================= */
 
 if (saveName) {
-  saveName.addEventListener(
-    "click",
-    () => {
-      data.userName =
-        userName
-          ? userName.value.trim()
-          : "";
+  saveName.addEventListener("click", () => {
+    data.userName = userName
+      ? userName.value.trim()
+      : "";
 
-      saveData();
-      renderWelcome();
+    saveData();
+    renderWelcome();
 
-      saveName.textContent =
-        "Enregistré ✓";
+    saveName.textContent = "Enregistré ✓";
 
-      setTimeout(
-        () => {
-          saveName.textContent =
-            "Enregistrer";
-        },
-        1500
-      );
-    }
-  );
+    setTimeout(() => {
+      saveName.textContent = "Enregistrer";
+    }, 1500);
+  });
 }
 
 function renderWelcome() {
@@ -386,150 +345,112 @@ function renderWelcome() {
 ========================================================= */
 
 if (addHabitBtn) {
-  addHabitBtn.addEventListener(
-    "click",
-    () => {
-      if (data.habits.length >= 10) {
-        alert(
-          "Tu peux avoir jusqu'à 10 habitudes."
-        );
-        return;
-      }
-
-      if (habitName) {
-        habitName.value = "";
-      }
-
-      selectedGoal = 3;
-
-      goalButtons.forEach(
-        button => {
-          button.classList.toggle(
-            "selected",
-            button.dataset.goal === "3"
-          );
-        }
+  addHabitBtn.addEventListener("click", () => {
+    if (data.habits.length >= 10) {
+      alert(
+        "Tu peux avoir jusqu'à 10 habitudes."
       );
-
-      if (habitModal) {
-        habitModal.classList.remove(
-          "hidden"
-        );
-      }
-
-      setTimeout(
-        () => {
-          if (habitName) {
-            habitName.focus();
-          }
-        },
-        100
-      );
+      return;
     }
-  );
+
+    if (habitName) {
+      habitName.value = "";
+    }
+
+    selectedGoal = 3;
+
+    goalButtons.forEach(button => {
+      button.classList.toggle(
+        "selected",
+        button.dataset.goal === "3"
+      );
+    });
+
+    if (habitModal) {
+      habitModal.classList.remove("hidden");
+    }
+
+    setTimeout(() => {
+      if (habitName) {
+        habitName.focus();
+      }
+    }, 100);
+  });
 }
 
 if (closeModal) {
-  closeModal.addEventListener(
-    "click",
-    () => {
-      if (habitModal) {
-        habitModal.classList.add(
-          "hidden"
-        );
-      }
+  closeModal.addEventListener("click", () => {
+    if (habitModal) {
+      habitModal.classList.add("hidden");
     }
-  );
+  });
 }
 
 if (habitModal) {
-  habitModal.addEventListener(
-    "click",
-    event => {
-      if (
-        event.target === habitModal
-      ) {
-        habitModal.classList.add(
-          "hidden"
-        );
-      }
+  habitModal.addEventListener("click", event => {
+    if (event.target === habitModal) {
+      habitModal.classList.add("hidden");
     }
-  );
+  });
 }
 
-goalButtons.forEach(
-  button => {
-    button.addEventListener(
-      "click",
-      () => {
-        selectedGoal =
-          Number(
-            button.dataset.goal
-          );
-
-        goalButtons.forEach(
-          item => {
-            item.classList.toggle(
-              "selected",
-              item === button
-            );
-          }
-        );
-      }
+goalButtons.forEach(button => {
+  button.addEventListener("click", () => {
+    selectedGoal = Number(
+      button.dataset.goal
     );
-  }
-);
+
+    goalButtons.forEach(item => {
+      item.classList.toggle(
+        "selected",
+        item === button
+      );
+    });
+  });
+});
 
 /* =========================================================
    CREATION HABITUDE
 ========================================================= */
 
 if (saveHabitBtn) {
-  saveHabitBtn.addEventListener(
-    "click",
-    () => {
-      const name =
-        habitName
-          ? habitName.value.trim()
-          : "";
+  saveHabitBtn.addEventListener("click", () => {
+    const name = habitName
+      ? habitName.value.trim()
+      : "";
 
-      if (!name) {
-        if (habitName) {
-          habitName.focus();
-        }
-        return;
+    if (!name) {
+      if (habitName) {
+        habitName.focus();
       }
 
-      const habit = {
-        id: Date.now(),
-        name: name,
-        goal: selectedGoal,
-        completed: {}
-      };
-
-      data.habits.push(habit);
-
-      if (
-        selectedCalendarHabitId === null
-      ) {
-        selectedCalendarHabitId =
-          habit.id;
-      }
-
-      saveData();
-
-      if (habitModal) {
-        habitModal.classList.add(
-          "hidden"
-        );
-      }
-
-      renderHabits();
-      renderCalendarHabitSelector();
-      renderCalendar();
-      renderMonthlyRecap();
+      return;
     }
-  );
+
+    const habit = {
+      id: Date.now(),
+      name: name,
+      goal: selectedGoal,
+      completed: {}
+    };
+
+    data.habits.push(habit);
+
+    if (selectedCalendarHabitId === null) {
+      selectedCalendarHabitId = habit.id;
+    }
+
+    saveData();
+
+    if (habitModal) {
+      habitModal.classList.add("hidden");
+    }
+
+    renderHabits();
+    renderCalendarHabitSelector();
+    renderCalendar();
+    renderMonthlyRecap();
+  });
 }
 
 /* =========================================================
@@ -537,14 +458,12 @@ if (saveHabitBtn) {
 ========================================================= */
 
 function countWeekCompleted(habit) {
-  return getWeekDays().filter(
-    day => {
-      return Boolean(
-        habit.completed &&
-        habit.completed[dateKey(day)]
-      );
-    }
-  ).length;
+  return getWeekDays().filter(day => {
+    return Boolean(
+      habit.completed &&
+      habit.completed[dateKey(day)]
+    );
+  }).length;
 }
 
 function renderHabits() {
@@ -569,144 +488,123 @@ function renderHabits() {
 
   const days = getWeekDays();
 
-  data.habits.forEach(
-    habit => {
-      if (!habit.completed) {
-        habit.completed = {};
-      }
+  data.habits.forEach(habit => {
+    if (!habit.completed) {
+      habit.completed = {};
+    }
 
-      const completed =
-        countWeekCompleted(habit);
+    const completed =
+      countWeekCompleted(habit);
 
-      const goalReached =
-        completed >= habit.goal;
+    const goalReached =
+      completed >= habit.goal;
 
-      const surpassed =
-        completed > habit.goal;
+    const surpassed =
+      completed > habit.goal;
 
-      const card =
-        document.createElement("div");
+    const card =
+      document.createElement("div");
 
-      card.className =
-        "habit-card" +
-        (
-          goalReached
-            ? " completed-goal"
-            : ""
-        );
+    card.className =
+      "habit-card" +
+      (goalReached
+        ? " completed-goal"
+        : "");
 
-      const daysHTML =
-        days
-          .map(
-            (day, index) => {
-              const key =
-                dateKey(day);
+    const daysHTML =
+      days.map((day, index) => {
+        const key = dateKey(day);
 
-              const checked =
-                Boolean(
-                  habit.completed[key]
-                );
+        const checked =
+          Boolean(habit.completed[key]);
 
-              const today =
-                key ===
-                dateKey(new Date());
+        const today =
+          key === dateKey(new Date());
 
-              return `
-                <div class="day">
+        return `
+          <div class="day">
 
-                  <button
-                    type="button"
-                    class="
-                      day-circle
-                      ${checked ? "checked" : ""}
-                      ${today ? "today" : ""}
-                    "
-                    data-habit="${habit.id}"
-                    data-date="${key}"
-                    aria-label="Marquer ${formatShortDate(day)}"
-                  >
-                    ${checked ? "✓" : ""}
-                  </button>
+            <button
+              type="button"
+              class="day-circle
+                ${checked ? "checked" : ""}
+                ${today ? "today" : ""}"
+              data-habit="${habit.id}"
+              data-date="${key}"
+              aria-label="Marquer ${formatShortDate(day)}"
+            >
+              ${checked ? "✓" : ""}
+            </button>
 
-                  <span>
-                    ${dayNames[index]}
-                  </span>
-
-                </div>
-              `;
-            }
-          )
-          .join("");
-
-      const remaining =
-        Math.max(
-          habit.goal - completed,
-          0
-        );
-
-      card.innerHTML = `
-        <div class="habit-top">
-
-          <div>
-
-            <div class="habit-name">
-              ${escapeHTML(habit.name)}
-            </div>
-
-            <div class="habit-progress">
-              <strong>
-                ${completed}/${habit.goal}
-              </strong>
-              jours cette semaine
-            </div>
+            <span>${dayNames[index]}</span>
 
           </div>
+        `;
+      }).join("");
 
-          <button
-            type="button"
-            class="delete-habit"
-            data-delete="${habit.id}"
-            aria-label="Supprimer ${escapeHTML(habit.name)}"
-          >
-            ×
-          </button>
+    const remaining =
+      Math.max(
+        habit.goal - completed,
+        0
+      );
 
+    card.innerHTML = `
+      <div class="habit-top">
+
+        <div>
+          <div class="habit-name">
+            ${escapeHTML(habit.name)}
+          </div>
+
+          <div class="habit-progress">
+            <strong>
+              ${completed}/${habit.goal}
+            </strong>
+            jours cette semaine
+          </div>
         </div>
 
-        <div class="days">
-          ${daysHTML}
-        </div>
-
-        <div
-          class="goal-badge ${goalReached ? "done" : ""}"
+        <button
+          type="button"
+          class="delete-habit"
+          data-delete="${habit.id}"
+          aria-label="Supprimer ${escapeHTML(habit.name)}"
         >
-          ${
-            goalReached
-              ? "✓ Objectif de la semaine atteint"
-              : `
-                ${remaining}
-                jour${remaining > 1 ? "s" : ""}
-                restant${remaining > 1 ? "s" : ""}
-              `
-          }
-        </div>
+          ×
+        </button>
 
+      </div>
+
+      <div class="days">
+        ${daysHTML}
+      </div>
+
+      <div class="goal-badge ${goalReached ? "done" : ""}">
         ${
-          surpassed
-            ? `
-              <div class="habit-celebration">
-                🔥
-                Tu t'es surpassé·e
-                sur cette habitude.
-              </div>
+          goalReached
+            ? "✓ Objectif de la semaine atteint"
+            : `
+              ${remaining}
+              jour${remaining > 1 ? "s" : ""}
+              restant${remaining > 1 ? "s" : ""}
             `
-            : ""
         }
-      `;
+      </div>
 
-      habitsList.appendChild(card);
-    }
-  );
+      ${
+        surpassed
+          ? `
+            <div class="habit-celebration">
+              🔥 Tu t'es surpassé·e
+              sur cette habitude.
+            </div>
+          `
+          : ""
+      }
+    `;
+
+    habitsList.appendChild(card);
+  });
 
   attachHabitEvents();
 }
@@ -714,88 +612,71 @@ function renderHabits() {
 function attachHabitEvents() {
   document
     .querySelectorAll(".day-circle")
-    .forEach(
-      button => {
-        button.addEventListener(
-          "click",
-          () => {
-            const habitId =
-              Number(
-                button.dataset.habit
-              );
+    .forEach(button => {
+      button.addEventListener("click", () => {
+        const habitId =
+          Number(button.dataset.habit);
 
-            const date =
-              button.dataset.date;
+        const date =
+          button.dataset.date;
 
-            const habit =
-              data.habits.find(
-                h =>
-                  h.id === habitId
-              );
+        const habit =
+          data.habits.find(
+            h => h.id === habitId
+          );
 
-            if (!habit) return;
+        if (!habit) return;
 
-            if (!habit.completed) {
-              habit.completed = {};
-            }
+        if (!habit.completed) {
+          habit.completed = {};
+        }
 
-            habit.completed[date] =
-              !habit.completed[date];
+        habit.completed[date] =
+          !habit.completed[date];
 
-            saveData();
+        saveData();
 
-            renderHabits();
-            renderCalendar();
-            renderMonthlyRecap();
-          }
-        );
-      }
-    );
+        renderHabits();
+        renderCalendar();
+        renderMonthlyRecap();
+      });
+    });
 
   document
     .querySelectorAll(".delete-habit")
-    .forEach(
-      button => {
-        button.addEventListener(
-          "click",
-          () => {
-            const id =
-              Number(
-                button.dataset.delete
-              );
+    .forEach(button => {
+      button.addEventListener("click", () => {
+        const id =
+          Number(button.dataset.delete);
 
-            if (
-              !confirm(
-                "Supprimer cette habitude ?"
-              )
-            ) {
-              return;
-            }
+        if (
+          !confirm(
+            "Supprimer cette habitude ?"
+          )
+        ) {
+          return;
+        }
 
-            data.habits =
-              data.habits.filter(
-                habit =>
-                  habit.id !== id
-              );
+        data.habits =
+          data.habits.filter(
+            habit => habit.id !== id
+          );
 
-            if (
-              selectedCalendarHabitId === id
-            ) {
-              selectedCalendarHabitId =
-                data.habits[0]?.id ||
-                null;
-            }
+        if (
+          selectedCalendarHabitId === id
+        ) {
+          selectedCalendarHabitId =
+            data.habits[0]?.id || null;
+        }
 
-            saveData();
+        saveData();
 
-            renderHabits();
-            renderCalendarHabitSelector();
-            renderCalendar();
-            renderMonthlyRecap();
-          }
-        );
-      }
-    );
+        renderHabits();
+        renderCalendarHabitSelector();
+        renderCalendar();
+        renderMonthlyRecap();
+      });
+    });
 }
 
 /* =========================================================
@@ -827,43 +708,34 @@ function renderCalendarHabitSelector() {
       data.habits[0].id;
   }
 
-  data.habits.forEach(
-    habit => {
-      const button =
-        document.createElement(
-          "button"
-        );
+  data.habits.forEach(habit => {
+    const button =
+      document.createElement("button");
 
-      button.type = "button";
+    button.type = "button";
+    button.className =
+      "calendar-habit-tab";
 
-      button.className =
-        "calendar-habit-tab";
-
-      button.classList.toggle(
-        "selected",
-        habit.id ===
+    button.classList.toggle(
+      "selected",
+      habit.id ===
         selectedCalendarHabitId
-      );
+    );
 
-      button.textContent =
-        habit.name;
+    button.textContent = habit.name;
 
-      button.addEventListener(
-        "click",
-        () => {
-          selectedCalendarHabitId =
-            habit.id;
+    button.addEventListener("click", () => {
+      selectedCalendarHabitId =
+        habit.id;
 
-          renderCalendarHabitSelector();
-          renderCalendar();
-        }
-      );
+      renderCalendarHabitSelector();
+      renderCalendar();
+    });
 
-      calendarHabitSelector.appendChild(
-        button
-      );
-    }
-  );
+    calendarHabitSelector.appendChild(
+      button
+    );
+  });
 }
 
 /* =========================================================
@@ -914,7 +786,6 @@ function renderCalendar() {
       <strong>
         ${escapeHTML(habit.name)}
       </strong>
-
       · objectif :
       ${habit.goal}
       jour${habit.goal > 1 ? "s" : ""}
@@ -934,11 +805,7 @@ function renderCalendar() {
   calendarGrid.innerHTML = "";
 
   const firstDay =
-    new Date(
-      year,
-      month,
-      1
-    );
+    new Date(year, month, 1);
 
   let start =
     firstDay.getDay();
@@ -961,16 +828,12 @@ function renderCalendar() {
     i++
   ) {
     const empty =
-      document.createElement(
-        "div"
-      );
+      document.createElement("div");
 
     empty.className =
       "calendar-day empty";
 
-    calendarGrid.appendChild(
-      empty
-    );
+    calendarGrid.appendChild(empty);
   }
 
   for (
@@ -994,8 +857,7 @@ function renderCalendar() {
       );
 
     const isToday =
-      key ===
-      dateKey(new Date());
+      key === dateKey(new Date());
 
     const hasJournal =
       Boolean(
@@ -1003,77 +865,54 @@ function renderCalendar() {
       );
 
     const cell =
-      document.createElement(
-        "button"
-      );
+      document.createElement("button");
 
     cell.type = "button";
 
     cell.className =
       "calendar-day" +
-      (
-        completed
-          ? " has-habit"
-          : ""
-      ) +
-      (
-        isToday
-          ? " today"
-          : ""
-      ) +
-      (
-        hasJournal
-          ? " has-journal"
-          : ""
-      );
+      (completed
+        ? " has-habit"
+        : "") +
+      (isToday
+        ? " today"
+        : "") +
+      (hasJournal
+        ? " has-journal"
+        : "");
 
     cell.textContent = day;
 
-    cell.addEventListener(
-      "click",
-      () => {
-        selectedJournalDate =
-          key;
+    cell.addEventListener("click", () => {
+      selectedJournalDate = key;
 
-        showPage(
-          "journalPage"
-        );
+      showPage("journalPage");
+      loadJournals(key);
+      updateWeeklyJournalAvailability();
+    });
 
-        loadJournals(key);
-        updateWeeklyJournalAvailability();
-      }
-    );
-
-    calendarGrid.appendChild(
-      cell
-    );
+    calendarGrid.appendChild(cell);
   }
 }
 
 if (prevMonth) {
-  prevMonth.addEventListener(
-    "click",
-    () => {
-      calendarDate.setMonth(
-        calendarDate.getMonth() - 1
-      );
+  prevMonth.addEventListener("click", () => {
+    calendarDate.setMonth(
+      calendarDate.getMonth() - 1
+    );
 
-      renderCalendar();
-    }
-  );
+    renderCalendar();
+  });
 }
 
 if (nextMonth) {
-  nextMonth.addEventListener(
-    "click",
-    () => {
-      calendarDate.setMonth(
-        calendarDate.getMonth() + 1
-      );
+  nextMonth.addEventListener("click", () => {
+    calendarDate.setMonth(
+      calendarDate.getMonth() + 1
+    );
 
-      renderCalendar();
-    }
-  );
+    renderCalendar();
+  });
 }
 
 /* =========================================================
@@ -1090,8 +929,7 @@ function renderMonthlyRecap() {
     return;
   }
 
-  const now =
-    new Date();
+  const now = new Date();
 
   const year =
     now.getFullYear();
@@ -1109,69 +947,55 @@ function renderMonthlyRecap() {
   monthlyRecap.innerHTML =
     data.habits
       .slice(0, 3)
-      .map(
-        habit => {
-          if (!habit.completed) {
-            habit.completed = {};
-          }
+      .map(habit => {
+        if (!habit.completed) {
+          habit.completed = {};
+        }
 
-          let completed = 0;
+        let completed = 0;
 
-          for (
-            let day = 1;
-            day <= daysInMonth;
-            day++
-          ) {
-            const date =
-              new Date(
-                year,
-                month,
-                day
-              );
-
-            if (
-              habit.completed[
-                dateKey(date)
-              ]
-            ) {
-              completed++;
-            }
-          }
-
-          const monthlyGoal =
-            Math.round(
-              habit.goal *
-              daysInMonth /
-              7
+        for (
+          let day = 1;
+          day <= daysInMonth;
+          day++
+        ) {
+          const date =
+            new Date(
+              year,
+              month,
+              day
             );
 
-          return `
-            <div style="margin-bottom:8px">
-
-              Ce mois-ci, tu as réussi à
-
-              <strong>
-                ${escapeHTML(habit.name)}
-              </strong>
-
-              <strong>
-                ${completed}
-              </strong>
-
-              jour${completed > 1 ? "s" : ""}
-
-              sur
-
-              <strong>
-                ${monthlyGoal}
-              </strong>
-
-              fixé${monthlyGoal > 1 ? "s" : ""}.
-
-            </div>
-          `;
+          if (
+            habit.completed[
+              dateKey(date)
+            ]
+          ) {
+            completed++;
+          }
         }
-      )
+
+        const monthlyGoal =
+          Math.round(
+            habit.goal *
+              daysInMonth /
+              7
+          );
+
+        return `
+          <div style="margin-bottom:8px">
+            Ce mois-ci, tu as réussi à
+            <strong>
+              ${escapeHTML(habit.name)}
+            </strong>
+            <strong>${completed}</strong>
+            jour${completed > 1 ? "s" : ""}
+            sur
+            <strong>${monthlyGoal}</strong>
+            fixé${monthlyGoal > 1 ? "s" : ""}.
+          </div>
+        `;
+      })
       .join("");
 }
 
@@ -1189,14 +1013,12 @@ function loadDailyFeelings(
     .querySelectorAll(
       ".feeling-option input"
     )
-    .forEach(
-      input => {
-        input.checked =
-          saved?.feelings?.includes(
-            input.value
-          ) || false;
-      }
-    );
+    .forEach(input => {
+      input.checked =
+        saved?.feelings?.includes(
+          input.value
+        ) || false;
+    });
 }
 
 function updateJournalDateTitle() {
@@ -1222,7 +1044,7 @@ function updateJournalDateTitle() {
   const date =
     new Date(
       selectedJournalDate +
-      "T00:00:00"
+        "T00:00:00"
     );
 
   title.textContent =
@@ -1238,8 +1060,7 @@ function updateJournalDateTitle() {
 function loadJournals(
   date = selectedJournalDate
 ) {
-  selectedJournalDate =
-    date;
+  selectedJournalDate = date;
 
   const savedDaily =
     data.dailyJournal[date];
@@ -1258,20 +1079,29 @@ function loadJournals(
     ];
 
   if (!journal) {
-    if (positive1) positive1.value = "";
-    if (positive2) positive2.value = "";
-    if (positive3) positive3.value = "";
-    if (weeklyText) weeklyText.value = "";
+    if (positive1) {
+      positive1.value = "";
+    }
+
+    if (positive2) {
+      positive2.value = "";
+    }
+
+    if (positive3) {
+      positive3.value = "";
+    }
+
+    if (weeklyText) {
+      weeklyText.value = "";
+    }
 
     document
       .querySelectorAll(
         '[data-category="positiveChoices"], [data-category="negativeChoices"]'
       )
-      .forEach(
-        input => {
-          input.checked = false;
-        }
-      );
+      .forEach(input => {
+        input.checked = false;
+      });
 
     return;
   }
@@ -1300,17 +1130,15 @@ function loadJournals(
     .querySelectorAll(
       '[data-category="positiveChoices"], [data-category="negativeChoices"]'
     )
-    .forEach(
-      input => {
-        const category =
-          input.dataset.category;
+    .forEach(input => {
+      const category =
+        input.dataset.category;
 
-        input.checked =
-          journal[category]?.includes(
-            input.value
-          ) || false;
-      }
-    );
+      input.checked =
+        journal[category]?.includes(
+          input.value
+        ) || false;
+    });
 }
 
 /* =========================================================
@@ -1318,44 +1146,37 @@ function loadJournals(
 ========================================================= */
 
 if (saveDaily) {
-  saveDaily.addEventListener(
-    "click",
-    () => {
-      const date =
-        selectedJournalDate;
+  saveDaily.addEventListener("click", () => {
+    const date =
+      selectedJournalDate;
 
-      const feelings =
-        [
-          ...document.querySelectorAll(
-            ".feeling-option input:checked"
-          )
-        ].map(
-          input =>
-            input.value
-        );
-
-      data.dailyJournal[date] = {
-        feelings,
-        text:
-          dailyJournal?.value || ""
-      };
-
-      saveData();
-
-      saveDaily.textContent =
-        "Enregistré ✓";
-
-      setTimeout(
-        () => {
-          saveDaily.textContent =
-            "Enregistrer";
-        },
-        1500
+    const feelings =
+      [
+        ...document.querySelectorAll(
+          ".feeling-option input:checked"
+        )
+      ].map(
+        input => input.value
       );
 
-      renderCalendar();
-    }
-  );
+    data.dailyJournal[date] = {
+      feelings,
+      text:
+        dailyJournal?.value || ""
+    };
+
+    saveData();
+
+    saveDaily.textContent =
+      "Enregistré ✓";
+
+    setTimeout(() => {
+      saveDaily.textContent =
+        "Enregistrer";
+    }, 1500);
+
+    renderCalendar();
+  });
 }
 
 /* =========================================================
@@ -1411,18 +1232,14 @@ function renderChoiceLists() {
       .map(
         (option, index) => `
           <label class="choice">
-
             <input
               type="checkbox"
               data-category="positiveChoices"
               value="${escapeHTML(option)}"
             >
-
             <span>
-              ${index + 1}.
-              ${escapeHTML(option)}
+              ${index + 1}. ${escapeHTML(option)}
             </span>
-
           </label>
         `
       )
@@ -1433,18 +1250,14 @@ function renderChoiceLists() {
       .map(
         (option, index) => `
           <label class="choice">
-
             <input
               type="checkbox"
               data-category="negativeChoices"
               value="${escapeHTML(option)}"
             >
-
             <span>
-              ${index + 1}.
-              ${escapeHTML(option)}
+              ${index + 1}. ${escapeHTML(option)}
             </span>
-
           </label>
         `
       )
@@ -1452,8 +1265,7 @@ function renderChoiceLists() {
 }
 
 function isWeeklyJournalAvailable() {
-  const now =
-    new Date();
+  const now = new Date();
 
   const day =
     now.getDay();
@@ -1521,76 +1333,65 @@ function getWeekKey() {
 }
 
 if (saveWeekly) {
-  saveWeekly.addEventListener(
-    "click",
-    () => {
-      if (
-        !isWeeklyJournalAvailable()
-      ) {
-        return;
-      }
-
-      if (
-        !positive1?.value.trim() ||
-        !positive2?.value.trim() ||
-        !positive3?.value.trim()
-      ) {
-        alert(
-          "Il manque encore une des trois choses positives de ta semaine."
-        );
-
-        return;
-      }
-
-      const positiveChoices =
-        [
-          ...document.querySelectorAll(
-            '[data-category="positiveChoices"]:checked'
-          )
-        ].map(
-          input =>
-            input.value
-        );
-
-      const negativeChoices =
-        [
-          ...document.querySelectorAll(
-            '[data-category="negativeChoices"]:checked'
-          )
-        ].map(
-          input =>
-            input.value
-        );
-
-      data.weeklyJournals[
-        getWeekKey()
-      ] = {
-        positiveChoices,
-        negativeChoices,
-        positive1:
-          positive1.value,
-        positive2:
-          positive2.value,
-        positive3:
-          positive3.value,
-        text:
-          weeklyText?.value || ""
-      };
-
-      saveData();
-
-      saveWeekly.textContent =
-        "Bilan enregistré ✓";
-
-      setTimeout(
-        () => {
-          saveWeekly.textContent =
-            "Enregistrer mon bilan";
-        },
-        1800
-      );
+  saveWeekly.addEventListener("click", () => {
+    if (
+      !isWeeklyJournalAvailable()
+    ) {
+      return;
     }
-  );
+
+    if (
+      !positive1?.value.trim() ||
+      !positive2?.value.trim() ||
+      !positive3?.value.trim()
+    ) {
+      alert(
+        "Il manque encore une des trois choses positives de ta semaine."
+      );
+
+      return;
+    }
+
+    const positiveChoices =
+      [
+        ...document.querySelectorAll(
+          '[data-category="positiveChoices"]:checked'
+        )
+      ].map(
+        input => input.value
+      );
+
+    const negativeChoices =
+      [
+        ...document.querySelectorAll(
+          '[data-category="negativeChoices"]:checked'
+        )
+      ].map(
+        input => input.value
+      );
+
+    data.weeklyJournals[
+      getWeekKey()
+    ] = {
+      positiveChoices,
+      negativeChoices,
+      positive1: positive1.value,
+      positive2: positive2.value,
+      positive3: positive3.value,
+      text:
+        weeklyText?.value || ""
+    };
+
+    saveData();
+
+    saveWeekly.textContent =
+      "Bilan enregistré ✓";
+
+    setTimeout(() => {
+      saveWeekly.textContent =
+        "Enregistrer mon bilan";
+    }, 1800);
+  });
 }
 
 /* =========================================================
@@ -1603,16 +1404,12 @@ function generateCode() {
 
   let code = "";
 
-  for (
-    let i = 0;
-    i < 6;
-    i++
-  ) {
+  for (let i = 0; i < 6; i++) {
     code +=
       characters[
         Math.floor(
           Math.random() *
-          characters.length
+            characters.length
         )
       ];
   }
@@ -1621,63 +1418,54 @@ function generateCode() {
 }
 
 if (generateDuo) {
-  generateDuo.addEventListener(
-    "click",
-    () => {
-      const code =
-        generateCode();
+  generateDuo.addEventListener("click", () => {
+    const code =
+      generateCode();
 
-      data.duo = {
-        code,
-        status: "waiting"
-      };
+    data.duo = {
+      code,
+      status: "waiting"
+    };
 
-      saveData();
-      renderDuo();
-    }
-  );
+    saveData();
+    renderDuo();
+  });
 }
 
 if (joinDuo) {
-  joinDuo.addEventListener(
-    "click",
-    () => {
-      const code =
-        duoCodeInput
-          ? duoCodeInput.value
-              .trim()
-              .toUpperCase()
-          : "";
+  joinDuo.addEventListener("click", () => {
+    const code =
+      duoCodeInput
+        ? duoCodeInput.value
+            .trim()
+            .toUpperCase()
+        : "";
 
-      if (code.length !== 6) {
-        alert(
-          "Le code doit contenir 6 caractères."
-        );
+    if (code.length !== 6) {
+      alert(
+        "Le code doit contenir 6 caractères."
+      );
 
-        return;
-      }
-
-      data.duo = {
-        code,
-        status: "connected"
-      };
-
-      saveData();
-      renderDuo();
+      return;
     }
-  );
+
+    data.duo = {
+      code,
+      status: "connected"
+    };
+
+    saveData();
+    renderDuo();
+  });
 }
 
 if (leaveDuo) {
-  leaveDuo.addEventListener(
-    "click",
-    () => {
-      data.duo = null;
+  leaveDuo.addEventListener("click", () => {
+    data.duo = null;
 
-      saveData();
-      renderDuo();
-    }
-  );
+    saveData();
+    renderDuo();
+  });
 }
 
 function renderDuo() {
@@ -1771,26 +1559,11 @@ function updateNotificationToggle() {
 
 function escapeHTML(value) {
   return String(value)
-    .replaceAll(
-      "&",
-      "&amp;"
-    )
-    .replaceAll(
-      "<",
-      "&lt;"
-    )
-    .replaceAll(
-      ">",
-      "&gt;"
-    )
-    .replaceAll(
-      '"',
-      "&quot;"
-    )
-    .replaceAll(
-      "'",
-      "&#039;"
-    );
+    .replaceAll("&", "&amp;")
+    .replaceAll("<", "&lt;")
+    .replaceAll(">", "&gt;")
+    .replaceAll('"', "&quot;")
+    .replaceAll("'", "&#039;");
 }
 
 /* =========================================================
@@ -1826,6 +1599,9 @@ function initialize() {
     );
     renderDuo();
 
+    console.log(
+      "Alizeti initialisée correctement."
+    );
   } catch (error) {
     console.error(
       "Erreur pendant l'initialisation d'Alizeti :",
