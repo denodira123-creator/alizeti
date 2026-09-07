@@ -270,6 +270,68 @@
 
       </div>
 
+      <div class="calendar-legend">
+
+        <span class="legend-dot journal-dot"></span>
+
+        <span>Journal rempli ce jour-là</span>
+
+      </div>
+
+
+      <!-- Journal du jour sélectionné dans le calendrier -->
+
+      <div
+        id="calendarJournalSection"
+        class="journal-card calendar-journal-card hidden"
+      >
+
+        <div class="journal-card-header">
+
+          <div>
+
+            <p class="eyebrow">
+              JOURNAL DE CE JOUR
+            </p>
+
+            <h2 id="calendarJournalTitle"></h2>
+
+          </div>
+
+          <span class="journal-icon">
+            ✎
+          </span>
+
+        </div>
+
+
+        <p
+          id="calendarJournalStatus"
+          class="soft-text calendar-journal-status hidden"
+        ></p>
+
+
+        <div
+          id="calendarFeelingGrid"
+          class="feeling-grid"
+        ></div>
+
+
+        <textarea
+          id="calendarJournalText"
+          placeholder="Écris ce que tu veux, si tu en as envie..."
+        ></textarea>
+
+
+        <button
+          id="calendarSaveDaily"
+          class="primary-button"
+        >
+          Enregistrer
+        </button>
+
+      </div>
+
     </section>
 
 
