@@ -1731,7 +1731,6 @@ function renderCalendar() {
 
 
 
-
     const cell =
 
       document.createElement("button");
@@ -2118,6 +2117,7 @@ function updateJournalDateTitle() {
 
 
 
+
 function getWeekKeyForDate(date) {
   return dateKey(getMonday(date));
 }
@@ -2151,7 +2151,6 @@ function loadWeeklyJournal(weekKey = selectedWeeklyWeekKey) {
   const currentWeekKey = getWeekKeyForDate(new Date());
   const isCurrentWeek = weekKey === currentWeekKey;
   const isFuture = weekKey > currentWeekKey;
-
   const canEdit =
     Boolean(journal) ||
     (isCurrentWeek && isWeeklyJournalAvailable());
@@ -2188,9 +2187,11 @@ function loadWeeklyJournal(weekKey = selectedWeeklyWeekKey) {
         ? "Ton bilan de la semaine est ouvert."
         : "Le bilan s'ouvre dimanche à 19h et reste disponible jusqu'au lundi soir.";
     } else if (isFuture) {
-      weeklyAvailability.textContent = "Cette semaine n'est pas encore disponible.";
+      weeklyAvailability.textContent =
+        "Cette semaine n'est pas encore disponible.";
     } else {
-      weeklyAvailability.textContent = "Aucun bilan enregistré pour cette semaine.";
+      weeklyAvailability.textContent =
+        "Aucun bilan enregistré pour cette semaine.";
     }
   }
 
@@ -2219,553 +2220,111 @@ function loadWeeklyJournal(weekKey = selectedWeeklyWeekKey) {
 }
 
 function loadJournals(
-
   date = selectedJournalDate
-
 ) {
-
   selectedJournalDate = date;
 
-
-
   const savedDaily =
-
     data.dailyJournal[date];
 
-
-
   if (dailyJournal) {
-
     dailyJournal.value =
-
       savedDaily?.text || "";
-
   }
-
-
 
   loadDailyFeelings(date);
-
   updateJournalDateTitle();
-
-
-
-  const journal =
-
-    data.weeklyJournals[
-
-      getWeekKey()
-
-    ];
-
-
-
-  if (!journal) {
-
-    if (positive1) {
-
-      positive1.value = "";
-
-    }
-
-
-
-    if (positive2) {
-
-      positive2.value = "";
-
-    }
-
-
-
-    if (positive3) {
-
-      positive3.value = "";
-
-    }
-
-
-
-    if (weeklyText) {
-
-      weeklyText.value = "";
-
-    }
-
-
-
-    document
-
-      .querySelectorAll(
-
-        '[data-category="positiveChoices"], [data-category="negativeChoices"]'
-
-      )
-
-      .forEach(input => {
-
-        input.checked = false;
-
-      });
-
-
-
-    return;
-
-  }
-
-
-
-  if (positive1) {
-
-    positive1.value =
-
-      journal.positive1 || "";
-
-  }
-
-
-
-  if (positive2) {
-
-    positive2.value =
-
-      journal.positive2 || "";
-
-  }
-
-
-
-  if (positive3) {
-
-    positive3.value =
-
-      journal.positive3 || "";
-
-  }
-
-
-
-  if (weeklyText) {
-
-    weeklyText.value =
-
-      journal.text || "";
-
-  }
-
-
-
-  document
-
-    .querySelectorAll(
-
-      '[data-category="positiveChoices"], [data-category="negativeChoices"]'
-
-    )
-
-    .forEach(input => {
-
-      const category =
-
-        input.dataset.category;
-
-
-
-      input.checked =
-
-        journal[category]?.includes(
-
-          input.value
-
-        ) || false;
-
-    });
-
+  updateJournalDateNavigation();
+
+  selectedWeeklyWeekKey =
+    getWeekKeyForDate(
+      new Date(date + "T00:00:00")
+    );
+
+  loadWeeklyJournal(
+    selectedWeeklyWeekKey
+  );
 }
 
 
 
-/* =========================================================
 
-   ENREGISTREMENT JOURNAL
+function updateJournalDateTitle() {
+  if (!dailyJournalTitle) return;
 
-========================================================= */
+  const today = dateKey(new Date());
 
-
-
-if (saveDaily) {
-
-  saveDaily.addEventListener("click", () => {
-
-    const date =
-
-      selectedJournalDate;
-
-
-
-    const feelings =
-
-      [
-
-        ...document.querySelectorAll(
-
-          ".feeling-option input:checked"
-
-        )
-
-      ].map(
-
-        input => input.value
-
-      );
-
-
-
-    data.dailyJournal[date] = {
-
-      feelings,
-
-      text:
-
-        dailyJournal?.value || ""
-
-    };
-
-
-
-    saveData();
-
-
-
-    saveDaily.textContent =
-
-      "Enregistré ✓";
-
-
-
-    setTimeout(() => {
-
-      saveDaily.textContent =
-
-        "Enregistrer";
-
-    }, 1500);
-
-
-
-    renderCalendar();
-
-  });
-
-}
-
-
-
-/* =========================================================
-
-   BILAN HEBDOMADAIRE
-
-========================================================= */
-
-
-
-const positiveOptions = [
-
-  "Je me suis bien senti·e",
-
-  "J'ai pris du temps pour moi",
-
-  "J'ai bien dormi",
-
-  "J'ai fait quelque chose que j'aime",
-
-  "J'ai été fier·ère de moi",
-
-  "J'ai passé du temps avec quelqu'un",
-
-  "J'ai avancé sur un projet",
-
-  "J'ai pris soin de moi",
-
-  "J'ai découvert quelque chose",
-
-  "Autre"
-
-];
-
-
-
-const negativeOptions = [
-
-  "Fatigue",
-
-  "Manque de temps",
-
-  "Stress",
-
-  "Manque de motivation",
-
-  "Sommeil difficile",
-
-  "Trop de choses à gérer",
-
-  "Difficulté à m'organiser",
-
-  "Baisse d'énergie",
-
-  "Imprévu",
-
-  "Autre"
-
-];
-
-
-
-function renderChoiceLists() {
-
-  const positiveContainer =
-
-    document.getElementById(
-
-      "positiveChoices"
-
-    );
-
-
-
-  const negativeContainer =
-
-    document.getElementById(
-
-      "negativeChoices"
-
-    );
-
-
-
-  if (
-
-    !positiveContainer ||
-
-    !negativeContainer
-
-  ) {
-
-    return;
-
-  }
-
-
-
-  positiveContainer.innerHTML =
-
-    positiveOptions
-
-      .map(
-
-        (option, index) => `
-
-          <label class="choice">
-
-            <input
-
-              type="checkbox"
-
-              data-category="positiveChoices"
-
-              value="${escapeHTML(option)}"
-
-            >
-
-            <span>
-
-              ${index + 1}. ${escapeHTML(option)}
-
-            </span>
-
-          </label>
-
-        `
-
-      )
-
-      .join("");
-
-
-
-  negativeContainer.innerHTML =
-
-    negativeOptions
-
-      .map(
-
-        (option, index) => `
-
-          <label class="choice">
-
-            <input
-
-              type="checkbox"
-
-              data-category="negativeChoices"
-
-              value="${escapeHTML(option)}"
-
-            >
-
-            <span>
-
-              ${index + 1}. ${escapeHTML(option)}
-
-            </span>
-
-          </label>
-
-        `
-
-      )
-
-      .join("");
-
-}
-
-
-
-function isWeeklyJournalAvailable() {
-
-  const now = new Date();
-
-
-
-  const day =
-
-    now.getDay();
-
-
-
-  const hour =
-
-    now.getHours();
-
-
-
-  if (
-
-    day === 0 &&
-
-    hour >= 19
-
-  ) {
-
-    return true;
-
-  }
-
-
-
-  if (day === 1) {
-
-    return true;
-
-  }
-
-
-
-  return false;
-
-}
-
-
-
-function updateWeeklyJournalAvailability() {
-
-  if (
-
-    !weeklyContent ||
-
-    !weeklyJournalCard
-
-  ) {
-
-    return;
-
-  }
-
-
-
-  if (
-
-    isWeeklyJournalAvailable()
-
-  ) {
-
-    weeklyContent.classList.remove(
-
-      "hidden"
-
-    );
-
-
-
-    weeklyJournalCard.classList.remove(
-
-      "locked"
-
-    );
-
-
-
-    if (weeklyAvailability) {
-
-      weeklyAvailability.textContent =
-
-        "Ton bilan de la semaine est ouvert.";
-
-    }
-
+  if (selectedJournalDate === today) {
+    dailyJournalTitle.textContent = "Comment te sens-tu ?";
   } else {
-
-    weeklyContent.classList.add(
-
-      "hidden"
-
+    const date = new Date(
+      selectedJournalDate + "T00:00:00"
     );
 
-
-
-    weeklyJournalCard.classList.add(
-
-      "locked"
-
-    );
-
-
-
-    if (weeklyAvailability) {
-
-      weeklyAvailability.textContent =
-
-        "Le bilan s'ouvre dimanche à 19h et reste disponible jusqu'au lundi soir.";
-
-    }
-
+    dailyJournalTitle.textContent =
+      `Journal du ${date.toLocaleDateString("fr-FR", {
+        day: "numeric",
+        month: "long"
+      })}`;
   }
-
 }
 
+function updateJournalDateNavigation() {
+  if (journalDateLabel) {
+    const today = dateKey(new Date());
+    const date = new Date(
+      selectedJournalDate + "T00:00:00"
+    );
 
+    journalDateLabel.textContent =
+      selectedJournalDate === today
+        ? "Aujourd'hui"
+        : date.toLocaleDateString("fr-FR", {
+            weekday: "short",
+            day: "numeric",
+            month: "short"
+          });
+  }
 
-function getWeekKey() {
+  if (nextJournalDay) {
+    nextJournalDay.disabled =
+      selectedJournalDate >= dateKey(new Date());
+  }
+}
 
-  return dateKey(
-
-    getMonday()
-
+function shiftJournalDay(amount) {
+  const current = new Date(
+    selectedJournalDate + "T00:00:00"
   );
 
+  current.setDate(
+    current.getDate() + amount
+  );
+
+  const today = new Date();
+  today.setHours(0, 0, 0, 0);
+
+  if (current > today) return;
+
+  loadJournals(dateKey(current));
 }
 
+
+if (prevJournalDay) {
+  prevJournalDay.addEventListener("click", () => {
+    shiftJournalDay(-1);
+  });
+}
+
+if (nextJournalDay) {
+  nextJournalDay.addEventListener("click", () => {
+    shiftJournalDay(1);
+  });
+}
+
+function updateWeeklyJournalAvailability() {
+  loadWeeklyJournal(selectedWeeklyWeekKey);
+}
 
 
 if (prevWeekly) {
@@ -2781,585 +2340,63 @@ if (nextWeekly) {
 }
 
 if (saveWeekly) {
-
   saveWeekly.addEventListener("click", () => {
+    const currentWeekKey =
+      getWeekKeyForDate(new Date());
+
+    const existingJournal =
+      data.weeklyJournals[selectedWeeklyWeekKey];
+
+    const canEdit =
+      Boolean(existingJournal) ||
+      (
+        selectedWeeklyWeekKey === currentWeekKey &&
+        isWeeklyJournalAvailable()
+      );
+
+    if (!canEdit) return;
 
     if (
-
-      !isWeeklyJournalAvailable()
-
-    ) {
-
-      return;
-
-    }
-
-
-
-    if (
-
       !positive1?.value.trim() ||
-
       !positive2?.value.trim() ||
-
       !positive3?.value.trim()
-
     ) {
-
       alert(
-
         "Il manque encore une des trois choses positives de ta semaine."
-
       );
-
-
-
       return;
-
     }
 
+    const positiveChoices = [
+      ...document.querySelectorAll(
+        '[data-category="positiveChoices"]:checked'
+      )
+    ].map(input => input.value);
 
+    const negativeChoices = [
+      ...document.querySelectorAll(
+        '[data-category="negativeChoices"]:checked'
+      )
+    ].map(input => input.value);
 
-    const positiveChoices =
-
-      [
-
-        ...document.querySelectorAll(
-
-          '[data-category="positiveChoices"]:checked'
-
-        )
-
-      ].map(
-
-        input => input.value
-
-      );
-
-
-
-    const negativeChoices =
-
-      [
-
-        ...document.querySelectorAll(
-
-          '[data-category="negativeChoices"]:checked'
-
-        )
-
-      ].map(
-
-        input => input.value
-
-      );
-
-
-
-    data.weeklyJournals[
-
-      getWeekKey()
-
-    ] = {
-
+    data.weeklyJournals[selectedWeeklyWeekKey] = {
       positiveChoices,
-
       negativeChoices,
-
       positive1: positive1.value,
-
       positive2: positive2.value,
-
       positive3: positive3.value,
-
-      text:
-
-        weeklyText?.value || ""
-
+      text: weeklyText?.value || ""
     };
 
-
-
     saveData();
-
-
+    loadWeeklyJournal(selectedWeeklyWeekKey);
 
     saveWeekly.textContent =
-
       "Bilan enregistré ✓";
 
-
-
     setTimeout(() => {
-
       saveWeekly.textContent =
-
         "Enregistrer mon bilan";
-
     }, 1800);
-
   });
-
-}
-
-
-
-/* =========================================================
-
-   MODE DUO
-
-========================================================= */
-
-
-
-function generateCode() {
-
-  const characters =
-
-    "ABCDEFGHJKLMNPQRSTUVWXYZ23456789";
-
-
-
-  let code = "";
-
-
-
-  for (let i = 0; i < 6; i++) {
-
-    code +=
-
-      characters[
-
-        Math.floor(
-
-          Math.random() *
-
-            characters.length
-
-        )
-
-      ];
-
-  }
-
-
-
-  return code;
-
-}
-
-
-
-if (generateDuo) {
-
-  generateDuo.addEventListener("click", () => {
-
-    const code =
-
-      generateCode();
-
-
-
-    data.duo = {
-
-      code,
-
-      status: "waiting"
-
-    };
-
-
-
-    saveData();
-
-    renderDuo();
-
-  });
-
-}
-
-
-
-if (joinDuo) {
-
-  joinDuo.addEventListener("click", () => {
-
-    const code =
-
-      duoCodeInput
-
-        ? duoCodeInput.value
-
-            .trim()
-
-            .toUpperCase()
-
-        : "";
-
-
-
-    if (code.length !== 6) {
-
-      alert(
-
-        "Le code doit contenir 6 caractères."
-
-      );
-
-
-
-      return;
-
-    }
-
-
-
-    data.duo = {
-
-      code,
-
-      status: "connected"
-
-    };
-
-
-
-    saveData();
-
-    renderDuo();
-
-  });
-
-}
-
-
-
-if (leaveDuo) {
-
-  leaveDuo.addEventListener("click", () => {
-
-    data.duo = null;
-
-
-
-    saveData();
-
-    renderDuo();
-
-  });
-
-}
-
-
-
-function renderDuo() {
-
-  if (
-
-    !duoDisconnected ||
-
-    !duoConnected
-
-  ) {
-
-    return;
-
-  }
-
-
-
-  if (!data.duo) {
-
-    duoDisconnected.classList.remove(
-
-      "hidden"
-
-    );
-
-
-
-    duoConnected.classList.add(
-
-      "hidden"
-
-    );
-
-
-
-    return;
-
-  }
-
-
-
-  duoDisconnected.classList.add(
-
-    "hidden"
-
-  );
-
-
-
-  duoConnected.classList.remove(
-
-    "hidden"
-
-  );
-
-
-
-  if (duoCodeDisplay) {
-
-    duoCodeDisplay.textContent =
-
-      `Code : ${data.duo.code}`;
-
-  }
-
-}
-
-
-
-/* =========================================================
-
-   NOTIFICATIONS
-
-========================================================= */
-
-
-
-if (notificationToggle) {
-
-  notificationToggle.addEventListener(
-
-    "click",
-
-    async () => {
-
-      data.notifications =
-
-        !data.notifications;
-
-
-
-      if (
-
-        data.notifications &&
-
-        "Notification" in window
-
-      ) {
-
-        try {
-
-          const permission =
-
-            await Notification.requestPermission();
-
-
-
-          if (
-
-            permission !== "granted"
-
-          ) {
-
-            data.notifications =
-
-              false;
-
-          }
-
-        } catch (error) {
-
-          console.error(
-
-            "Erreur notifications :",
-
-            error
-
-          );
-
-
-
-          data.notifications =
-
-            false;
-
-        }
-
-      }
-
-
-
-      saveData();
-
-      updateNotificationToggle();
-
-    }
-
-  );
-
-}
-
-
-
-function updateNotificationToggle() {
-
-  if (!notificationToggle) return;
-
-
-
-  notificationToggle.classList.toggle(
-
-    "on",
-
-    data.notifications
-
-  );
-
-}
-
-
-
-/* =========================================================
-
-   SECURITE
-
-========================================================= */
-
-
-
-function escapeHTML(value) {
-
-  return String(value)
-
-    .replaceAll("&", "&amp;")
-
-    .replaceAll("<", "&lt;")
-
-    .replaceAll(">", "&gt;")
-
-    .replaceAll('"', "&quot;")
-
-    .replaceAll("'", "&#039;");
-
-}
-
-
-
-/* =========================================================
-
-   INITIALISATION
-
-========================================================= */
-
-
-
-function initialize() {
-
-  try {
-
-    const monday =
-
-      getMonday();
-
-
-
-    const sunday =
-
-      getSunday();
-
-
-
-    if (weekDates) {
-
-      weekDates.textContent =
-
-        `${formatShortDate(monday)} — ${formatShortDate(sunday)}`;
-
-    }
-
-
-
-    selectedJournalDate =
-
-      dateKey(new Date());
-
-
-
-    renderWelcome();
-
-    renderChoiceLists();
-
-    renderHabits();
-
-    renderCalendarHabitSelector();
-
-    renderCalendar();
-
-    renderMonthlyRecap();
-
-    updateNotificationToggle();
-
-    updateWeeklyJournalAvailability();
-
-    loadJournals(
-
-      selectedJournalDate
-
-    );
-
-    renderDuo();
-
-
-
-    console.log(
-
-      "Alizeti initialisée correctement."
-
-    );
-
-  } catch (error) {
-
-    console.error(
-
-      "Erreur pendant l'initialisation d'Alizeti :",
-
-      error
-
-    );
-
-  }
-
-}
-
-
-
-/* =========================================================
-
-   LANCEMENT
-
-========================================================= */
-
-
-
-if (
-
-  document.readyState === "loading"
-
-) {
-
-  document.addEventListener(
-
-    "DOMContentLoaded",
-
-    initialize
-
-  );
-
-} else {
-
-  initialize();
-
 }
