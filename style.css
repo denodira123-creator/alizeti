@@ -754,6 +754,10 @@ textarea {
   line-height: 1.6;
 }
 
+#dailyJournal {
+  margin-bottom: 18px;
+}
+
 input,
 select {
   padding: 13px;
