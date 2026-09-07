@@ -1,2358 +1,1535 @@
 const STORAGE_KEY = "alizeti_v02";
 
-let data = JSON.parse(
-  localStorage.getItem(STORAGE_KEY)
-) || {
-  habits: [],
-  dailyJournal: {},
-  weeklyJournals: {},
-  notifications: false,
-  userName: "",
-  duo: null
+/* =========================================================
+DONNÉES
+========================================================= */
+
+const defaultData = {
+habits: [],
+dailyJournal: {},
+weeklyJournals: {},
+notifications: false,
+userName: "",
+duo: null
 };
 
+let data;
+
+try {
+const saved = localStorage.getItem(STORAGE_KEY);
+data = saved ? JSON.parse(saved) : structuredClone(defaultData);
+} catch (error) {
+console.error("Erreur lors du chargement des données :", error);
+data = structuredClone(defaultData);
+}
+
+data.habits = Array.isArray(data.habits) ? data.habits : [];
+data.dailyJournal =
+data.dailyJournal && typeof data.dailyJournal === "object"
+? data.dailyJournal
+: {};
+data.weeklyJournals =
+data.weeklyJournals && typeof data.weeklyJournals === "object"
+? data.weeklyJournals
+: {};
 
 /* =========================================================
-   SAUVEGARDE
-   ========================================================= */
+SAUVEGARDE
+========================================================= */
 
 function saveData() {
-
-  localStorage.setItem(
-    STORAGE_KEY,
-    JSON.stringify(data)
-  );
-
+try {
+localStorage.setItem(
+STORAGE_KEY,
+JSON.stringify(data)
+);
+} catch (error) {
+console.error("Impossible de sauvegarder les données :", error);
+}
 }
 
-
 /* =========================================================
-   ELEMENTS
-   ========================================================= */
+ELEMENTS
+========================================================= */
 
-const pages =
-  document.querySelectorAll(".page");
+const pages = document.querySelectorAll(".page");
+const navItems = document.querySelectorAll(".nav-item");
 
-const navItems =
-  document.querySelectorAll(".nav-item");
+const settingsBtn = document.getElementById("settingsBtn");
 
-const settingsBtn =
-  document.getElementById("settingsBtn");
+const addHabitBtn = document.getElementById("addHabitBtn");
+const habitModal = document.getElementById("habitModal");
+const closeModal = document.getElementById("closeModal");
+const habitName = document.getElementById("habitName");
+const saveHabitBtn = document.getElementById("saveHabit");
+const goalButtons = document.querySelectorAll(".goal-options button");
 
-const addHabitBtn =
-  document.getElementById("addHabitBtn");
+const habitsList = document.getElementById("habitsList");
+const weekDates = document.getElementById("weekDates");
+const welcomeName = document.getElementById("welcomeName");
 
-const habitModal =
-  document.getElementById("habitModal");
-
-const closeModal =
-  document.getElementById("closeModal");
-
-const habitName =
-  document.getElementById("habitName");
-
-const saveHabitBtn =
-  document.getElementById("saveHabit");
-
-const goalButtons =
-  document.querySelectorAll(
-    ".goal-options button"
-  );
-
-const habitsList =
-  document.getElementById("habitsList");
-
-const weekDates =
-  document.getElementById("weekDates");
-
-const welcomeName =
-  document.getElementById("welcomeName");
-
-const calendarTitle =
-  document.getElementById("calendarTitle");
-
-const calendarGrid =
-  document.getElementById("calendarGrid");
-
+const calendarTitle = document.getElementById("calendarTitle");
+const calendarGrid = document.getElementById("calendarGrid");
 const calendarHabitSelector =
-  document.getElementById(
-    "calendarHabitSelector"
-  );
-
+document.getElementById("calendarHabitSelector");
 const calendarHabitInfo =
-  document.getElementById(
-    "calendarHabitInfo"
-  );
+document.getElementById("calendarHabitInfo");
 
-const dailyJournal =
-  document.getElementById(
-    "dailyJournal"
-  );
+const prevMonth = document.getElementById("prevMonth");
+const nextMonth = document.getElementById("nextMonth");
 
-const saveDaily =
-  document.getElementById(
-    "saveDaily"
-  );
+const dailyJournal = document.getElementById("dailyJournal");
+const saveDaily = document.getElementById("saveDaily");
 
 const weeklyJournalCard =
-  document.getElementById(
-    "weeklyJournalCard"
-  );
-
+document.getElementById("weeklyJournalCard");
 const weeklyAvailability =
-  document.getElementById(
-    "weeklyAvailability"
-  );
-
+document.getElementById("weeklyAvailability");
 const weeklyContent =
-  document.getElementById(
-    "weeklyContent"
-  );
+document.getElementById("weeklyContent");
 
-const positive1 =
-  document.getElementById(
-    "positive1"
-  );
+const positive1 = document.getElementById("positive1");
+const positive2 = document.getElementById("positive2");
+const positive3 = document.getElementById("positive3");
+const weeklyText = document.getElementById("weeklyText");
+const saveWeekly = document.getElementById("saveWeekly");
 
-const positive2 =
-  document.getElementById(
-    "positive2"
-  );
-
-const positive3 =
-  document.getElementById(
-    "positive3"
-  );
-
-const weeklyText =
-  document.getElementById(
-    "weeklyText"
-  );
-
-const saveWeekly =
-  document.getElementById(
-    "saveWeekly"
-  );
-
-const monthlyRecap =
-  document.getElementById(
-    "monthlyRecap"
-  );
+const monthlyRecap = document.getElementById("monthlyRecap");
 
 const notificationToggle =
-  document.getElementById(
-    "notificationToggle"
-  );
+document.getElementById("notificationToggle");
 
-const userName =
-  document.getElementById(
-    "userName"
-  );
+const userName = document.getElementById("userName");
+const saveName = document.getElementById("saveName");
 
-const saveName =
-  document.getElementById(
-    "saveName"
-  );
-
-const generateDuo =
-  document.getElementById(
-    "generateDuo"
-  );
-
-const joinDuo =
-  document.getElementById(
-    "joinDuo"
-  );
-
-const duoCodeInput =
-  document.getElementById(
-    "duoCodeInput"
-  );
-
-const duoDisconnected =
-  document.getElementById(
-    "duoDisconnected"
-  );
-
-const duoConnected =
-  document.getElementById(
-    "duoConnected"
-  );
-
-const duoCodeDisplay =
-  document.getElementById(
-    "duoCodeDisplay"
-  );
-
-const leaveDuo =
-  document.getElementById(
-    "leaveDuo"
-  );
-
+const generateDuo = document.getElementById("generateDuo");
+const joinDuo = document.getElementById("joinDuo");
+const duoCodeInput = document.getElementById("duoCodeInput");
+const duoDisconnected = document.getElementById("duoDisconnected");
+const duoConnected = document.getElementById("duoConnected");
+const duoCodeDisplay = document.getElementById("duoCodeDisplay");
+const leaveDuo = document.getElementById("leaveDuo");
 
 /* =========================================================
-   ETAT
-   ========================================================= */
+ETAT
+========================================================= */
 
 let selectedGoal = 3;
-
 let selectedCalendarHabitId = null;
-
 let calendarDate = new Date();
-
-/*
-   Date actuellement consultée dans le journal.
-   Par défaut : aujourd'hui.
-*/
-let selectedJournalDate =
-  dateKey(new Date());
-
+let selectedJournalDate = dateKey(new Date());
 
 /* =========================================================
-   DATES
-   ========================================================= */
+DATES
+========================================================= */
 
 const dayNames = [
-  "L",
-  "M",
-  "M",
-  "J",
-  "V",
-  "S",
-  "D"
+"L",
+"M",
+"M",
+"J",
+"V",
+"S",
+"D"
 ];
-
 
 const monthNames = [
-  "Janvier",
-  "Février",
-  "Mars",
-  "Avril",
-  "Mai",
-  "Juin",
-  "Juillet",
-  "Août",
-  "Septembre",
-  "Octobre",
-  "Novembre",
-  "Décembre"
+"Janvier",
+"Février",
+"Mars",
+"Avril",
+"Mai",
+"Juin",
+"Juillet",
+"Août",
+"Septembre",
+"Octobre",
+"Novembre",
+"Décembre"
 ];
 
-
 function dateKey(date) {
-
-  return [
-    date.getFullYear(),
-
-    String(
-      date.getMonth() + 1
-    ).padStart(2, "0"),
-
-    String(
-      date.getDate()
-    ).padStart(2, "0")
-
-  ].join("-");
-
+return [
+date.getFullYear(),
+String(date.getMonth() + 1).padStart(2, "0"),
+String(date.getDate()).padStart(2, "0")
+].join("-");
 }
 
+function getMonday(date = new Date()) {
+const d = new Date(date);
+const day = d.getDay();
 
-function getMonday(
-  date = new Date()
-) {
+const diff = day === 0 ? -6 : 1 - day;
 
-  const d =
-    new Date(date);
+d.setDate(d.getDate() + diff);
 
-  const day =
-    d.getDay();
+d.setHours(0, 0, 0, 0);
 
-  const diff =
-    day === 0
-      ? -6
-      : 1 - day;
-
-  d.setDate(
-    d.getDate() + diff
-  );
-
-  d.setHours(
-    0,
-    0,
-    0,
-    0
-  );
-
-  return d;
-
+return d;
 }
 
+function getSunday(date = new Date()) {
+const monday = getMonday(date);
+const sunday = new Date(monday);
 
-function getSunday(
-  date = new Date()
-) {
+sunday.setDate(monday.getDate() + 6);
 
-  const monday =
-    getMonday(date);
-
-  const sunday =
-    new Date(monday);
-
-  sunday.setDate(
-    monday.getDate() + 6
-  );
-
-  return sunday;
-
+return sunday;
 }
-
 
 function getWeekDays() {
+const monday = getMonday();
 
-  const monday =
-    getMonday();
+return Array.from(
+{ length: 7 },
+(_, index) => {
+const day = new Date(monday);
 
-  return Array.from(
-    { length: 7 },
-    (_, index) => {
+```
+  day.setDate(monday.getDate() + index);
 
-      const day =
-        new Date(monday);
-
-      day.setDate(
-        monday.getDate() + index
-      );
-
-      return day;
-
-    }
-  );
-
+  return day;
 }
+```
 
+);
+}
 
 function formatShortDate(date) {
-
-  return date.toLocaleDateString(
-    "fr-FR",
-    {
-      day: "numeric",
-      month: "short"
-    }
-  );
-
+return date.toLocaleDateString(
+"fr-FR",
+{
+day: "numeric",
+month: "short"
 }
-
+);
+}
 
 /* =========================================================
-   NAVIGATION
-   ========================================================= */
+NAVIGATION
+========================================================= */
 
 function showPage(pageId) {
+pages.forEach(page => {
+page.classList.toggle(
+"active",
+page.id === pageId
+);
+});
 
-  pages.forEach(page => {
+navItems.forEach(item => {
+item.classList.toggle(
+"active",
+item.dataset.page === pageId
+);
+});
 
-    page.classList.toggle(
-      "active",
-      page.id === pageId
-    );
+if (pageId === "calendarPage") {
+renderCalendar();
+}
 
-  });
+if (pageId === "journalPage") {
+loadJournals(selectedJournalDate);
+updateWeeklyJournalAvailability();
+}
 
+if (pageId === "settingsPage") {
+if (userName) {
+userName.value = data.userName || "";
+}
 
-  navItems.forEach(item => {
+```
+renderDuo();
+```
 
-    item.classList.toggle(
-      "active",
-      item.dataset.page === pageId
-    );
+}
+}
 
-  });
+navItems.forEach(item => {
+item.addEventListener("click", () => {
+if (item.dataset.page === "journalPage") {
+selectedJournalDate = dateKey(new Date());
+}
 
+```
+showPage(item.dataset.page);
+```
 
-  if (
-    pageId === "calendarPage"
-  ) {
+});
+});
 
-    renderCalendar();
+if (settingsBtn) {
+settingsBtn.addEventListener("click", () => {
+showPage("settingsPage");
+});
+}
 
-  }
+/* =========================================================
+NOM
+========================================================= */
 
+if (saveName) {
+saveName.addEventListener("click", () => {
+data.userName = userName.value.trim();
 
-  if (
-    pageId === "journalPage"
-  ) {
+```
+saveData();
+renderWelcome();
 
-    loadJournals(
-      selectedJournalDate
-    );
+saveName.textContent = "Enregistré ✓";
 
-    updateWeeklyJournalAvailability();
+setTimeout(() => {
+  saveName.textContent = "Enregistrer";
+}, 1500);
+```
 
-  }
+});
+}
 
+function renderWelcome() {
+if (!welcomeName) return;
 
-  if (
-    pageId === "settingsPage"
-  ) {
+welcomeName.textContent = data.userName
+? data.userName.toUpperCase()
+: "ALIZETI";
+}
 
-    userName.value =
-      data.userName || "";
+/* =========================================================
+MODAL HABITUDE
+========================================================= */
 
-    renderDuo();
+if (addHabitBtn) {
+addHabitBtn.addEventListener("click", () => {
+if (data.habits.length >= 10) {
+alert("Tu peux avoir jusqu'à 10 habitudes.");
+return;
+}
 
-  }
+```
+habitName.value = "";
+selectedGoal = 3;
+
+goalButtons.forEach(button => {
+  button.classList.toggle(
+    "selected",
+    button.dataset.goal === "3"
+  );
+});
+
+habitModal.classList.remove("hidden");
+
+setTimeout(() => {
+  habitName.focus();
+}, 100);
+```
+
+});
+}
+
+if (closeModal) {
+closeModal.addEventListener("click", () => {
+habitModal.classList.add("hidden");
+});
+}
+
+if (habitModal) {
+habitModal.addEventListener("click", event => {
+if (event.target === habitModal) {
+habitModal.classList.add("hidden");
+}
+});
+}
+
+goalButtons.forEach(button => {
+button.addEventListener("click", () => {
+selectedGoal = Number(button.dataset.goal);
+
+```
+goalButtons.forEach(item => {
+  item.classList.toggle(
+    "selected",
+    item === button
+  );
+});
+```
+
+});
+});
+
+if (saveHabitBtn) {
+saveHabitBtn.addEventListener("click", () => {
+const name = habitName.value.trim();
+
+```
+if (!name) {
+  habitName.focus();
+  return;
+}
+
+const habit = {
+  id: Date.now(),
+  name,
+  goal: selectedGoal,
+  completed: {}
+};
+
+data.habits.push(habit);
+
+if (selectedCalendarHabitId === null) {
+  selectedCalendarHabitId = habit.id;
+}
+
+saveData();
+
+habitModal.classList.add("hidden");
+
+renderHabits();
+renderCalendarHabitSelector();
+renderCalendar();
+renderMonthlyRecap();
+```
+
+});
+}
+
+/* =========================================================
+HABITUDES
+========================================================= */
+
+function countWeekCompleted(habit) {
+return getWeekDays().filter(day => {
+return Boolean(
+habit.completed?.[dateKey(day)]
+);
+}).length;
+}
+
+function renderHabits() {
+if (!habitsList) return;
+
+habitsList.innerHTML = "";
+
+if (!data.habits.length) {
+habitsList.innerHTML = `       <div class="month-card">         <div class="monthly-recap">
+          Tu n'as pas encore ajouté d'habitude.           <br><br>
+          Commence simplement par quelque chose
+          que tu aimerais essayer de faire régulièrement.         </div>       </div>
+    `;
+
+```
+return;
+```
 
 }
 
+const days = getWeekDays();
 
-navItems.forEach(item => {
+data.habits.forEach(habit => {
+if (!habit.completed) {
+habit.completed = {};
+}
 
-  item.addEventListener(
-    "click",
-    () => {
+```
+const completed = countWeekCompleted(habit);
+const goalReached = completed >= habit.goal;
+const surpassed = completed > habit.goal;
 
-      /*
-        Quand on clique directement
-        sur Journal dans la navigation,
-        on revient automatiquement
-        au journal d'aujourd'hui.
-      */
+const card = document.createElement("div");
 
-      if (
-        item.dataset.page === "journalPage"
-      ) {
+card.className =
+  "habit-card" +
+  (goalReached ? " completed-goal" : "");
 
-        selectedJournalDate =
-          dateKey(new Date());
+const daysHTML = days.map((day, index) => {
+  const key = dateKey(day);
 
-      }
-
-
-      showPage(
-        item.dataset.page
-      );
-
-    }
+  const checked = Boolean(
+    habit.completed[key]
   );
+
+  const today =
+    key === dateKey(new Date());
+
+  return `
+    <div class="day">
+
+      <button
+        type="button"
+        class="
+          day-circle
+          ${checked ? "checked" : ""}
+          ${today ? "today" : ""}
+        "
+        data-habit="${habit.id}"
+        data-date="${key}"
+        aria-label="Marquer ${formatShortDate(day)}"
+      >
+        ${checked ? "✓" : ""}
+      </button>
+
+      <span>${dayNames[index]}</span>
+
+    </div>
+  `;
+}).join("");
+
+const remaining = Math.max(
+  habit.goal - completed,
+  0
+);
+
+card.innerHTML = `
+  <div class="habit-top">
+
+    <div>
+
+      <div class="habit-name">
+        ${escapeHTML(habit.name)}
+      </div>
+
+      <div class="habit-progress">
+        <strong>${completed}/${habit.goal}</strong>
+        jours cette semaine
+      </div>
+
+    </div>
+
+    <button
+      type="button"
+      class="delete-habit"
+      data-delete="${habit.id}"
+      aria-label="Supprimer ${escapeHTML(habit.name)}"
+    >
+      ×
+    </button>
+
+  </div>
+
+  <div class="days">
+    ${daysHTML}
+  </div>
+
+  <div class="goal-badge ${goalReached ? "done" : ""}">
+
+    ${
+      goalReached
+        ? "✓ Objectif de la semaine atteint"
+        : `
+          ${remaining}
+          jour${remaining > 1 ? "s" : ""}
+          restant${remaining > 1 ? "s" : ""}
+        `
+    }
+
+  </div>
+
+  ${
+    surpassed
+      ? `
+        <div class="habit-celebration">
+          🔥
+          Tu t'es surpassé·e
+          sur cette habitude.
+        </div>
+      `
+      : ""
+  }
+`;
+
+habitsList.appendChild(card);
+```
 
 });
 
-
-settingsBtn.addEventListener(
-  "click",
-  () => {
-
-    showPage(
-      "settingsPage"
-    );
-
-  }
-);
-
-
-/* =========================================================
-   NOM
-   ========================================================= */
-
-saveName.addEventListener(
-  "click",
-  () => {
-
-    data.userName =
-      userName.value.trim();
-
-    saveData();
-
-    renderWelcome();
-
-    saveName.textContent =
-      "Enregistré ✓";
-
-    setTimeout(
-      () => {
-
-        saveName.textContent =
-          "Enregistrer";
-
-      },
-      1500
-    );
-
-  }
-);
-
-
-function renderWelcome() {
-
-  welcomeName.textContent =
-    data.userName
-      ? data.userName.toUpperCase()
-      : "ALIZETI";
-
+attachHabitEvents();
 }
-
-
-/* =========================================================
-   MODAL HABITUDE
-   ========================================================= */
-
-addHabitBtn.addEventListener(
-  "click",
-  () => {
-
-    if (
-      data.habits.length >= 10
-    ) {
-
-      alert(
-        "Tu peux avoir jusqu'à 10 habitudes."
-      );
-
-      return;
-
-    }
-
-
-    habitName.value = "";
-
-    selectedGoal = 3;
-
-
-    goalButtons.forEach(
-      button => {
-
-        button.classList.toggle(
-          "selected",
-          button.dataset.goal === "3"
-        );
-
-      }
-    );
-
-
-    habitModal.classList.remove(
-      "hidden"
-    );
-
-
-    setTimeout(
-      () => habitName.focus(),
-      100
-    );
-
-  }
-);
-
-
-closeModal.addEventListener(
-  "click",
-  () => {
-
-    habitModal.classList.add(
-      "hidden"
-    );
-
-  }
-);
-
-
-habitModal.addEventListener(
-  "click",
-  event => {
-
-    if (
-      event.target === habitModal
-    ) {
-
-      habitModal.classList.add(
-        "hidden"
-      );
-
-    }
-
-  }
-);
-
-
-/* Sélecteur du nombre de jours */
-
-goalButtons.forEach(
-  button => {
-
-    button.addEventListener(
-      "click",
-      () => {
-
-        selectedGoal =
-          Number(
-            button.dataset.goal
-          );
-
-
-        goalButtons.forEach(
-          item => {
-
-            item.classList.toggle(
-              "selected",
-              item === button
-            );
-
-          }
-        );
-
-      }
-    );
-
-  }
-);
-
-
-/* Création */
-
-saveHabitBtn.addEventListener(
-  "click",
-  () => {
-
-    const name =
-      habitName.value.trim();
-
-
-    if (!name) {
-
-      habitName.focus();
-
-      return;
-
-    }
-
-
-    const habit = {
-
-      id: Date.now(),
-
-      name,
-
-      goal: selectedGoal,
-
-      completed: {}
-
-    };
-
-
-    data.habits.push(
-      habit
-    );
-
-
-    if (
-      selectedCalendarHabitId === null
-    ) {
-
-      selectedCalendarHabitId =
-        habit.id;
-
-    }
-
-
-    saveData();
-
-
-    habitModal.classList.add(
-      "hidden"
-    );
-
-
-    renderHabits();
-
-    renderCalendarHabitSelector();
-
-    renderCalendar();
-
-    renderMonthlyRecap();
-
-  }
-);
-
-
-/* =========================================================
-   HABITUDES
-   ========================================================= */
-
-function countWeekCompleted(
-  habit
-) {
-
-  return getWeekDays()
-    .filter(
-      day =>
-        habit.completed[
-          dateKey(day)
-        ]
-    )
-    .length;
-
-}
-
-
-function renderHabits() {
-
-  habitsList.innerHTML = "";
-
-
-  if (
-    !data.habits.length
-  ) {
-
-    habitsList.innerHTML = `
-
-      <div class="month-card">
-
-        <div class="monthly-recap">
-
-          Tu n'as pas encore ajouté d'habitude.
-
-          <br><br>
-
-          Commence simplement par quelque chose
-          que tu aimerais essayer de faire régulièrement.
-
-        </div>
-
-      </div>
-
-    `;
-
-    return;
-
-  }
-
-
-  const days =
-    getWeekDays();
-
-
-  data.habits.forEach(
-    habit => {
-
-      const completed =
-        countWeekCompleted(
-          habit
-        );
-
-
-      const goalReached =
-        completed >= habit.goal;
-
-
-      const surpassed =
-        completed > habit.goal;
-
-
-      const card =
-        document.createElement(
-          "div"
-        );
-
-
-      card.className =
-        "habit-card" +
-        (
-          goalReached
-            ? " completed-goal"
-            : ""
-        );
-
-
-      const daysHTML =
-        days.map(
-          (day, index) => {
-
-            const key =
-              dateKey(day);
-
-
-            const checked =
-              Boolean(
-                habit.completed[key]
-              );
-
-
-            const today =
-              key ===
-              dateKey(
-                new Date()
-              );
-
-
-            return `
-
-              <div class="day">
-
-                <button
-                  class="
-                    day-circle
-                    ${checked ? "checked" : ""}
-                    ${today ? "today" : ""}
-                  "
-                  data-habit="${habit.id}"
-                  data-date="${key}"
-                >
-
-                  ${
-                    checked
-                      ? "✓"
-                      : ""
-                  }
-
-                </button>
-
-                <span>
-                  ${dayNames[index]}
-                </span>
-
-              </div>
-
-            `;
-
-          }
-        ).join("");
-
-
-      card.innerHTML = `
-
-        <div class="habit-top">
-
-          <div>
-
-            <div class="habit-name">
-              ${escapeHTML(habit.name)}
-            </div>
-
-            <div class="habit-progress">
-
-              <strong>
-                ${completed}/${habit.goal}
-              </strong>
-
-              jours cette semaine
-
-            </div>
-
-          </div>
-
-
-          <button
-            class="delete-habit"
-            data-delete="${habit.id}"
-          >
-            ×
-          </button>
-
-        </div>
-
-
-        <div class="days">
-          ${daysHTML}
-        </div>
-
-
-        <div
-          class="
-            goal-badge
-            ${goalReached ? "done" : ""}
-          "
-        >
-
-          ${
-            goalReached
-
-              ? "✓ Objectif de la semaine atteint"
-
-              : `
-                ${habit.goal - completed}
-                jour${
-                  habit.goal - completed > 1
-                    ? "s"
-                    : ""
-                }
-                restant${
-                  habit.goal - completed > 1
-                    ? "s"
-                    : ""
-                }
-              `
-          }
-
-        </div>
-
-
-        ${
-          surpassed
-
-            ? `
-
-              <div class="habit-celebration">
-
-                🔥
-
-                Tu t'es surpassé·e
-                sur cette habitude.
-
-              </div>
-
-            `
-
-            : ""
-        }
-
-      `;
-
-
-      habitsList.appendChild(
-        card
-      );
-
-    }
-  );
-
-
-  attachHabitEvents();
-
-}
-
 
 function attachHabitEvents() {
-
-  document
-    .querySelectorAll(
-      ".day-circle"
-    )
-    .forEach(
-      button => {
-
-        button.addEventListener(
-          "click",
-          () => {
-
-            const habitId =
-              Number(
-                button.dataset.habit
-              );
-
-
-            const date =
-              button.dataset.date;
-
-
-            const habit =
-              data.habits.find(
-                h =>
-                  h.id === habitId
-              );
-
-
-            if (!habit) return;
-
-
-            habit.completed[date] =
-              !habit.completed[date];
-
-
-            saveData();
-
-
-            renderHabits();
-
-            renderCalendar();
-
-            renderMonthlyRecap();
-
-          }
-        );
-
-      }
-    );
-
-
-  document
-    .querySelectorAll(
-      ".delete-habit"
-    )
-    .forEach(
-      button => {
-
-        button.addEventListener(
-          "click",
-          () => {
-
-            const id =
-              Number(
-                button.dataset.delete
-              );
-
-
-            if (
-              !confirm(
-                "Supprimer cette habitude ?"
-              )
-            ) {
-
-              return;
-
-            }
-
-
-            data.habits =
-              data.habits.filter(
-                habit =>
-                  habit.id !== id
-              );
-
-
-            if (
-              selectedCalendarHabitId === id
-            ) {
-
-              selectedCalendarHabitId =
-                data.habits[0]?.id ||
-                null;
-
-            }
-
-
-            saveData();
-
-
-            renderHabits();
-
-            renderCalendarHabitSelector();
-
-            renderCalendar();
-
-            renderMonthlyRecap();
-
-          }
-        );
-
-      }
-    );
-
-}
-
-
-/* =========================================================
-   CALENDRIER — CHOIX DE L'HABITUDE
-   ========================================================= */
-
-function renderCalendarHabitSelector() {
-
-  calendarHabitSelector.innerHTML = "";
-
-
-  if (
-    !data.habits.length
-  ) {
-
-    calendarHabitInfo.innerHTML =
-      "";
-
-    return;
-
-  }
-
-
-  const selectedExists =
-    data.habits.some(
-      habit =>
-        habit.id ===
-        selectedCalendarHabitId
-    );
-
-
-  if (
-    !selectedExists
-  ) {
-
-    selectedCalendarHabitId =
-      data.habits[0].id;
-
-  }
-
-
-  data.habits.forEach(
-    habit => {
-
-      const button =
-        document.createElement(
-          "button"
-        );
-
-
-      button.className =
-        "calendar-habit-tab";
-
-
-      button.classList.toggle(
-        "selected",
-        habit.id ===
-        selectedCalendarHabitId
-      );
-
-
-      button.textContent =
-        habit.name;
-
-
-      button.addEventListener(
-        "click",
-        () => {
-
-          selectedCalendarHabitId =
-            habit.id;
-
-          renderCalendarHabitSelector();
-
-          renderCalendar();
-
-        }
-      );
-
-
-      calendarHabitSelector.appendChild(
-        button
-      );
-
-    }
+document.querySelectorAll(".day-circle").forEach(button => {
+button.addEventListener("click", () => {
+const habitId = Number(button.dataset.habit);
+const date = button.dataset.date;
+
+```
+  const habit = data.habits.find(
+    h => h.id === habitId
   );
-
-}
-
-
-/* =========================================================
-   CALENDRIER
-   ========================================================= */
-
-function renderCalendar() {
-
-  renderCalendarHabitSelector();
-
-
-  if (
-    !data.habits.length
-  ) {
-
-    calendarTitle.textContent =
-      "";
-
-    calendarGrid.innerHTML = `
-
-      <div
-        class="calendar-empty-message"
-        style="grid-column:1/-1"
-      >
-        Ajoute une habitude pour commencer
-        à remplir ton calendrier.
-      </div>
-
-    `;
-
-    return;
-
-  }
-
-
-  const habit =
-    data.habits.find(
-      item =>
-        item.id ===
-        selectedCalendarHabitId
-    );
-
 
   if (!habit) return;
 
-
-  calendarHabitInfo.innerHTML = `
-
-    <strong>
-      ${escapeHTML(habit.name)}
-    </strong>
-
-    · objectif :
-
-    ${habit.goal}
-    jour${habit.goal > 1 ? "s" : ""}
-    / semaine
-
-  `;
-
-
-  const year =
-    calendarDate.getFullYear();
-
-
-  const month =
-    calendarDate.getMonth();
-
-
-  calendarTitle.textContent =
-    `${monthNames[month]} ${year}`;
-
-
-  calendarGrid.innerHTML = "";
-
-
-  const firstDay =
-    new Date(
-      year,
-      month,
-      1
-    );
-
-
-  let start =
-    firstDay.getDay();
-
-
-  start =
-    start === 0
-      ? 6
-      : start - 1;
-
-
-  const daysInMonth =
-    new Date(
-      year,
-      month + 1,
-      0
-    ).getDate();
-
-
-  for (
-    let i = 0;
-    i < start;
-    i++
-  ) {
-
-    const empty =
-      document.createElement(
-        "div"
-      );
-
-
-    empty.className =
-      "calendar-day empty";
-
-
-    calendarGrid.appendChild(
-      empty
-    );
-
+  if (!habit.completed) {
+    habit.completed = {};
   }
 
+  habit.completed[date] =
+    !habit.completed[date];
 
-  for (
-    let day = 1;
-    day <= daysInMonth;
-    day++
-  ) {
+  saveData();
 
-    const date =
-      new Date(
-        year,
-        month,
-        day
-      );
+  renderHabits();
+  renderCalendar();
+  renderMonthlyRecap();
+});
+```
 
+});
 
-    const key =
-      dateKey(date);
+document.querySelectorAll(".delete-habit").forEach(button => {
+button.addEventListener("click", () => {
+const id = Number(button.dataset.delete);
 
-
-    const completed =
-      Boolean(
-        habit.completed[key]
-      );
-
-
-    const isToday =
-      key ===
-      dateKey(
-        new Date()
-      );
-
-
-    const hasJournal =
-      Boolean(
-        data.dailyJournal[key]
-      );
-
-
-    /*
-      On utilise maintenant un bouton
-      pour pouvoir cliquer sur la date.
-    */
-
-    const cell =
-      document.createElement(
-        "button"
-      );
-
-
-    cell.className =
-      "calendar-day" +
-      (
-        completed
-          ? " has-habit"
-          : ""
-      ) +
-      (
-        isToday
-          ? " today"
-          : ""
-      ) +
-      (
-        hasJournal
-          ? " has-journal"
-          : ""
-      );
-
-
-    cell.textContent =
-      day;
-
-
-    /*
-      Cliquer sur une date ouvre
-      directement le journal correspondant.
-    */
-
-    cell.addEventListener(
-      "click",
-      () => {
-
-        selectedJournalDate =
-          key;
-
-
-        showPage(
-          "journalPage"
-        );
-
-
-        loadJournals(
-          key
-        );
-
-
-        updateWeeklyJournalAvailability();
-
-      }
-    );
-
-
-    calendarGrid.appendChild(
-      cell
-    );
-
+```
+  if (!confirm("Supprimer cette habitude ?")) {
+    return;
   }
+
+  data.habits = data.habits.filter(
+    habit => habit.id !== id
+  );
+
+  if (selectedCalendarHabitId === id) {
+    selectedCalendarHabitId =
+      data.habits[0]?.id || null;
+  }
+
+  saveData();
+
+  renderHabits();
+  renderCalendarHabitSelector();
+  renderCalendar();
+  renderMonthlyRecap();
+});
+```
+
+});
+}
+
+/* =========================================================
+CALENDRIER — CHOIX DE L'HABITUDE
+========================================================= */
+
+function renderCalendarHabitSelector() {
+if (!calendarHabitSelector) return;
+
+calendarHabitSelector.innerHTML = "";
+
+if (!data.habits.length) {
+if (calendarHabitInfo) {
+calendarHabitInfo.innerHTML = "";
+}
+
+```
+return;
+```
 
 }
 
+const selectedExists = data.habits.some(
+habit =>
+habit.id === selectedCalendarHabitId
+);
 
-/* Mois précédent */
+if (!selectedExists) {
+selectedCalendarHabitId =
+data.habits[0].id;
+}
 
-document
-  .getElementById(
-    "prevMonth"
-  )
-  .addEventListener(
-    "click",
-    () => {
+data.habits.forEach(habit => {
+const button =
+document.createElement("button");
 
-      calendarDate.setMonth(
-        calendarDate.getMonth() - 1
-      );
+```
+button.type = "button";
+button.className =
+  "calendar-habit-tab";
 
-      renderCalendar();
+button.classList.toggle(
+  "selected",
+  habit.id === selectedCalendarHabitId
+);
 
-    }
-  );
+button.textContent = habit.name;
 
+button.addEventListener("click", () => {
+  selectedCalendarHabitId = habit.id;
 
-/* Mois suivant */
+  renderCalendarHabitSelector();
+  renderCalendar();
+});
 
-document
-  .getElementById(
-    "nextMonth"
-  )
-  .addEventListener(
-    "click",
-    () => {
+calendarHabitSelector.appendChild(button);
+```
 
-      calendarDate.setMonth(
-        calendarDate.getMonth() + 1
-      );
-
-      renderCalendar();
-
-    }
-  );
-
+});
+}
 
 /* =========================================================
-   RECAP MENSUEL
-   ========================================================= */
+CALENDRIER
+========================================================= */
+
+function renderCalendar() {
+if (!calendarGrid || !calendarTitle) {
+return;
+}
+
+renderCalendarHabitSelector();
+
+if (!data.habits.length) {
+calendarTitle.textContent = "";
+
+```
+calendarGrid.innerHTML = `
+  <div
+    class="calendar-empty-message"
+    style="grid-column:1/-1"
+  >
+    Ajoute une habitude pour commencer
+    à remplir ton calendrier.
+  </div>
+`;
+
+return;
+```
+
+}
+
+const habit = data.habits.find(
+item =>
+item.id === selectedCalendarHabitId
+);
+
+if (!habit) return;
+
+if (!habit.completed) {
+habit.completed = {};
+}
+
+if (calendarHabitInfo) {
+calendarHabitInfo.innerHTML = `       <strong>
+        ${escapeHTML(habit.name)}       </strong>
+      · objectif :
+      ${habit.goal}
+      jour${habit.goal > 1 ? "s" : ""}
+      / semaine
+    `;
+}
+
+const year = calendarDate.getFullYear();
+const month = calendarDate.getMonth();
+
+calendarTitle.textContent =
+`${monthNames[month]} ${year}`;
+
+calendarGrid.innerHTML = "";
+
+const firstDay =
+new Date(year, month, 1);
+
+let start = firstDay.getDay();
+
+start =
+start === 0
+? 6
+: start - 1;
+
+const daysInMonth =
+new Date(
+year,
+month + 1,
+0
+).getDate();
+
+for (let i = 0; i < start; i++) {
+const empty =
+document.createElement("div");
+
+```
+empty.className =
+  "calendar-day empty";
+
+calendarGrid.appendChild(empty);
+```
+
+}
+
+for (
+let day = 1;
+day <= daysInMonth;
+day++
+) {
+const date =
+new Date(
+year,
+month,
+day
+);
+
+```
+const key = dateKey(date);
+
+const completed =
+  Boolean(habit.completed[key]);
+
+const isToday =
+  key === dateKey(new Date());
+
+const hasJournal =
+  Boolean(data.dailyJournal[key]);
+
+const cell =
+  document.createElement("button");
+
+cell.type = "button";
+
+cell.className =
+  "calendar-day" +
+  (completed ? " has-habit" : "") +
+  (isToday ? " today" : "") +
+  (hasJournal ? " has-journal" : "");
+
+cell.textContent = day;
+
+cell.addEventListener("click", () => {
+  selectedJournalDate = key;
+
+  showPage("journalPage");
+  loadJournals(key);
+  updateWeeklyJournalAvailability();
+});
+
+calendarGrid.appendChild(cell);
+```
+
+}
+}
+
+if (prevMonth) {
+prevMonth.addEventListener("click", () => {
+calendarDate.setMonth(
+calendarDate.getMonth() - 1
+);
+
+```
+renderCalendar();
+```
+
+});
+}
+
+if (nextMonth) {
+nextMonth.addEventListener("click", () => {
+calendarDate.setMonth(
+calendarDate.getMonth() + 1
+);
+
+```
+renderCalendar();
+```
+
+});
+}
+
+/* =========================================================
+RECAP MENSUEL
+========================================================= */
 
 function renderMonthlyRecap() {
+if (!monthlyRecap) return;
 
-  if (
-    !data.habits.length
-  ) {
+if (!data.habits.length) {
+monthlyRecap.textContent =
+"Ajoute une habitude pour commencer ton suivi.";
 
-    monthlyRecap.textContent =
-      "Ajoute une habitude pour commencer ton suivi.";
-
-    return;
-
-  }
-
-
-  const now =
-    new Date();
-
-
-  const year =
-    now.getFullYear();
-
-
-  const month =
-    now.getMonth();
-
-
-  const daysInMonth =
-    new Date(
-      year,
-      month + 1,
-      0
-    ).getDate();
-
-
-  monthlyRecap.innerHTML =
-    data.habits
-      .slice(0, 3)
-      .map(
-        habit => {
-
-          let completed = 0;
-
-
-          for (
-            let day = 1;
-            day <= daysInMonth;
-            day++
-          ) {
-
-            const date =
-              new Date(
-                year,
-                month,
-                day
-              );
-
-
-            if (
-              habit.completed[
-                dateKey(date)
-              ]
-            ) {
-
-              completed++;
-
-            }
-
-          }
-
-
-          const monthlyGoal =
-            Math.round(
-              habit.goal *
-              daysInMonth /
-              7
-            );
-
-
-          return `
-
-            <div style="margin-bottom:8px">
-
-              Ce mois-ci, tu as réussi à
-
-              <strong>
-                ${escapeHTML(habit.name)}
-              </strong>
-
-              <strong>
-                ${completed}
-              </strong>
-
-              jour${
-                completed > 1
-                  ? "s"
-                  : ""
-              }
-
-              sur
-
-              <strong>
-                ${monthlyGoal}
-              </strong>
-
-              fixé${
-                monthlyGoal > 1
-                  ? "s"
-                  : ""
-              }.
-
-            </div>
-
-          `;
-
-        }
-      )
-      .join("");
+```
+return;
+```
 
 }
 
+const now = new Date();
+
+const year = now.getFullYear();
+const month = now.getMonth();
+
+const daysInMonth =
+new Date(
+year,
+month + 1,
+0
+).getDate();
+
+monthlyRecap.innerHTML =
+data.habits
+.slice(0, 3)
+.map(habit => {
+let completed = 0;
+
+```
+    if (!habit.completed) {
+      habit.completed = {};
+    }
+
+    for (
+      let day = 1;
+      day <= daysInMonth;
+      day++
+    ) {
+      const date =
+        new Date(
+          year,
+          month,
+          day
+        );
+
+      if (
+        habit.completed[
+          dateKey(date)
+        ]
+      ) {
+        completed++;
+      }
+    }
+
+    const monthlyGoal =
+      Math.round(
+        habit.goal *
+        daysInMonth /
+        7
+      );
+
+    return `
+      <div style="margin-bottom:8px">
+
+        Ce mois-ci, tu as réussi à
+
+        <strong>
+          ${escapeHTML(habit.name)}
+        </strong>
+
+        <strong>
+          ${completed}
+        </strong>
+
+        jour${completed > 1 ? "s" : ""}
+
+        sur
+
+        <strong>
+          ${monthlyGoal}
+        </strong>
+
+        fixé${monthlyGoal > 1 ? "s" : ""}.
+
+      </div>
+    `;
+  })
+  .join("");
+```
+
+}
 
 /* =========================================================
-   JOURNAL QUOTIDIEN
-   ========================================================= */
+JOURNAL QUOTIDIEN
+========================================================= */
 
 function loadDailyFeelings(
-  date = selectedJournalDate
+date = selectedJournalDate
 ) {
+const saved =
+data.dailyJournal[date];
 
-  const saved =
-    data.dailyJournal[
-      date
-    ];
-
-
-  document
-    .querySelectorAll(
-      ".feeling-option input"
-    )
-    .forEach(
-      input => {
-
-        input.checked =
-          saved?.feelings?.includes(
-            input.value
-          ) || false;
-
-      }
-    );
-
+document
+.querySelectorAll(
+".feeling-option input"
+)
+.forEach(input => {
+input.checked =
+saved?.feelings?.includes(
+input.value
+) || false;
+});
 }
 
-
-/*
-   Met à jour éventuellement le titre
-   de la section journal si un élément
-   avec cet ID existe dans le HTML.
-*/
-
 function updateJournalDateTitle() {
+const title =
+document.getElementById(
+"dailyJournalTitle"
+);
 
-  const title =
-    document.getElementById(
-      "dailyJournalTitle"
-    );
+if (!title) return;
 
+const today =
+dateKey(new Date());
 
-  if (!title) return;
+if (selectedJournalDate === today) {
+title.textContent = "Aujourd'hui";
+return;
+}
 
+const date =
+new Date(
+selectedJournalDate + "T00:00:00"
+);
 
-  const today =
-    dateKey(
-      new Date()
-    );
-
-
-  if (
-    selectedJournalDate === today
-  ) {
-
-    title.textContent =
-      "Aujourd'hui";
-
-    return;
-
-  }
-
-
-  const date =
-    new Date(
-      selectedJournalDate + "T00:00:00"
-    );
-
-
-  title.textContent =
-    `Journal du ${date.toLocaleDateString(
+title.textContent =
+`Journal du ${date.toLocaleDateString(
       "fr-FR",
       {
         day: "numeric",
         month: "long"
       }
     )}`;
-
 }
-
 
 function loadJournals(
-  date = selectedJournalDate
+date = selectedJournalDate
 ) {
+selectedJournalDate = date;
 
-  selectedJournalDate =
-    date;
+const savedDaily =
+data.dailyJournal[date];
 
+if (dailyJournal) {
+dailyJournal.value =
+savedDaily?.text || "";
+}
 
-  const savedDaily =
-    data.dailyJournal[
-      date
-    ];
+loadDailyFeelings(date);
+updateJournalDateTitle();
 
+const journal =
+data.weeklyJournals[
+getWeekKey()
+];
 
-  dailyJournal.value =
-    savedDaily?.text || "";
+if (!journal) {
+if (positive1) positive1.value = "";
+if (positive2) positive2.value = "";
+if (positive3) positive3.value = "";
+if (weeklyText) weeklyText.value = "";
 
+```
+document
+  .querySelectorAll(
+    '[data-category="positiveChoices"], [data-category="negativeChoices"]'
+  )
+  .forEach(input => {
+    input.checked = false;
+  });
 
-  loadDailyFeelings(
-    date
-  );
-
-
-  updateJournalDateTitle();
-
-
-  /*
-     Le bilan hebdomadaire reste lié
-     à la semaine actuelle.
-  */
-
-  const journal =
-    data.weeklyJournals[
-      getWeekKey()
-    ];
-
-
-  if (!journal) {
-
-    positive1.value = "";
-    positive2.value = "";
-    positive3.value = "";
-    weeklyText.value = "";
-
-    document
-      .querySelectorAll(
-        ".choice input"
-      )
-      .forEach(
-        input =>
-          input.checked = false
-      );
-
-    return;
-
-  }
-
-
-  positive1.value =
-    journal.positive1 || "";
-
-
-  positive2.value =
-    journal.positive2 || "";
-
-
-  positive3.value =
-    journal.positive3 || "";
-
-
-  weeklyText.value =
-    journal.text || "";
-
-
-  document
-    .querySelectorAll(
-      ".choice input"
-    )
-    .forEach(
-      input => {
-
-        const category =
-          input.dataset.category;
-
-
-        input.checked =
-          journal[category]?.includes(
-            input.value
-          ) || false;
-
-      }
-    );
+return;
+```
 
 }
 
+if (positive1) {
+positive1.value =
+journal.positive1 || "";
+}
+
+if (positive2) {
+positive2.value =
+journal.positive2 || "";
+}
+
+if (positive3) {
+positive3.value =
+journal.positive3 || "";
+}
+
+if (weeklyText) {
+weeklyText.value =
+journal.text || "";
+}
+
+document
+.querySelectorAll(
+'[data-category="positiveChoices"], [data-category="negativeChoices"]'
+)
+.forEach(input => {
+const category =
+input.dataset.category;
+
+```
+  input.checked =
+    journal[category]?.includes(
+      input.value
+    ) || false;
+});
+```
+
+}
 
 /* =========================================================
-   ENREGISTREMENT JOURNAL QUOTIDIEN
-   ========================================================= */
+ENREGISTREMENT JOURNAL QUOTIDIEN
+========================================================= */
 
-saveDaily.addEventListener(
-  "click",
-  () => {
+if (saveDaily) {
+saveDaily.addEventListener("click", () => {
+const date = selectedJournalDate;
 
-    const date =
-      selectedJournalDate;
+```
+const feelings =
+  [
+    ...document.querySelectorAll(
+      ".feeling-option input:checked"
+    )
+  ].map(input => input.value);
 
+data.dailyJournal[date] = {
+  feelings,
+  text: dailyJournal?.value || ""
+};
 
-    const feelings =
-      [
-        ...document.querySelectorAll(
-          ".feeling-option input:checked"
-        )
-      ].map(
-        input =>
-          input.value
-      );
+saveData();
 
+saveDaily.textContent =
+  "Enregistré ✓";
 
-    data.dailyJournal[date] = {
+setTimeout(() => {
+  saveDaily.textContent =
+    "Enregistrer";
+}, 1500);
 
-      feelings,
+renderCalendar();
+```
 
-      text:
-        dailyJournal.value
-
-    };
-
-
-    saveData();
-
-
-    saveDaily.textContent =
-      "Enregistré ✓";
-
-
-    setTimeout(
-      () => {
-
-        saveDaily.textContent =
-          "Enregistrer";
-
-      },
-      1500
-    );
-
-
-    /*
-      On actualise le calendrier pour
-      afficher immédiatement le point
-      indiquant qu'un journal existe.
-    */
-
-    renderCalendar();
-
-  }
-);
-
+});
+}
 
 /* =========================================================
-   BILAN HEBDOMADAIRE
-   ========================================================= */
+BILAN HEBDOMADAIRE
+========================================================= */
 
 const positiveOptions = [
-
-  "Je me suis bien senti·e",
-  "J'ai pris du temps pour moi",
-  "J'ai bien dormi",
-  "J'ai fait quelque chose que j'aime",
-  "J'ai été fier·ère de moi",
-  "J'ai passé du temps avec quelqu'un",
-  "J'ai avancé sur un projet",
-  "J'ai pris soin de moi",
-  "J'ai découvert quelque chose",
-  "Autre"
-
+"Je me suis bien senti·e",
+"J'ai pris du temps pour moi",
+"J'ai bien dormi",
+"J'ai fait quelque chose que j'aime",
+"J'ai été fier·ère de moi",
+"J'ai passé du temps avec quelqu'un",
+"J'ai avancé sur un projet",
+"J'ai pris soin de moi",
+"J'ai découvert quelque chose",
+"Autre"
 ];
-
 
 const negativeOptions = [
-
-  "Fatigue",
-  "Manque de temps",
-  "Stress",
-  "Manque de motivation",
-  "Sommeil difficile",
-  "Trop de choses à gérer",
-  "Difficulté à m'organiser",
-  "Baisse d'énergie",
-  "Imprévu",
-  "Autre"
-
+"Fatigue",
+"Manque de temps",
+"Stress",
+"Manque de motivation",
+"Sommeil difficile",
+"Trop de choses à gérer",
+"Difficulté à m'organiser",
+"Baisse d'énergie",
+"Imprévu",
+"Autre"
 ];
 
-
 function renderChoiceLists() {
+const positiveContainer =
+document.getElementById(
+"positiveChoices"
+);
 
-  const positiveContainer =
-    document.getElementById(
-      "positiveChoices"
-    );
+const negativeContainer =
+document.getElementById(
+"negativeChoices"
+);
 
-
-  const negativeContainer =
-    document.getElementById(
-      "negativeChoices"
-    );
-
-
-  positiveContainer.innerHTML =
-    positiveOptions
-      .map(
-        (option, index) => `
-
-          <label class="choice">
-
-            <input
-              type="checkbox"
-              data-category="positiveChoices"
-              value="${escapeHTML(option)}"
-            >
-
-            <span>
-
-              ${index + 1}.
-              ${escapeHTML(option)}
-
-            </span>
-
-          </label>
-
-        `
-      )
-      .join("");
-
-
-  negativeContainer.innerHTML =
-    negativeOptions
-      .map(
-        (option, index) => `
-
-          <label class="choice">
-
-            <input
-              type="checkbox"
-              data-category="negativeChoices"
-              value="${escapeHTML(option)}"
-            >
-
-            <span>
-
-              ${index + 1}.
-              ${escapeHTML(option)}
-
-            </span>
-
-          </label>
-
-        `
-      )
-      .join("");
-
+if (!positiveContainer || !negativeContainer) {
+return;
 }
 
+positiveContainer.innerHTML =
+positiveOptions
+.map(
+(option, index) => ` <label class="choice">
+
+```
+        <input
+          type="checkbox"
+          data-category="positiveChoices"
+          value="${escapeHTML(option)}"
+        >
+
+        <span>
+          ${index + 1}.
+          ${escapeHTML(option)}
+        </span>
+
+      </label>
+    `
+  )
+  .join("");
+```
+
+negativeContainer.innerHTML =
+negativeOptions
+.map(
+(option, index) => ` <label class="choice">
+
+```
+        <input
+          type="checkbox"
+          data-category="negativeChoices"
+          value="${escapeHTML(option)}"
+        >
+
+        <span>
+          ${index + 1}.
+          ${escapeHTML(option)}
+        </span>
+
+      </label>
+    `
+  )
+  .join("");
+```
+
+}
 
 function isWeeklyJournalAvailable() {
+const now = new Date();
 
-  const now =
-    new Date();
+const day = now.getDay();
+const hour = now.getHours();
 
-
-  const day =
-    now.getDay();
-
-
-  const hour =
-    now.getHours();
-
-
-  /* Dimanche à partir de 19h */
-
-  if (
-    day === 0 &&
-    hour >= 19
-  ) {
-
-    return true;
-
-  }
-
-
-  /* Tout le lundi */
-
-  if (
-    day === 1
-  ) {
-
-    return true;
-
-  }
-
-
-  return false;
-
+if (day === 0 && hour >= 19) {
+return true;
 }
 
+if (day === 1) {
+return true;
+}
+
+return false;
+}
 
 function updateWeeklyJournalAvailability() {
-
-  if (
-    isWeeklyJournalAvailable()
-  ) {
-
-    weeklyContent.classList.remove(
-      "hidden"
-    );
-
-
-    weeklyJournalCard.classList.remove(
-      "locked"
-    );
-
-
-    weeklyAvailability.textContent =
-      "Ton bilan de la semaine est ouvert.";
-
-  } else {
-
-    weeklyContent.classList.add(
-      "hidden"
-    );
-
-
-    weeklyJournalCard.classList.add(
-      "locked"
-    );
-
-
-    weeklyAvailability.textContent =
-      "Le bilan s'ouvre dimanche à 19h et reste disponible jusqu'au lundi soir.";
-
-  }
-
+if (!weeklyContent || !weeklyJournalCard) {
+return;
 }
 
+if (isWeeklyJournalAvailable()) {
+weeklyContent.classList.remove("hidden");
+
+```
+weeklyJournalCard.classList.remove(
+  "locked"
+);
+
+if (weeklyAvailability) {
+  weeklyAvailability.textContent =
+    "Ton bilan de la semaine est ouvert.";
+}
+```
+
+} else {
+weeklyContent.classList.add("hidden");
+
+```
+weeklyJournalCard.classList.add(
+  "locked"
+);
+
+if (weeklyAvailability) {
+  weeklyAvailability.textContent =
+    "Le bilan s'ouvre dimanche à 19h et reste disponible jusqu'au lundi soir.";
+}
+```
+
+}
+}
 
 function getWeekKey() {
-
-  return dateKey(
-    getMonday()
-  );
-
+return dateKey(getMonday());
 }
 
+if (saveWeekly) {
+saveWeekly.addEventListener("click", () => {
+if (!isWeeklyJournalAvailable()) {
+return;
+}
 
-saveWeekly.addEventListener(
-  "click",
-  () => {
+```
+if (
+  !positive1?.value.trim() ||
+  !positive2?.value.trim() ||
+  !positive3?.value.trim()
+) {
+  alert(
+    "Il manque encore une des trois choses positives de ta semaine."
+  );
 
-    if (
-      !isWeeklyJournalAvailable()
-    ) {
+  return;
+}
 
-      return;
+const positiveChoices =
+  [
+    ...document.querySelectorAll(
+      '[data-category="positiveChoices"]:checked'
+    )
+  ].map(input => input.value);
 
-    }
+const negativeChoices =
+  [
+    ...document.querySelectorAll(
+      '[data-category="negativeChoices"]:checked'
+    )
+  ].map(input => input.value);
 
+data.weeklyJournals[getWeekKey()] = {
+  positiveChoices,
+  negativeChoices,
+  positive1: positive1.value,
+  positive2: positive2.value,
+  positive3: positive3.value,
+  text: weeklyText?.value || ""
+};
 
-    if (
-      !positive1.value.trim() ||
-      !positive2.value.trim() ||
-      !positive3.value.trim()
-    ) {
+saveData();
 
-      alert(
-        "Il manque encore une des trois choses positives de ta semaine."
-      );
+saveWeekly.textContent =
+  "Bilan enregistré ✓";
 
-      return;
+setTimeout(() => {
+  saveWeekly.textContent =
+    "Enregistrer mon bilan";
+}, 1800);
+```
 
-    }
-
-
-    const positiveChoices =
-      [
-        ...document.querySelectorAll(
-          '[data-category="positiveChoices"]:checked'
-        )
-      ].map(
-        input =>
-          input.value
-      );
-
-
-    const negativeChoices =
-      [
-        ...document.querySelectorAll(
-          '[data-category="negativeChoices"]:checked'
-        )
-      ].map(
-        input =>
-          input.value
-      );
-
-
-    data.weeklyJournals[
-      getWeekKey()
-    ] = {
-
-      positiveChoices,
-
-      negativeChoices,
-
-      positive1:
-        positive1.value,
-
-      positive2:
-        positive2.value,
-
-      positive3:
-        positive3.value,
-
-      text:
-        weeklyText.value
-
-    };
-
-
-    saveData();
-
-
-    saveWeekly.textContent =
-      "Bilan enregistré ✓";
-
-
-    setTimeout(
-      () => {
-
-        saveWeekly.textContent =
-          "Enregistrer mon bilan";
-
-      },
-      1800
-    );
-
-  }
-);
-
+});
+}
 
 /* =========================================================
-   MODE DUO
-   ========================================================= */
+MODE DUO
+========================================================= */
 
 function generateCode() {
+const characters =
+"ABCDEFGHJKLMNPQRSTUVWXYZ23456789";
 
-  const characters =
-    "ABCDEFGHJKLMNPQRSTUVWXYZ23456789";
+let code = "";
 
-
-  let code = "";
-
-
-  for (
-    let i = 0;
-    i < 6;
-    i++
-  ) {
-
-    code +=
-      characters[
-        Math.floor(
-          Math.random() *
-          characters.length
-        )
-      ];
-
-  }
-
-
-  return code;
-
+for (let i = 0; i < 6; i++) {
+code +=
+characters[
+Math.floor(
+Math.random() *
+characters.length
+)
+];
 }
 
+return code;
+}
 
-generateDuo.addEventListener(
-  "click",
-  () => {
+if (generateDuo) {
+generateDuo.addEventListener("click", () => {
+const code = generateCode();
 
-    const code =
-      generateCode();
+```
+data.duo = {
+  code,
+  status: "waiting"
+};
 
+saveData();
+renderDuo();
+```
 
-    data.duo = {
+});
+}
 
-      code,
+if (joinDuo) {
+joinDuo.addEventListener("click", () => {
+const code =
+duoCodeInput.value
+.trim()
+.toUpperCase();
 
-      status: "waiting"
+```
+if (code.length !== 6) {
+  alert(
+    "Le code doit contenir 6 caractères."
+  );
 
-    };
+  return;
+}
 
+data.duo = {
+  code,
+  status: "connected"
+};
 
-    saveData();
+saveData();
+renderDuo();
+```
 
-    renderDuo();
+});
+}
 
-  }
-);
+if (leaveDuo) {
+leaveDuo.addEventListener("click", () => {
+data.duo = null;
 
+```
+saveData();
+renderDuo();
+```
 
-joinDuo.addEventListener(
-  "click",
-  () => {
-
-    const code =
-      duoCodeInput.value
-        .trim()
-        .toUpperCase();
-
-
-    if (
-      code.length !== 6
-    ) {
-
-      alert(
-        "Le code doit contenir 6 caractères."
-      );
-
-      return;
-
-    }
-
-
-    data.duo = {
-
-      code,
-
-      status: "connected"
-
-    };
-
-
-    saveData();
-
-    renderDuo();
-
-  }
-);
-
-
-leaveDuo.addEventListener(
-  "click",
-  () => {
-
-    data.duo = null;
-
-    saveData();
-
-    renderDuo();
-
-  }
-);
-
+});
+}
 
 function renderDuo() {
-
-  if (!data.duo) {
-
-    duoDisconnected.classList.remove(
-      "hidden"
-    );
-
-    duoConnected.classList.add(
-      "hidden"
-    );
-
-    return;
-
-  }
-
-
-  duoDisconnected.classList.add(
-    "hidden"
-  );
-
-
-  duoConnected.classList.remove(
-    "hidden"
-  );
-
-
-  duoCodeDisplay.textContent =
-    `Code : ${data.duo.code}`;
-
+if (!duoDisconnected || !duoConnected) {
+return;
 }
 
-
-/* =========================================================
-   NOTIFICATIONS
-   ========================================================= */
-
-notificationToggle.addEventListener(
-  "click",
-  async () => {
-
-    data.notifications =
-      !data.notifications;
-
-
-    if (
-      data.notifications &&
-      "Notification" in window
-    ) {
-
-      try {
-
-        const permission =
-          await Notification.requestPermission();
-
-
-        if (
-          permission !== "granted"
-        ) {
-
-          data.notifications =
-            false;
-
-        }
-
-      } catch {
-
-        data.notifications =
-          false;
-
-      }
-
-    }
-
-
-    saveData();
-
-    updateNotificationToggle();
-
-  }
+if (!data.duo) {
+duoDisconnected.classList.remove(
+"hidden"
 );
 
+```
+duoConnected.classList.add(
+  "hidden"
+);
+
+return;
+```
+
+}
+
+duoDisconnected.classList.add(
+"hidden"
+);
+
+duoConnected.classList.remove(
+"hidden"
+);
+
+if (duoCodeDisplay) {
+duoCodeDisplay.textContent =
+`Code : ${data.duo.code}`;
+}
+}
+
+/* =========================================================
+NOTIFICATIONS
+========================================================= */
+
+if (notificationToggle) {
+notificationToggle.addEventListener(
+"click",
+async () => {
+data.notifications =
+!data.notifications;
+
+```
+  if (
+    data.notifications &&
+    "Notification" in window
+  ) {
+    try {
+      const permission =
+        await Notification.requestPermission();
+
+      if (permission !== "granted") {
+        data.notifications = false;
+      }
+    } catch (error) {
+      console.error(
+        "Erreur notifications :",
+        error
+      );
+
+      data.notifications = false;
+    }
+  }
+
+  saveData();
+  updateNotificationToggle();
+}
+```
+
+);
+}
 
 function updateNotificationToggle() {
+if (!notificationToggle) return;
 
-  notificationToggle.classList.toggle(
-    "on",
-    data.notifications
-  );
-
+notificationToggle.classList.toggle(
+"on",
+data.notifications
+);
 }
 
-
 /* =========================================================
-   SECURITE
-   ========================================================= */
+SECURITE
+========================================================= */
 
 function escapeHTML(value) {
-
-  return String(value)
-
-    .replaceAll(
-      "&",
-      "&amp;"
-    )
-
-    .replaceAll(
-      "<",
-      "&lt;"
-    )
-
-    .replaceAll(
-      ">",
-      "&gt;"
-    )
-
-    .replaceAll(
-      '"',
-      "&quot;"
-    )
-
-    .replaceAll(
-      "'",
-      "&#039;"
-    );
-
+return String(value)
+.replaceAll("&", "&")
+.replaceAll("<", "<")
+.replaceAll(">", ">")
+.replaceAll('"', """)
+.replaceAll("'", "'");
 }
-
 
 /* =========================================================
-   INITIALISATION
-   ========================================================= */
+INITIALISATION
+========================================================= */
 
 function initialize() {
+try {
+const monday = getMonday();
+const sunday = getSunday();
 
-  const monday =
-    getMonday();
-
-
-  const sunday =
-    getSunday();
-
-
+```
+if (weekDates) {
   weekDates.textContent =
     `${formatShortDate(monday)} — ${formatShortDate(sunday)}`;
-
-
-  /*
-    Le journal commence toujours
-    sur aujourd'hui.
-  */
-
-  selectedJournalDate =
-    dateKey(new Date());
-
-
-  renderWelcome();
-
-  renderChoiceLists();
-
-  renderHabits();
-
-  renderCalendarHabitSelector();
-
-  renderCalendar();
-
-  renderMonthlyRecap();
-
-  updateNotificationToggle();
-
-  updateWeeklyJournalAvailability();
-
-  loadJournals(
-    selectedJournalDate
-  );
-
-  renderDuo();
-
 }
 
+selectedJournalDate =
+  dateKey(new Date());
 
+renderWelcome();
+renderChoiceLists();
+renderHabits();
+renderCalendarHabitSelector();
+renderCalendar();
+renderMonthlyRecap();
+updateNotificationToggle();
+updateWeeklyJournalAvailability();
+loadJournals(selectedJournalDate);
+renderDuo();
+```
+
+} catch (error) {
+console.error(
+"Erreur pendant l'initialisation d'Alizeti :",
+error
+);
+}
+}
+
+/* =========================================================
+LANCEMENT
+========================================================= */
+
+if (
+document.readyState === "loading"
+) {
+document.addEventListener(
+"DOMContentLoaded",
+initialize
+);
+} else {
 initialize();
+}
