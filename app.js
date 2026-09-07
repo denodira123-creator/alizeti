@@ -27,6 +27,7 @@ try {
 }
 
 /* Sécurisation des données */
+
 if (!Array.isArray(data.habits)) {
   data.habits = [];
 }
@@ -67,20 +68,35 @@ function saveData() {
 const pages = document.querySelectorAll(".page");
 const navItems = document.querySelectorAll(".nav-item");
 
-const settingsBtn = document.getElementById("settingsBtn");
+const settingsBtn =
+  document.getElementById("settingsBtn");
 
-const addHabitBtn = document.getElementById("addHabitBtn");
-const habitModal = document.getElementById("habitModal");
-const closeModal = document.getElementById("closeModal");
-const habitName = document.getElementById("habitName");
-const saveHabitBtn = document.getElementById("saveHabit");
-const goalButtons = document.querySelectorAll(
-  ".goal-options button"
-);
+const addHabitBtn =
+  document.getElementById("addHabitBtn");
 
-const habitsList = document.getElementById("habitsList");
-const weekDates = document.getElementById("weekDates");
-const welcomeName = document.getElementById("welcomeName");
+const habitModal =
+  document.getElementById("habitModal");
+
+const closeModal =
+  document.getElementById("closeModal");
+
+const habitName =
+  document.getElementById("habitName");
+
+const saveHabitBtn =
+  document.getElementById("saveHabit");
+
+const goalButtons =
+  document.querySelectorAll(".goal-options button");
+
+const habitsList =
+  document.getElementById("habitsList");
+
+const weekDates =
+  document.getElementById("weekDates");
+
+const welcomeName =
+  document.getElementById("welcomeName");
 
 const calendarTitle =
   document.getElementById("calendarTitle");
@@ -106,11 +122,29 @@ const dailyJournal =
 const saveDaily =
   document.getElementById("saveDaily");
 
+const dailyJournalTitle =
+  document.getElementById("dailyJournalTitle");
+
 const weeklyJournalCard =
   document.getElementById("weeklyJournalCard");
 
 const weeklyAvailability =
   document.getElementById("weeklyAvailability");
+
+const weeklyHistoryRange =
+  document.getElementById("weeklyHistoryRange");
+
+const weeklyHistoryStatus =
+  document.getElementById("weeklyHistoryStatus");
+
+const prevWeekly =
+  document.getElementById("prevWeekly");
+
+const nextWeekly =
+  document.getElementById("nextWeekly");
+
+const weeklyJournalTitle =
+  document.getElementById("weeklyJournalTitle");
 
 const weeklyContent =
   document.getElementById("weeklyContent");
@@ -170,7 +204,16 @@ const leaveDuo =
 let selectedGoal = 3;
 let selectedCalendarHabitId = null;
 let calendarDate = new Date();
-let selectedJournalDate = dateKey(new Date());
+
+let selectedJournalDate =
+  dateKey(new Date());
+
+/*
+  Nouvelle gestion de l'historique hebdomadaire :
+  on mémorise la semaine actuellement affichée.
+*/
+let selectedWeeklyWeekKey =
+  dateKey(getMonday(new Date()));
 
 /* =========================================================
    DATES
@@ -213,7 +256,10 @@ function getMonday(date = new Date()) {
   const d = new Date(date);
   const day = d.getDay();
 
-  const diff = day === 0 ? -6 : 1 - day;
+  const diff =
+    day === 0
+      ? -6
+      : 1 - day;
 
   d.setDate(d.getDate() + diff);
   d.setHours(0, 0, 0, 0);
@@ -225,7 +271,9 @@ function getSunday(date = new Date()) {
   const monday = getMonday(date);
   const sunday = new Date(monday);
 
-  sunday.setDate(monday.getDate() + 6);
+  sunday.setDate(
+    monday.getDate() + 6
+  );
 
   return sunday;
 }
@@ -287,7 +335,8 @@ function showPage(pageId) {
 
   if (pageId === "settingsPage") {
     if (userName) {
-      userName.value = data.userName || "";
+      userName.value =
+        data.userName || "";
     }
 
     renderDuo();
@@ -296,8 +345,12 @@ function showPage(pageId) {
 
 navItems.forEach(item => {
   item.addEventListener("click", () => {
-    if (item.dataset.page === "journalPage") {
-      selectedJournalDate = dateKey(new Date());
+
+    if (
+      item.dataset.page === "journalPage"
+    ) {
+      selectedJournalDate =
+        dateKey(new Date());
     }
 
     showPage(item.dataset.page);
@@ -305,9 +358,12 @@ navItems.forEach(item => {
 });
 
 if (settingsBtn) {
-  settingsBtn.addEventListener("click", () => {
-    showPage("settingsPage");
-  });
+  settingsBtn.addEventListener(
+    "click",
+    () => {
+      showPage("settingsPage");
+    }
+  );
 }
 
 /* =========================================================
@@ -316,17 +372,21 @@ if (settingsBtn) {
 
 if (saveName) {
   saveName.addEventListener("click", () => {
-    data.userName = userName
-      ? userName.value.trim()
-      : "";
+
+    data.userName =
+      userName
+        ? userName.value.trim()
+        : "";
 
     saveData();
     renderWelcome();
 
-    saveName.textContent = "Enregistré ✓";
+    saveName.textContent =
+      "Enregistré ✓";
 
     setTimeout(() => {
-      saveName.textContent = "Enregistrer";
+      saveName.textContent =
+        "Enregistrer";
     }, 1500);
   });
 }
@@ -345,68 +405,91 @@ function renderWelcome() {
 ========================================================= */
 
 if (addHabitBtn) {
-  addHabitBtn.addEventListener("click", () => {
-    if (data.habits.length >= 10) {
-      alert(
-        "Tu peux avoir jusqu'à 10 habitudes."
-      );
-      return;
-    }
+  addHabitBtn.addEventListener(
+    "click",
+    () => {
 
-    if (habitName) {
-      habitName.value = "";
-    }
-
-    selectedGoal = 3;
-
-    goalButtons.forEach(button => {
-      button.classList.toggle(
-        "selected",
-        button.dataset.goal === "3"
-      );
-    });
-
-    if (habitModal) {
-      habitModal.classList.remove("hidden");
-    }
-
-    setTimeout(() => {
-      if (habitName) {
-        habitName.focus();
+      if (data.habits.length >= 10) {
+        alert(
+          "Tu peux avoir jusqu'à 10 habitudes."
+        );
+        return;
       }
-    }, 100);
-  });
+
+      if (habitName) {
+        habitName.value = "";
+      }
+
+      selectedGoal = 3;
+
+      goalButtons.forEach(button => {
+        button.classList.toggle(
+          "selected",
+          button.dataset.goal === "3"
+        );
+      });
+
+      if (habitModal) {
+        habitModal.classList.remove(
+          "hidden"
+        );
+      }
+
+      setTimeout(() => {
+        if (habitName) {
+          habitName.focus();
+        }
+      }, 100);
+    }
+  );
 }
 
 if (closeModal) {
-  closeModal.addEventListener("click", () => {
-    if (habitModal) {
-      habitModal.classList.add("hidden");
+  closeModal.addEventListener(
+    "click",
+    () => {
+
+      if (habitModal) {
+        habitModal.classList.add(
+          "hidden"
+        );
+      }
     }
-  });
+  );
 }
 
 if (habitModal) {
-  habitModal.addEventListener("click", event => {
-    if (event.target === habitModal) {
-      habitModal.classList.add("hidden");
+  habitModal.addEventListener(
+    "click",
+    event => {
+
+      if (
+        event.target === habitModal
+      ) {
+        habitModal.classList.add(
+          "hidden"
+        );
+      }
     }
-  });
+  );
 }
 
 goalButtons.forEach(button => {
-  button.addEventListener("click", () => {
-    selectedGoal = Number(
-      button.dataset.goal
-    );
+  button.addEventListener(
+    "click",
+    () => {
 
-    goalButtons.forEach(item => {
-      item.classList.toggle(
-        "selected",
-        item === button
-      );
-    });
-  });
+      selectedGoal =
+        Number(button.dataset.goal);
+
+      goalButtons.forEach(item => {
+        item.classList.toggle(
+          "selected",
+          item === button
+        );
+      });
+    }
+  );
 });
 
 /* =========================================================
@@ -414,365 +497,207 @@ goalButtons.forEach(button => {
 ========================================================= */
 
 if (saveHabitBtn) {
-  saveHabitBtn.addEventListener("click", () => {
-    const name = habitName
-      ? habitName.value.trim()
-      : "";
+  saveHabitBtn.addEventListener(
+    "click",
+    () => {
 
-    if (!name) {
-      if (habitName) {
-        habitName.focus();
+      const name =
+        habitName
+          ? habitName.value.trim()
+          : "";
+
+      if (!name) {
+        if (habitName) {
+          habitName.focus();
+        }
+
+        return;
       }
 
-      return;
+      const habit = {
+        id: Date.now(),
+        name: name,
+        goal: selectedGoal,
+        completed: {}
+      };
+
+      data.habits.push(habit);
+
+      if (
+        selectedCalendarHabitId === null
+      ) {
+        selectedCalendarHabitId =
+          habit.id;
+      }
+
+      saveData();
+
+      if (habitModal) {
+        habitModal.classList.add(
+          "hidden"
+        );
+      }
+
+      renderHabits();
+      renderCalendarHabitSelector();
+      renderCalendar();
+      renderMonthlyRecap();
     }
-
-    const habit = {
-      id: Date.now(),
-      name: name,
-      goal: selectedGoal,
-      completed: {}
-    };
-
-    data.habits.push(habit);
-
-    if (selectedCalendarHabitId === null) {
-      selectedCalendarHabitId = habit.id;
-    }
-
-    saveData();
-
-    if (habitModal) {
-      habitModal.classList.add("hidden");
-    }
-
-    renderHabits();
-    renderCalendarHabitSelector();
-    renderCalendar();
-    renderMonthlyRecap();
-  });
+  );
 }
 
 /* =========================================================
    HABITUDES
 ========================================================= */
 
-function countWeekCompleted(habit) {
-  return getWeekDays().filter(day => {
-    return Boolean(
-      habit.completed &&
-      habit.completed[dateKey(day)]
-    );
-  }).length;
-}
-
 function renderHabits() {
+
   if (!habitsList) return;
 
-  habitsList.innerHTML = "";
+  if (data.habits.length === 0) {
 
-  if (!data.habits.length) {
     habitsList.innerHTML = `
-      <div class="month-card">
-        <div class="monthly-recap">
-          Tu n'as pas encore ajouté d'habitude.
-          <br><br>
-          Commence simplement par quelque chose
-          que tu aimerais essayer de faire régulièrement.
-        </div>
+      <div class="empty-state">
+        <p>Commence doucement 🌱</p>
+        <span>Ajoute ta première habitude.</span>
       </div>
     `;
 
     return;
   }
 
-  const days = getWeekDays();
-
-  data.habits.forEach(habit => {
-    if (!habit.completed) {
-      habit.completed = {};
-    }
-
-    const completed =
-      countWeekCompleted(habit);
-
-    const goalReached =
-      completed >= habit.goal;
-
-    const surpassed =
-      completed > habit.goal;
-
-    const card =
-      document.createElement("div");
-
-    card.className =
-      "habit-card" +
-      (goalReached
-        ? " completed-goal"
-        : "");
-
-    const daysHTML =
-      days.map((day, index) => {
-        const key = dateKey(day);
-
-        const checked =
-          Boolean(habit.completed[key]);
+  habitsList.innerHTML =
+    data.habits
+      .map(habit => {
 
         const today =
-          key === dateKey(new Date());
+          dateKey(new Date());
+
+        const completed =
+          Boolean(
+            habit.completed?.[today]
+          );
 
         return `
-          <div class="day">
+          <div
+            class="habit-row ${completed ? "completed" : ""}"
+            data-habit-id="${habit.id}"
+          >
 
             <button
-              type="button"
-              class="day-circle
-                ${checked ? "checked" : ""}
-                ${today ? "today" : ""}"
-              data-habit="${habit.id}"
-              data-date="${key}"
-              aria-label="Marquer ${formatShortDate(day)}"
+              class="habit-check"
+              data-action="toggle"
+              data-id="${habit.id}"
+              aria-label="Marquer l'habitude"
             >
-              ${checked ? "✓" : ""}
+              ${completed ? "✓" : ""}
             </button>
 
-            <span>${dayNames[index]}</span>
+            <div class="habit-info">
+
+              <strong>
+                ${escapeHTML(habit.name)}
+              </strong>
+
+              <span>
+                ${habit.goal} jour${habit.goal > 1 ? "s" : ""} / semaine
+              </span>
+
+            </div>
+
+            <button
+              class="habit-delete"
+              data-action="delete"
+              data-id="${habit.id}"
+              aria-label="Supprimer"
+            >
+              ×
+            </button>
 
           </div>
         `;
-      }).join("");
+      })
+      .join("");
 
-    const remaining =
-      Math.max(
-        habit.goal - completed,
-        0
+  habitsList
+    .querySelectorAll(
+      "[data-action='toggle']"
+    )
+    .forEach(button => {
+
+      button.addEventListener(
+        "click",
+        () => {
+
+          const id =
+            Number(button.dataset.id);
+
+          toggleHabit(
+            id,
+            dateKey(new Date())
+          );
+        }
       );
+    });
 
-    card.innerHTML = `
-      <div class="habit-top">
-
-        <div>
-          <div class="habit-name">
-            ${escapeHTML(habit.name)}
-          </div>
-
-          <div class="habit-progress">
-            <strong>
-              ${completed}/${habit.goal}
-            </strong>
-            jours cette semaine
-          </div>
-        </div>
-
-        <button
-          type="button"
-          class="delete-habit"
-          data-delete="${habit.id}"
-          aria-label="Supprimer ${escapeHTML(habit.name)}"
-        >
-          ×
-        </button>
-
-      </div>
-
-      <div class="days">
-        ${daysHTML}
-      </div>
-
-      <div class="goal-badge ${goalReached ? "done" : ""}">
-        ${
-          goalReached
-            ? "✓ Objectif de la semaine atteint"
-            : `
-              ${remaining}
-              jour${remaining > 1 ? "s" : ""}
-              restant${remaining > 1 ? "s" : ""}
-            `
-        }
-      </div>
-
-      ${
-        surpassed
-          ? `
-            <div class="habit-celebration">
-              🔥 Tu t'es surpassé·e
-              sur cette habitude.
-            </div>
-          `
-          : ""
-      }
-    `;
-
-    habitsList.appendChild(card);
-  });
-
-  attachHabitEvents();
-}
-
-function attachHabitEvents() {
-  document
-    .querySelectorAll(".day-circle")
+  habitsList
+    .querySelectorAll(
+      "[data-action='delete']"
+    )
     .forEach(button => {
-      button.addEventListener("click", () => {
-        const habitId =
-          Number(button.dataset.habit);
 
-        const date =
-          button.dataset.date;
+      button.addEventListener(
+        "click",
+        () => {
 
-        const habit =
-          data.habits.find(
-            h => h.id === habitId
-          );
+          const id =
+            Number(button.dataset.id);
 
-        if (!habit) return;
+          const habit =
+            data.habits.find(
+              item => item.id === id
+            );
 
-        if (!habit.completed) {
-          habit.completed = {};
+          if (!habit) return;
+
+          const confirmed =
+            confirm(
+              `Supprimer l'habitude « ${habit.name} » ?`
+            );
+
+          if (!confirmed) return;
+
+          data.habits =
+            data.habits.filter(
+              item => item.id !== id
+            );
+
+          if (
+            selectedCalendarHabitId === id
+          ) {
+            selectedCalendarHabitId =
+              data.habits[0]?.id ?? null;
+          }
+
+          saveData();
+
+          renderHabits();
+          renderCalendarHabitSelector();
+          renderCalendar();
+          renderMonthlyRecap();
         }
-
-        habit.completed[date] =
-          !habit.completed[date];
-
-        saveData();
-
-        renderHabits();
-        renderCalendar();
-        renderMonthlyRecap();
-      });
-    });
-
-  document
-    .querySelectorAll(".delete-habit")
-    .forEach(button => {
-      button.addEventListener("click", () => {
-        const id =
-          Number(button.dataset.delete);
-
-        if (
-          !confirm(
-            "Supprimer cette habitude ?"
-          )
-        ) {
-          return;
-        }
-
-        data.habits =
-          data.habits.filter(
-            habit => habit.id !== id
-          );
-
-        if (
-          selectedCalendarHabitId === id
-        ) {
-          selectedCalendarHabitId =
-            data.habits[0]?.id || null;
-        }
-
-        saveData();
-
-        renderHabits();
-        renderCalendarHabitSelector();
-        renderCalendar();
-        renderMonthlyRecap();
-      });
+      );
     });
 }
 
-/* =========================================================
-   CALENDRIER — CHOIX HABITUDE
-========================================================= */
-
-function renderCalendarHabitSelector() {
-  if (!calendarHabitSelector) return;
-
-  calendarHabitSelector.innerHTML = "";
-
-  if (!data.habits.length) {
-    if (calendarHabitInfo) {
-      calendarHabitInfo.innerHTML = "";
-    }
-
-    return;
-  }
-
-  const selectedExists =
-    data.habits.some(
-      habit =>
-        habit.id ===
-        selectedCalendarHabitId
-    );
-
-  if (!selectedExists) {
-    selectedCalendarHabitId =
-      data.habits[0].id;
-  }
-
-  data.habits.forEach(habit => {
-    const button =
-      document.createElement("button");
-
-    button.type = "button";
-    button.className =
-      "calendar-habit-tab";
-
-    button.classList.toggle(
-      "selected",
-      habit.id ===
-        selectedCalendarHabitId
-    );
-
-    button.textContent = habit.name;
-
-    button.addEventListener("click", () => {
-      selectedCalendarHabitId =
-        habit.id;
-
-      renderCalendarHabitSelector();
-      renderCalendar();
-    });
-
-    calendarHabitSelector.appendChild(
-      button
-    );
-  });
-}
-
-/* =========================================================
-   CALENDRIER
-========================================================= */
-
-function renderCalendar() {
-  if (
-    !calendarGrid ||
-    !calendarTitle
-  ) {
-    return;
-  }
-
-  renderCalendarHabitSelector();
-
-  if (!data.habits.length) {
-    calendarTitle.textContent = "";
-
-    calendarGrid.innerHTML = `
-      <div
-        class="calendar-empty-message"
-        style="grid-column:1/-1"
-      >
-        Ajoute une habitude pour commencer
-        à remplir ton calendrier.
-      </div>
-    `;
-
-    return;
-  }
+function toggleHabit(
+  habitId,
+  key
+) {
 
   const habit =
     data.habits.find(
-      item =>
-        item.id ===
-        selectedCalendarHabitId
+      item => item.id === habitId
     );
 
   if (!habit) return;
@@ -781,16 +706,112 @@ function renderCalendar() {
     habit.completed = {};
   }
 
-  if (calendarHabitInfo) {
-    calendarHabitInfo.innerHTML = `
-      <strong>
-        ${escapeHTML(habit.name)}
-      </strong>
-      · objectif :
-      ${habit.goal}
-      jour${habit.goal > 1 ? "s" : ""}
-      / semaine
-    `;
+  habit.completed[key] =
+    !habit.completed[key];
+
+  saveData();
+
+  renderHabits();
+  renderCalendar();
+  renderMonthlyRecap();
+}
+
+/* =========================================================
+   CALENDRIER
+========================================================= */
+
+function renderCalendarHabitSelector() {
+
+  if (!calendarHabitSelector) {
+    return;
+  }
+
+  if (data.habits.length === 0) {
+
+    calendarHabitSelector.innerHTML = "";
+
+    if (calendarHabitInfo) {
+      calendarHabitInfo.textContent =
+        "Ajoute une habitude pour voir ton suivi.";
+    }
+
+    return;
+  }
+
+  if (
+    selectedCalendarHabitId === null ||
+    !data.habits.some(
+      habit =>
+        habit.id ===
+        selectedCalendarHabitId
+    )
+  ) {
+    selectedCalendarHabitId =
+      data.habits[0].id;
+  }
+
+  calendarHabitSelector.innerHTML =
+    data.habits
+      .map(
+        habit => `
+          <button
+            type="button"
+            class="calendar-habit-button ${
+              habit.id ===
+              selectedCalendarHabitId
+                ? "active"
+                : ""
+            }"
+            data-id="${habit.id}"
+          >
+            ${escapeHTML(habit.name)}
+          </button>
+        `
+      )
+      .join("");
+
+  calendarHabitSelector
+    .querySelectorAll(
+      ".calendar-habit-button"
+    )
+    .forEach(button => {
+
+      button.addEventListener(
+        "click",
+        () => {
+
+          selectedCalendarHabitId =
+            Number(button.dataset.id);
+
+          renderCalendarHabitSelector();
+          renderCalendar();
+        }
+      );
+    });
+
+  const habit =
+    data.habits.find(
+      item =>
+        item.id ===
+        selectedCalendarHabitId
+    );
+
+  if (
+    calendarHabitInfo &&
+    habit
+  ) {
+    calendarHabitInfo.textContent =
+      `${habit.goal} jour${habit.goal > 1 ? "s" : ""} par semaine`;
+  }
+}
+
+function renderCalendar() {
+
+  if (
+    !calendarTitle ||
+    !calendarGrid
+  ) {
+    return;
   }
 
   const year =
@@ -805,15 +826,23 @@ function renderCalendar() {
   calendarGrid.innerHTML = "";
 
   const firstDay =
-    new Date(year, month, 1);
+    new Date(
+      year,
+      month,
+      1
+    );
 
-  let start =
+  let startDay =
     firstDay.getDay();
 
-  start =
-    start === 0
+  /*
+    JS : dimanche = 0
+    Notre calendrier commence lundi.
+  */
+  startDay =
+    startDay === 0
       ? 6
-      : start - 1;
+      : startDay - 1;
 
   const daysInMonth =
     new Date(
@@ -822,18 +851,26 @@ function renderCalendar() {
       0
     ).getDate();
 
+  /*
+    Cases avant le premier jour.
+  */
   for (
-    let i = 0;
-    i < start;
-    i++
+    let index = 0;
+    index < startDay;
+    index++
   ) {
+
     const empty =
-      document.createElement("div");
+      document.createElement(
+        "div"
+      );
 
     empty.className =
       "calendar-day empty";
 
-    calendarGrid.appendChild(empty);
+    calendarGrid.appendChild(
+      empty
+    );
   }
 
   for (
@@ -841,6 +878,7 @@ function renderCalendar() {
     day <= daysInMonth;
     day++
   ) {
+
     const date =
       new Date(
         year,
@@ -851,216 +889,194 @@ function renderCalendar() {
     const key =
       dateKey(date);
 
-    const completed =
-      Boolean(
-        habit.completed[key]
-      );
-
     const isToday =
       key === dateKey(new Date());
 
+    const habit =
+      data.habits.find(
+        item =>
+          item.id ===
+          selectedCalendarHabitId
+      );
+
+    const completed =
+      Boolean(
+        habit?.completed?.[key]
+      );
+
+    /*
+      NOUVEAU :
+      présence d'un journal quotidien.
+      Cela permet d'afficher seulement
+      un petit point dans le calendrier.
+    */
     const hasJournal =
       Boolean(
         data.dailyJournal[key]
       );
 
     const cell =
-      document.createElement("button");
+      document.createElement(
+        "button"
+      );
 
     cell.type = "button";
 
     cell.className =
       "calendar-day" +
-      (completed
-        ? " has-habit"
-        : "") +
-      (isToday
-        ? " today"
-        : "") +
-      (hasJournal
-        ? " has-journal"
-        : "");
+      (
+        completed
+          ? " has-habit"
+          : ""
+      ) +
+      (
+        isToday
+          ? " today"
+          : ""
+      ) +
+      (
+        hasJournal
+          ? " has-journal"
+          : ""
+      );
 
-    cell.textContent = day;
+    cell.textContent =
+      day;
 
-    cell.addEventListener("click", () => {
-      selectedJournalDate = key;
+    cell.addEventListener(
+      "click",
+      () => {
 
-      showPage("journalPage");
-      loadJournals(key);
-      updateWeeklyJournalAvailability();
-    });
+        /*
+          Cliquer sur un jour ouvre
+          directement le journal de ce jour.
+        */
+        selectedJournalDate =
+          key;
 
-    calendarGrid.appendChild(cell);
+        showPage(
+          "journalPage"
+        );
+
+        loadJournals(key);
+
+        updateWeeklyJournalAvailability();
+      }
+    );
+
+    calendarGrid.appendChild(
+      cell
+    );
   }
 }
 
 if (prevMonth) {
-  prevMonth.addEventListener("click", () => {
-    calendarDate.setMonth(
-      calendarDate.getMonth() - 1
-    );
+  prevMonth.addEventListener(
+    "click",
+    () => {
 
-    renderCalendar();
-  });
+      calendarDate =
+        new Date(
+          calendarDate.getFullYear(),
+          calendarDate.getMonth() - 1,
+          1
+        );
+
+      renderCalendar();
+    }
+  );
 }
 
 if (nextMonth) {
-  nextMonth.addEventListener("click", () => {
-    calendarDate.setMonth(
-      calendarDate.getMonth() + 1
-    );
+  nextMonth.addEventListener(
+    "click",
+    () => {
 
-    renderCalendar();
-  });
-}
+      calendarDate =
+        new Date(
+          calendarDate.getFullYear(),
+          calendarDate.getMonth() + 1,
+          1
+        );
 
-/* =========================================================
-   RECAP MENSUEL
-========================================================= */
-
-function renderMonthlyRecap() {
-  if (!monthlyRecap) return;
-
-  if (!data.habits.length) {
-    monthlyRecap.textContent =
-      "Ajoute une habitude pour commencer ton suivi.";
-
-    return;
-  }
-
-  const now = new Date();
-
-  const year =
-    now.getFullYear();
-
-  const month =
-    now.getMonth();
-
-  const daysInMonth =
-    new Date(
-      year,
-      month + 1,
-      0
-    ).getDate();
-
-  monthlyRecap.innerHTML =
-    data.habits
-      .slice(0, 3)
-      .map(habit => {
-        if (!habit.completed) {
-          habit.completed = {};
-        }
-
-        let completed = 0;
-
-        for (
-          let day = 1;
-          day <= daysInMonth;
-          day++
-        ) {
-          const date =
-            new Date(
-              year,
-              month,
-              day
-            );
-
-          if (
-            habit.completed[
-              dateKey(date)
-            ]
-          ) {
-            completed++;
-          }
-        }
-
-        const monthlyGoal =
-          Math.round(
-            habit.goal *
-              daysInMonth /
-              7
-          );
-
-        return `
-          <div style="margin-bottom:8px">
-            Ce mois-ci, tu as réussi à
-            <strong>
-              ${escapeHTML(habit.name)}
-            </strong>
-            <strong>${completed}</strong>
-            jour${completed > 1 ? "s" : ""}
-            sur
-            <strong>${monthlyGoal}</strong>
-            fixé${monthlyGoal > 1 ? "s" : ""}.
-          </div>
-        `;
-      })
-      .join("");
+      renderCalendar();
+    }
+  );
 }
 
 /* =========================================================
    JOURNAL QUOTIDIEN
 ========================================================= */
 
-function loadDailyFeelings(
-  date = selectedJournalDate
-) {
-  const saved =
-    data.dailyJournal[date];
-
-  document
-    .querySelectorAll(
-      ".feeling-option input"
-    )
-    .forEach(input => {
-      input.checked =
-        saved?.feelings?.includes(
-          input.value
-        ) || false;
-    });
-}
-
 function updateJournalDateTitle() {
-  const title =
-    document.getElementById(
-      "dailyJournalTitle"
-    );
 
-  if (!title) return;
-
-  const today =
-    dateKey(new Date());
-
-  if (
-    selectedJournalDate === today
-  ) {
-    title.textContent =
-      "Aujourd'hui";
-
+  if (!dailyJournalTitle) {
     return;
   }
 
   const date =
     new Date(
       selectedJournalDate +
-        "T00:00:00"
+      "T00:00:00"
     );
 
-  title.textContent =
-    `Journal du ${date.toLocaleDateString(
+  const today =
+    dateKey(new Date());
+
+  if (
+    selectedJournalDate ===
+    today
+  ) {
+
+    dailyJournalTitle.textContent =
+      "Comment te sens-tu ?";
+
+    return;
+  }
+
+  const label =
+    date.toLocaleDateString(
       "fr-FR",
       {
+        weekday: "long",
         day: "numeric",
         month: "long"
       }
-    )}`;
+    );
+
+  dailyJournalTitle.textContent =
+    `Ton journal du ${label}`;
+}
+
+function loadDailyFeelings(
+  date
+) {
+
+  const saved =
+    data.dailyJournal[date];
+
+  const feelings =
+    saved?.feelings || [];
+
+  document
+    .querySelectorAll(
+      ".feeling-option input"
+    )
+    .forEach(input => {
+
+      input.checked =
+        feelings.includes(
+          input.value
+        );
+    });
 }
 
 function loadJournals(
   date = selectedJournalDate
 ) {
-  selectedJournalDate = date;
+
+  selectedJournalDate =
+    date;
 
   const savedDaily =
     data.dailyJournal[date];
@@ -1071,112 +1087,69 @@ function loadJournals(
   }
 
   loadDailyFeelings(date);
+
   updateJournalDateTitle();
 
-  const journal =
-    data.weeklyJournals[
-      getWeekKey()
-    ];
-
-  if (!journal) {
-    if (positive1) {
-      positive1.value = "";
-    }
-
-    if (positive2) {
-      positive2.value = "";
-    }
-
-    if (positive3) {
-      positive3.value = "";
-    }
-
-    if (weeklyText) {
-      weeklyText.value = "";
-    }
-
-    document
-      .querySelectorAll(
-        '[data-category="positiveChoices"], [data-category="negativeChoices"]'
+  /*
+    Quand on consulte un jour précis,
+    on affiche aussi le bilan de la semaine
+    correspondante.
+  */
+  selectedWeeklyWeekKey =
+    getWeekKeyForDate(
+      new Date(
+        date + "T00:00:00"
       )
-      .forEach(input => {
-        input.checked = false;
-      });
+    );
 
-    return;
-  }
-
-  if (positive1) {
-    positive1.value =
-      journal.positive1 || "";
-  }
-
-  if (positive2) {
-    positive2.value =
-      journal.positive2 || "";
-  }
-
-  if (positive3) {
-    positive3.value =
-      journal.positive3 || "";
-  }
-
-  if (weeklyText) {
-    weeklyText.value =
-      journal.text || "";
-  }
-
-  document
-    .querySelectorAll(
-      '[data-category="positiveChoices"], [data-category="negativeChoices"]'
-    )
-    .forEach(input => {
-      const category =
-        input.dataset.category;
-
-      input.checked =
-        journal[category]?.includes(
-          input.value
-        ) || false;
-    });
+  loadWeeklyJournal(
+    selectedWeeklyWeekKey
+  );
 }
 
-/* =========================================================
-   ENREGISTREMENT JOURNAL
-========================================================= */
-
 if (saveDaily) {
-  saveDaily.addEventListener("click", () => {
-    const date =
-      selectedJournalDate;
 
-    const feelings =
-      [
-        ...document.querySelectorAll(
-          ".feeling-option input:checked"
-        )
-      ].map(
-        input => input.value
-      );
+  saveDaily.addEventListener(
+    "click",
+    () => {
 
-    data.dailyJournal[date] = {
-      feelings,
-      text:
-        dailyJournal?.value || ""
-    };
+      const feelings =
+        [
+          ...document.querySelectorAll(
+            ".feeling-option input:checked"
+          )
+        ].map(
+          input =>
+            input.value
+        );
 
-    saveData();
+      data.dailyJournal[
+        selectedJournalDate
+      ] = {
+        text:
+          dailyJournal
+            ? dailyJournal.value
+            : "",
+        feelings
+      };
 
-    saveDaily.textContent =
-      "Enregistré ✓";
+      saveData();
 
-    setTimeout(() => {
       saveDaily.textContent =
-        "Enregistrer";
-    }, 1500);
+        "Enregistré ✓";
 
-    renderCalendar();
-  });
+      /*
+        Rafraîchit le calendrier :
+        le petit point apparaît immédiatement.
+      */
+      renderCalendar();
+
+      setTimeout(() => {
+        saveDaily.textContent =
+          "Enregistrer";
+      }, 1800);
+    }
+  );
 }
 
 /* =========================================================
@@ -1184,32 +1157,21 @@ if (saveDaily) {
 ========================================================= */
 
 const positiveOptions = [
-  "Je me suis bien senti·e",
-  "J'ai pris du temps pour moi",
-  "J'ai bien dormi",
-  "J'ai fait quelque chose que j'aime",
-  "J'ai été fier·ère de moi",
-  "J'ai passé du temps avec quelqu'un",
-  "J'ai avancé sur un projet",
-  "J'ai pris soin de moi",
-  "J'ai découvert quelque chose",
-  "Autre"
+  "Sereine",
+  "Énergique",
+  "Productive",
+  "Épanouissante"
 ];
 
 const negativeOptions = [
   "Fatigue",
-  "Manque de temps",
   "Stress",
-  "Manque de motivation",
-  "Sommeil difficile",
-  "Trop de choses à gérer",
-  "Difficulté à m'organiser",
-  "Baisse d'énergie",
-  "Imprévu",
-  "Autre"
+  "Manque de temps",
+  "Difficultés"
 ];
 
 function renderChoiceLists() {
+
   const positiveContainer =
     document.getElementById(
       "positiveChoices"
@@ -1264,8 +1226,18 @@ function renderChoiceLists() {
       .join("");
 }
 
+/*
+  Le bilan de la semaine courante reste soumis
+  à la règle existante :
+  dimanche à partir de 19h + lundi.
+
+  En revanche, les anciens bilans enregistrés
+  restent toujours consultables/modifiables.
+*/
 function isWeeklyJournalAvailable() {
-  const now = new Date();
+
+  const now =
+    new Date();
 
   const day =
     now.getDay();
@@ -1287,111 +1259,514 @@ function isWeeklyJournalAvailable() {
   return false;
 }
 
-function updateWeeklyJournalAvailability() {
-  if (
-    !weeklyContent ||
-    !weeklyJournalCard
-  ) {
-    return;
-  }
+/*
+  Renvoie la clé de la semaine
+  correspondant au lundi de la date.
+*/
+function getWeekKeyForDate(date) {
 
-  if (
-    isWeeklyJournalAvailable()
-  ) {
-    weeklyContent.classList.remove(
-      "hidden"
-    );
-
-    weeklyJournalCard.classList.remove(
-      "locked"
-    );
-
-    if (weeklyAvailability) {
-      weeklyAvailability.textContent =
-        "Ton bilan de la semaine est ouvert.";
-    }
-  } else {
-    weeklyContent.classList.add(
-      "hidden"
-    );
-
-    weeklyJournalCard.classList.add(
-      "locked"
-    );
-
-    if (weeklyAvailability) {
-      weeklyAvailability.textContent =
-        "Le bilan s'ouvre dimanche à 19h et reste disponible jusqu'au lundi soir.";
-    }
-  }
-}
-
-function getWeekKey() {
   return dateKey(
-    getMonday()
+    getMonday(date)
   );
 }
 
-if (saveWeekly) {
-  saveWeekly.addEventListener("click", () => {
-    if (
-      !isWeeklyJournalAvailable()
-    ) {
-      return;
+/*
+  Affichage :
+  7 septembre — 13 septembre 2026
+*/
+function formatWeekRange(
+  weekKey
+) {
+
+  const monday =
+    new Date(
+      weekKey +
+      "T00:00:00"
+    );
+
+  const sunday =
+    new Date(monday);
+
+  sunday.setDate(
+    monday.getDate() + 6
+  );
+
+  return `${monday.toLocaleDateString(
+    "fr-FR",
+    {
+      day: "numeric",
+      month: "long"
     }
-
-    if (
-      !positive1?.value.trim() ||
-      !positive2?.value.trim() ||
-      !positive3?.value.trim()
-    ) {
-      alert(
-        "Il manque encore une des trois choses positives de ta semaine."
-      );
-
-      return;
+  )} — ${sunday.toLocaleDateString(
+    "fr-FR",
+    {
+      day: "numeric",
+      month: "long",
+      year: "numeric"
     }
+  )}`;
+}
 
-    const positiveChoices =
-      [
-        ...document.querySelectorAll(
-          '[data-category="positiveChoices"]:checked'
-        )
-      ].map(
-        input => input.value
-      );
+/*
+  Flèche précédente / suivante.
+*/
+function shiftWeeklyHistory(
+  amount
+) {
 
-    const negativeChoices =
-      [
-        ...document.querySelectorAll(
-          '[data-category="negativeChoices"]:checked'
-        )
-      ].map(
-        input => input.value
-      );
+  const current =
+    new Date(
+      selectedWeeklyWeekKey +
+      "T00:00:00"
+    );
 
+  current.setDate(
+    current.getDate() +
+    amount * 7
+  );
+
+  selectedWeeklyWeekKey =
+    dateKey(current);
+
+  loadWeeklyJournal(
+    selectedWeeklyWeekKey
+  );
+}
+
+/*
+  Charge le bilan de la semaine choisie.
+*/
+function loadWeeklyJournal(
+  weekKey = selectedWeeklyWeekKey
+) {
+
+  selectedWeeklyWeekKey =
+    weekKey;
+
+  const journal =
     data.weeklyJournals[
-      getWeekKey()
-    ] = {
-      positiveChoices,
-      negativeChoices,
-      positive1: positive1.value,
-      positive2: positive2.value,
-      positive3: positive3.value,
-      text:
-        weeklyText?.value || ""
-    };
+      weekKey
+    ];
 
-    saveData();
+  const currentWeekKey =
+    getWeekKeyForDate(
+      new Date()
+    );
 
-    saveWeekly.textContent =
-      "Bilan enregistré ✓";
+  const isCurrentWeek =
+    weekKey ===
+    currentWeekKey;
 
-    setTimeout(() => {
+  const isFuture =
+    weekKey >
+    currentWeekKey;
+
+  /*
+    Un ancien journal existe :
+    il est consultable et modifiable.
+
+    La semaine courante :
+    elle reste soumise à la règle
+    dimanche 19h / lundi.
+
+    Une semaine passée sans journal :
+    elle reste simplement vide.
+  */
+  const canEdit =
+    Boolean(journal) ||
+    (
+      isCurrentWeek &&
+      isWeeklyJournalAvailable()
+    );
+
+  if (weeklyHistoryRange) {
+
+    weeklyHistoryRange.textContent =
+      formatWeekRange(
+        weekKey
+      );
+  }
+
+  if (weeklyJournalTitle) {
+
+    weeklyJournalTitle.textContent =
+      isCurrentWeek
+        ? "Comment s'est passée ta semaine ?"
+        : "Ton bilan de la semaine";
+  }
+
+  if (
+    weeklyContent &&
+    weeklyJournalCard
+  ) {
+
+    if (canEdit) {
+
+      weeklyContent.classList.remove(
+        "hidden"
+      );
+
+      weeklyJournalCard.classList.remove(
+        "locked"
+      );
+
+    } else {
+
+      weeklyContent.classList.add(
+        "hidden"
+      );
+
+      weeklyJournalCard.classList.add(
+        "locked"
+      );
+    }
+  }
+
+  if (weeklyAvailability) {
+
+    if (journal) {
+
+      weeklyAvailability.textContent =
+        isCurrentWeek
+          ? "Ton bilan est enregistré. Tu peux encore le modifier."
+          : "Bilan enregistré. Tu peux le relire et le modifier.";
+
+    } else if (isCurrentWeek) {
+
+      weeklyAvailability.textContent =
+        isWeeklyJournalAvailable()
+          ? "Ton bilan de la semaine est ouvert."
+          : "Le bilan s'ouvre dimanche à 19h et reste disponible jusqu'au lundi soir.";
+
+    } else if (isFuture) {
+
+      weeklyAvailability.textContent =
+        "Cette semaine n'est pas encore disponible.";
+
+    } else {
+
+      weeklyAvailability.textContent =
+        "Aucun bilan enregistré pour cette semaine.";
+    }
+  }
+
+  if (weeklyHistoryStatus) {
+
+    weeklyHistoryStatus.textContent =
+      journal
+        ? "✓ Un bilan est enregistré pour cette semaine."
+        : "Aucun bilan enregistré pour cette semaine.";
+  }
+
+  /*
+    La flèche précédente est toujours possible.
+
+    La flèche suivante est désactivée
+    lorsque l'on atteint la semaine actuelle.
+  */
+  if (prevWeekly) {
+    prevWeekly.disabled = false;
+  }
+
+  if (nextWeekly) {
+    nextWeekly.disabled =
+      weekKey >= currentWeekKey;
+  }
+
+  /*
+    Si la semaine n'est pas éditable,
+    on ne touche pas aux champs.
+  */
+  if (!canEdit) {
+    return;
+  }
+
+  if (positive1) {
+    positive1.value =
+      journal?.positive1 || "";
+  }
+
+  if (positive2) {
+    positive2.value =
+      journal?.positive2 || "";
+  }
+
+  if (positive3) {
+    positive3.value =
+      journal?.positive3 || "";
+  }
+
+  if (weeklyText) {
+    weeklyText.value =
+      journal?.text || "";
+  }
+
+  /*
+    Recharge les choix positifs/négatifs
+    du bilan enregistré.
+  */
+  document
+    .querySelectorAll(
+      '[data-category="positiveChoices"], [data-category="negativeChoices"]'
+    )
+    .forEach(input => {
+
+      const category =
+        input.dataset.category;
+
+      input.checked =
+        journal?.[category]
+          ?.includes(
+            input.value
+          ) || false;
+    });
+}
+
+function updateWeeklyJournalAvailability() {
+
+  loadWeeklyJournal(
+    selectedWeeklyWeekKey
+  );
+}
+
+function getWeekKey() {
+
+  return selectedWeeklyWeekKey;
+}
+
+/*
+  Flèche semaine précédente.
+*/
+if (prevWeekly) {
+
+  prevWeekly.addEventListener(
+    "click",
+    () => {
+
+      shiftWeeklyHistory(-1);
+    }
+  );
+}
+
+/*
+  Flèche semaine suivante.
+*/
+if (nextWeekly) {
+
+  nextWeekly.addEventListener(
+    "click",
+    () => {
+
+      shiftWeeklyHistory(1);
+    }
+  );
+}
+
+/*
+  Sauvegarde du bilan.
+
+  IMPORTANT :
+  on sauvegarde maintenant dans la semaine
+  actuellement sélectionnée et non systématiquement
+  dans la semaine actuelle.
+*/
+if (saveWeekly) {
+
+  saveWeekly.addEventListener(
+    "click",
+    () => {
+
+      const currentWeekKey =
+        getWeekKeyForDate(
+          new Date()
+        );
+
+      const existingJournal =
+        data.weeklyJournals[
+          selectedWeeklyWeekKey
+        ];
+
+      const canEdit =
+        Boolean(existingJournal) ||
+        (
+          selectedWeeklyWeekKey ===
+          currentWeekKey &&
+          isWeeklyJournalAvailable()
+        );
+
+      if (!canEdit) {
+        return;
+      }
+
+      if (
+        !positive1?.value.trim() ||
+        !positive2?.value.trim() ||
+        !positive3?.value.trim()
+      ) {
+
+        alert(
+          "Il manque encore une des trois choses positives de ta semaine."
+        );
+
+        return;
+      }
+
+      const positiveChoices =
+        [
+          ...document.querySelectorAll(
+            '[data-category="positiveChoices"]:checked'
+          )
+        ].map(
+          input =>
+            input.value
+        );
+
+      const negativeChoices =
+        [
+          ...document.querySelectorAll(
+            '[data-category="negativeChoices"]:checked'
+          )
+        ].map(
+          input =>
+            input.value
+        );
+
+      data.weeklyJournals[
+        selectedWeeklyWeekKey
+      ] = {
+
+        positiveChoices,
+
+        negativeChoices,
+
+        positive1:
+          positive1.value,
+
+        positive2:
+          positive2.value,
+
+        positive3:
+          positive3.value,
+
+        text:
+          weeklyText?.value || ""
+      };
+
+      saveData();
+
+      /*
+        Recharge immédiatement le bilan
+        enregistré.
+      */
+      loadWeeklyJournal(
+        selectedWeeklyWeekKey
+      );
+
       saveWeekly.textContent =
-        "Enregistrer mon bilan";
-    }, 1800);
+        "Bilan enregistré ✓";
+
+      setTimeout(() => {
+
+        saveWeekly.textContent =
+          "Enregistrer mon bilan";
+
+      }, 1800);
+    }
+  );
+}
+
+/* =========================================================
+   RECAP MENSUEL
+========================================================= */
+
+function renderMonthlyRecap() {
+
+  if (!monthlyRecap) {
+    return;
+  }
+
+  if (data.habits.length === 0) {
+
+    monthlyRecap.innerHTML =
+      `
+        <p class="soft-text">
+          Ajoute une habitude pour commencer ton suivi.
+        </p>
+      `;
+
+    return;
+  }
+
+  const now =
+    new Date();
+
+  const year =
+    now.getFullYear();
+
+  const month =
+    now.getMonth();
+
+  const daysInMonth =
+    new Date(
+      year,
+      month + 1,
+      0
+    ).getDate();
+
+  let total = 0;
+  let completed = 0;
+
+  data.habits.forEach(habit => {
+
+    for (
+      let day = 1;
+      day <= daysInMonth;
+      day++
+    ) {
+
+      total++;
+
+      const key =
+        dateKey(
+          new Date(
+            year,
+            month,
+            day
+          )
+        );
+
+      if (
+        habit.completed?.[key]
+      ) {
+        completed++;
+      }
+    }
   });
+
+  const percentage =
+    total === 0
+      ? 0
+      : Math.round(
+          (completed / total) *
+          100
+        );
+
+  monthlyRecap.innerHTML =
+    `
+      <div class="recap-number">
+        ${percentage}%
+      </div>
+
+      <div class="recap-text">
+        <strong>
+          ${completed} jour${completed > 1 ? "s" : ""}
+        </strong>
+
+        <span>
+          d'habitudes réalisées ce mois-ci
+        </span>
+      </div>
+    `;
 }
 
 /* =========================================================
@@ -1399,17 +1774,23 @@ if (saveWeekly) {
 ========================================================= */
 
 function generateCode() {
+
   const characters =
     "ABCDEFGHJKLMNPQRSTUVWXYZ23456789";
 
   let code = "";
 
-  for (let i = 0; i < 6; i++) {
+  for (
+    let i = 0;
+    i < 6;
+    i++
+  ) {
+
     code +=
       characters[
         Math.floor(
           Math.random() *
-            characters.length
+          characters.length
         )
       ];
   }
@@ -1418,57 +1799,74 @@ function generateCode() {
 }
 
 if (generateDuo) {
-  generateDuo.addEventListener("click", () => {
-    const code =
-      generateCode();
 
-    data.duo = {
-      code,
-      status: "waiting"
-    };
+  generateDuo.addEventListener(
+    "click",
+    () => {
 
-    saveData();
-    renderDuo();
-  });
+      const code =
+        generateCode();
+
+      data.duo = {
+        code,
+        status: "waiting"
+      };
+
+      saveData();
+      renderDuo();
+    }
+  );
 }
 
 if (joinDuo) {
-  joinDuo.addEventListener("click", () => {
-    const code =
-      duoCodeInput
-        ? duoCodeInput.value
-            .trim()
-            .toUpperCase()
-        : "";
 
-    if (code.length !== 6) {
-      alert(
-        "Le code doit contenir 6 caractères."
-      );
+  joinDuo.addEventListener(
+    "click",
+    () => {
 
-      return;
+      const code =
+        duoCodeInput
+          ? duoCodeInput.value
+              .trim()
+              .toUpperCase()
+          : "";
+
+      if (code.length !== 6) {
+
+        alert(
+          "Le code doit contenir 6 caractères."
+        );
+
+        return;
+      }
+
+      data.duo = {
+        code,
+        status: "connected"
+      };
+
+      saveData();
+      renderDuo();
     }
-
-    data.duo = {
-      code,
-      status: "connected"
-    };
-
-    saveData();
-    renderDuo();
-  });
+  );
 }
 
 if (leaveDuo) {
-  leaveDuo.addEventListener("click", () => {
-    data.duo = null;
 
-    saveData();
-    renderDuo();
-  });
+  leaveDuo.addEventListener(
+    "click",
+    () => {
+
+      data.duo = null;
+
+      saveData();
+      renderDuo();
+    }
+  );
 }
 
 function renderDuo() {
+
   if (
     !duoDisconnected ||
     !duoConnected
@@ -1477,6 +1875,7 @@ function renderDuo() {
   }
 
   if (!data.duo) {
+
     duoDisconnected.classList.remove(
       "hidden"
     );
@@ -1497,6 +1896,7 @@ function renderDuo() {
   );
 
   if (duoCodeDisplay) {
+
     duoCodeDisplay.textContent =
       `Code : ${data.duo.code}`;
   }
@@ -1507,9 +1907,11 @@ function renderDuo() {
 ========================================================= */
 
 if (notificationToggle) {
+
   notificationToggle.addEventListener(
     "click",
     async () => {
+
       data.notifications =
         !data.notifications;
 
@@ -1517,17 +1919,22 @@ if (notificationToggle) {
         data.notifications &&
         "Notification" in window
       ) {
+
         try {
+
           const permission =
             await Notification.requestPermission();
 
           if (
-            permission !== "granted"
+            permission !==
+            "granted"
           ) {
             data.notifications =
               false;
           }
+
         } catch (error) {
+
           console.error(
             "Erreur notifications :",
             error
@@ -1545,7 +1952,10 @@ if (notificationToggle) {
 }
 
 function updateNotificationToggle() {
-  if (!notificationToggle) return;
+
+  if (!notificationToggle) {
+    return;
+  }
 
   notificationToggle.classList.toggle(
     "on",
@@ -1558,12 +1968,33 @@ function updateNotificationToggle() {
 ========================================================= */
 
 function escapeHTML(value) {
+
   return String(value)
-    .replaceAll("&", "&amp;")
-    .replaceAll("<", "&lt;")
-    .replaceAll(">", "&gt;")
-    .replaceAll('"', "&quot;")
-    .replaceAll("'", "&#039;");
+
+    .replaceAll(
+      "&",
+      "&amp;"
+    )
+
+    .replaceAll(
+      "<",
+      "&lt;"
+    )
+
+    .replaceAll(
+      ">",
+      "&gt;"
+    )
+
+    .replaceAll(
+      '"',
+      "&quot;"
+    )
+
+    .replaceAll(
+      "'",
+      "&#039;"
+    );
 }
 
 /* =========================================================
@@ -1571,7 +2002,9 @@ function escapeHTML(value) {
 ========================================================= */
 
 function initialize() {
+
   try {
+
     const monday =
       getMonday();
 
@@ -1579,30 +2012,50 @@ function initialize() {
       getSunday();
 
     if (weekDates) {
+
       weekDates.textContent =
         `${formatShortDate(monday)} — ${formatShortDate(sunday)}`;
     }
 
     selectedJournalDate =
-      dateKey(new Date());
+      dateKey(
+        new Date()
+      );
+
+    /*
+      Toujours commencer sur la semaine actuelle.
+    */
+    selectedWeeklyWeekKey =
+      getWeekKeyForDate(
+        new Date()
+      );
 
     renderWelcome();
+
     renderChoiceLists();
+
     renderHabits();
+
     renderCalendarHabitSelector();
+
     renderCalendar();
+
     renderMonthlyRecap();
+
     updateNotificationToggle();
-    updateWeeklyJournalAvailability();
+
     loadJournals(
       selectedJournalDate
     );
+
     renderDuo();
 
     console.log(
       "Alizeti initialisée correctement."
     );
+
   } catch (error) {
+
     console.error(
       "Erreur pendant l'initialisation d'Alizeti :",
       error
@@ -1615,12 +2068,17 @@ function initialize() {
 ========================================================= */
 
 if (
-  document.readyState === "loading"
+  document.readyState ===
+  "loading"
 ) {
+
   document.addEventListener(
     "DOMContentLoaded",
     initialize
   );
+
 } else {
+
   initialize();
+
 }
