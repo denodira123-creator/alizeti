@@ -18,12 +18,20 @@
 }
 
 
+/* =========================================================
+   BASE
+   ========================================================= */
+
 * {
   box-sizing: border-box;
   margin: 0;
   padding: 0;
+  -webkit-tap-highlight-color: transparent;
 }
 
+html {
+  -webkit-text-size-adjust: 100%;
+}
 
 body {
   font-family:
@@ -37,7 +45,6 @@ body {
   min-height: 100vh;
 }
 
-
 button,
 input,
 textarea,
@@ -45,12 +52,28 @@ select {
   font: inherit;
 }
 
-
 button {
   border: 0;
   cursor: pointer;
+  -webkit-appearance: none;
+  appearance: none;
+  outline: none;
 }
 
+button:focus,
+button:focus-visible,
+button:active {
+  outline: none;
+}
+
+button::-moz-focus-inner {
+  border: 0;
+}
+
+
+/* =========================================================
+   APPLICATION
+   ========================================================= */
 
 .app {
   width: 100%;
@@ -63,7 +86,9 @@ button {
 }
 
 
-/* HEADER */
+/* =========================================================
+   HEADER
+   ========================================================= */
 
 .topbar {
   height: 76px;
@@ -76,7 +101,6 @@ button {
   border-bottom: 1px solid var(--border);
 }
 
-
 .brand {
   display: flex;
   align-items: center;
@@ -87,41 +111,40 @@ button {
   letter-spacing: -.6px;
 }
 
-
 .logo {
   width: 30px;
   height: 30px;
+  flex-shrink: 0;
 }
-
 
 .icon-button {
-width: 42px;
-height: 42px;
+  width: 42px;
+  height: 42px;
 
-border-radius: 50%;
+  border-radius: 50%;
 
-background: transparent;
-color: #9aabb9;
+  background: transparent;
+  color: #9aabb9;
 
-display: flex;
-align-items: center;
-justify-content: center;
+  display: flex;
+  align-items: center;
+  justify-content: center;
 
-transition:
-background .2s ease,
-color .2s ease;
+  transition:
+    background .2s ease,
+    color .2s ease;
 }
 
-.icon-button.active {
-background: var(--blue-light);
-color: var(--blue-dark);
+.icon-button.active,
+#settingsBtn.active {
+  background: var(--blue-light);
+  color: var(--blue-dark);
 }
-
-
 
 .icon-button svg {
   width: 21px;
   height: 21px;
+
   fill: none;
   stroke: currentColor;
   stroke-width: 1.5;
@@ -129,29 +152,47 @@ color: var(--blue-dark);
   stroke-linejoin: round;
 }
 
+.settings-icon {
+  width: 22px;
+  height: 22px;
+}
 
-/* PAGES */
+
+/* =========================================================
+   PAGES
+   ========================================================= */
 
 .page {
   display: none;
   padding: 32px 30px;
 }
 
-
 .page.active {
   display: block;
 }
-
 
 .welcome {
   margin-bottom: 27px;
 }
 
+.welcome .eyebrow {
+  display: block;
+  margin-bottom: 5px;
+
+  color: var(--blue);
+  font-size: 13px;
+  font-weight: 700;
+  letter-spacing: .08em;
+}
+
+.welcome h1 {
+  margin-top: 0;
+  line-height: 1.15;
+}
 
 .page-heading {
   margin-bottom: 27px;
 }
-
 
 .eyebrow {
   color: var(--blue-dark);
@@ -161,24 +202,20 @@ color: var(--blue-dark);
   margin-bottom: 7px;
 }
 
-
 h1 {
   font-size: 32px;
   letter-spacing: -1.2px;
 }
-
 
 h2 {
   font-size: 19px;
   line-height: 1.35;
 }
 
-
 h3 {
   font-size: 14px;
   margin-bottom: 12px;
 }
-
 
 .soft-text {
   color: var(--text-light);
@@ -188,14 +225,15 @@ h3 {
 }
 
 
-/* HABITUDES */
+/* =========================================================
+   HABITUDES
+   ========================================================= */
 
 .habits-list {
   display: flex;
   flex-direction: column;
   gap: 16px;
 }
-
 
 .habit-card {
   border: 1px solid var(--border);
@@ -207,12 +245,10 @@ h3 {
   transition: .25s ease;
 }
 
-
 .habit-card.completed-goal {
   border-color: #b9dbc7;
   background: #fcfefc;
 }
-
 
 .habit-top {
   display: flex;
@@ -220,12 +256,10 @@ h3 {
   gap: 15px;
 }
 
-
 .habit-name {
   font-size: 17px;
   font-weight: 650;
 }
-
 
 .habit-progress {
   margin-top: 5px;
@@ -233,11 +267,9 @@ h3 {
   font-size: 12px;
 }
 
-
 .habit-progress strong {
   color: var(--blue-dark);
 }
-
 
 .delete-habit {
   background: transparent;
@@ -246,7 +278,9 @@ h3 {
 }
 
 
-/* 7 JOURS */
+/* =========================================================
+   7 JOURS
+   ========================================================= */
 
 .days {
   display: grid;
@@ -254,7 +288,6 @@ h3 {
   gap: 7px;
   margin-top: 18px;
 }
-
 
 .day {
   display: flex;
@@ -265,7 +298,6 @@ h3 {
   font-size: 10px;
   color: var(--text-light);
 }
-
 
 .day-circle {
   width: 34px;
@@ -285,23 +317,19 @@ h3 {
   transition: .2s;
 }
 
-
 .day-circle.checked {
   background: var(--blue);
   border-color: var(--blue);
   color: white;
 }
 
-
 .day-circle.today {
   box-shadow: 0 0 0 3px var(--blue-light);
 }
 
-
 .day-circle:active {
   transform: scale(.88);
 }
-
 
 .goal-badge {
   display: inline-flex;
@@ -318,22 +346,17 @@ h3 {
   font-weight: 650;
 }
 
-
 .goal-badge.done {
   background: #e8f5ed;
   color: #4d9a70;
   animation: goalDone .5s ease;
 }
 
-
 @keyframes goalDone {
   0% { transform: scale(.85); }
   60% { transform: scale(1.08); }
   100% { transform: scale(1); }
 }
-
-
-/* DEPASSEMENT INDIVIDUEL */
 
 .habit-celebration {
   margin-top: 12px;
@@ -355,7 +378,6 @@ h3 {
   animation: celebrationIn .4s ease;
 }
 
-
 @keyframes celebrationIn {
   from {
     opacity: 0;
@@ -369,7 +391,9 @@ h3 {
 }
 
 
-/* AJOUT */
+/* =========================================================
+   AJOUT HABITUDE
+   ========================================================= */
 
 .add-habit {
   width: 100%;
@@ -385,13 +409,80 @@ h3 {
   font-weight: 600;
 }
 
-
 .add-habit span {
   font-size: 21px;
 }
 
 
-/* MOIS */
+/* =========================================================
+   OBJECTIF 1–7 JOURS
+   ========================================================= */
+
+.goal-selector {
+  margin: 22px 0 24px;
+}
+
+.goal-selector > p {
+  margin-bottom: 12px;
+
+  color: var(--text);
+  font-size: 13px;
+  font-weight: 600;
+}
+
+.goal-options {
+  display: grid;
+  grid-template-columns: repeat(7, minmax(0, 1fr));
+  gap: 7px;
+
+  width: 100%;
+}
+
+.goal-options button {
+  width: 100%;
+  min-width: 0;
+  height: 42px;
+  padding: 0;
+
+  display: flex;
+  align-items: center;
+  justify-content: center;
+
+  border: 1px solid var(--border);
+  border-radius: 13px;
+
+  background: #fff;
+  color: var(--text-light);
+
+  font-size: 14px;
+  font-weight: 650;
+
+  box-shadow: none;
+
+  transition:
+    background .18s ease,
+    border-color .18s ease,
+    color .18s ease,
+    transform .12s ease;
+}
+
+.goal-options button.selected {
+  background: var(--blue);
+  border-color: var(--blue);
+  color: white;
+
+  box-shadow:
+    0 4px 10px rgba(111,168,220,.20);
+}
+
+.goal-options button:active {
+  transform: scale(.94);
+}
+
+
+/* =========================================================
+   MOIS
+   ========================================================= */
 
 .month-card {
   margin-top: 30px;
@@ -401,7 +492,6 @@ h3 {
 
   background: var(--blue-pale);
 }
-
 
 .month-card-title {
   display: flex;
@@ -414,14 +504,15 @@ h3 {
   margin-bottom: 12px;
 }
 
-
 .monthly-recap {
   font-size: 14px;
   line-height: 1.65;
 }
 
 
-/* CALENDRIER */
+/* =========================================================
+   CALENDRIER
+   ========================================================= */
 
 .calendar-card {
   border: 1px solid var(--border);
@@ -432,7 +523,6 @@ h3 {
   box-shadow: var(--shadow);
 }
 
-
 .calendar-header {
   display: flex;
   align-items: center;
@@ -440,7 +530,6 @@ h3 {
 
   margin-bottom: 20px;
 }
-
 
 .calendar-header button {
   width: 35px;
@@ -454,7 +543,6 @@ h3 {
   font-size: 21px;
 }
 
-
 .weekdays,
 .calendar-grid {
   display: grid;
@@ -462,11 +550,9 @@ h3 {
   gap: 8px;
 }
 
-
 .weekdays {
   margin-bottom: 8px;
 }
-
 
 .weekdays span {
   text-align: center;
@@ -474,7 +560,6 @@ h3 {
   color: var(--text-light);
   font-weight: 650;
 }
-
 
 .calendar-day {
   aspect-ratio: 1;
@@ -488,27 +573,22 @@ h3 {
   font-size: 13px;
 }
 
-
 .calendar-day.empty {
   visibility: hidden;
 }
 
-
 .calendar-day.today {
   box-shadow: inset 0 0 0 1.5px var(--blue);
 }
-
 
 .calendar-day.has-habit {
   background: var(--blue);
   color: white;
 }
 
-
 .calendar-day.today.has-habit {
   box-shadow: 0 0 0 3px var(--blue-light);
 }
-
 
 .calendar-legend {
   margin-top: 18px;
@@ -521,16 +601,94 @@ h3 {
   font-size: 12px;
 }
 
-
 .legend-dot {
   width: 12px;
   height: 12px;
+
   border-radius: 50%;
   background: var(--blue);
 }
 
 
-/* JOURNAL */
+/* =========================================================
+   CALENDRIER — HABITUDES
+   ========================================================= */
+
+.calendar-habit-selector {
+  display: flex;
+  gap: 8px;
+
+  overflow-x: auto;
+
+  padding: 2px 2px 8px;
+  margin-bottom: 4px;
+
+  scrollbar-width: none;
+}
+
+.calendar-habit-selector::-webkit-scrollbar {
+  display: none;
+}
+
+.calendar-habit-tab {
+  flex-shrink: 0;
+
+  border: 1px solid var(--border);
+
+  background: #fff;
+  color: var(--text-light);
+
+  padding: 9px 14px;
+
+  border-radius: 999px;
+
+  font-size: 13px;
+  font-weight: 600;
+
+  transition: .2s ease;
+}
+
+.calendar-habit-tab.selected {
+  background: var(--blue);
+  color: #fff;
+  border-color: var(--blue);
+
+  box-shadow:
+    0 3px 9px rgba(111,168,220,.18);
+}
+
+.calendar-habit-info {
+  min-height: 24px;
+
+  color: var(--text-light);
+  font-size: 13px;
+
+  margin: 0 3px 10px;
+}
+
+.calendar-habit-info strong {
+  color: var(--text);
+}
+
+.calendar-empty-message {
+  padding: 18px;
+
+  background: rgba(111,168,220,.07);
+
+  border-radius: 16px;
+
+  color: var(--text-light);
+
+  font-size: 14px;
+  line-height: 1.5;
+
+  text-align: center;
+}
+
+
+/* =========================================================
+   JOURNAL
+   ========================================================= */
 
 .journal-card {
   border: 1px solid var(--border);
@@ -542,14 +700,13 @@ h3 {
   box-shadow: var(--shadow);
 }
 
-
 .journal-card-header {
   display: flex;
   justify-content: space-between;
   gap: 15px;
+
   margin-bottom: 18px;
 }
-
 
 .journal-icon,
 .duo-icon {
@@ -570,7 +727,6 @@ h3 {
   font-size: 20px;
 }
 
-
 textarea,
 input,
 select {
@@ -585,20 +741,18 @@ select {
   outline: none;
 }
 
-
 textarea {
   min-height: 120px;
   padding: 14px;
+
   resize: vertical;
   line-height: 1.6;
 }
-
 
 input,
 select {
   padding: 13px;
 }
-
 
 textarea:focus,
 input:focus,
@@ -607,72 +761,156 @@ select:focus {
   box-shadow: 0 0 0 3px var(--blue-light);
 }
 
-
 label {
   display: block;
+
   font-size: 13px;
   font-weight: 600;
+
   margin-bottom: 18px;
 }
-
 
 label textarea {
   margin-top: 8px;
 }
 
 
-/* CHOIX DU BILAN */
+/* =========================================================
+   JOURNAL — SENTIMENTS
+   ========================================================= */
+
+.feeling-grid {
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+
+  gap: 9px;
+
+  width: 100%;
+
+  margin: 17px 0 16px;
+}
+
+.feeling-option {
+  width: 100%;
+  min-width: 0;
+  margin-bottom: 0 !important;
+
+  position: relative;
+}
+
+.feeling-option input {
+  position: absolute;
+
+  opacity: 0;
+  pointer-events: none;
+}
+
+.feeling-option span {
+  width: 100%;
+  height: 44px;
+  min-height: 44px;
+
+  padding: 8px 9px;
+
+  display: flex;
+  align-items: center;
+  justify-content: center;
+
+  border: 1px solid var(--border);
+  border-radius: 13px;
+
+  background: #fff;
+  color: var(--text-light);
+
+  font-size: 13px;
+  font-weight: 500;
+
+  line-height: 1.15;
+  text-align: center;
+
+  white-space: normal;
+
+  cursor: pointer;
+
+  transition:
+    background .18s ease,
+    border-color .18s ease,
+    color .18s ease;
+}
+
+.feeling-option input:checked + span {
+  background: var(--blue-light);
+
+  border-color: var(--blue);
+
+  color: var(--blue-dark);
+
+  font-weight: 650;
+}
+
+
+/* =========================================================
+   CHOIX DU BILAN
+   ========================================================= */
 
 .choice-section {
   margin-bottom: 24px;
 }
 
-
 .choice-grid {
   display: grid;
-  grid-template-columns: repeat(2, 1fr);
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+
   gap: 8px;
 }
-
 
 .choice {
   position: relative;
 }
 
-
 .choice input {
   position: absolute;
+
   opacity: 0;
+  pointer-events: none;
 }
 
-
 .choice span {
-  display: block;
+  display: flex;
+  align-items: center;
 
-  padding: 11px 12px;
+  min-height: 42px;
+
+  padding: 8px 10px;
 
   border: 1px solid var(--border);
   border-radius: 13px;
 
-  background: #fbfdff;
-
+  background: #fff;
   color: var(--text-light);
 
   font-size: 12px;
+  line-height: 1.25;
 
-  transition: .2s;
+  cursor: pointer;
+
+  transition: .2s ease;
 }
-
 
 .choice input:checked + span {
-  background: var(--blue-light);
-  border-color: #a8cce8;
-  color: var(--blue-dark);
-  font-weight: 600;
+  background: rgba(111,168,220,.13);
+
+  border-color: var(--blue);
+
+  color: var(--blue);
+
+  font-weight: 650;
 }
 
 
-/* POSITIFS */
+/* =========================================================
+   POSITIFS
+   ========================================================= */
 
 .positive-list {
   margin: 22px 0;
@@ -685,14 +923,15 @@ label textarea {
   border: 1px solid #e2f0e7;
 }
 
-
 .positive-list input {
   margin-bottom: 8px;
   background: white;
 }
 
 
-/* BOUTONS */
+/* =========================================================
+   BOUTONS
+   ========================================================= */
 
 .primary-button {
   width: 100%;
@@ -708,16 +947,13 @@ label textarea {
   transition: .2s;
 }
 
-
 .primary-button:hover {
   background: var(--blue-dark);
 }
 
-
 .small-button {
   margin-top: 10px;
 }
-
 
 .secondary-button {
   padding: 13px 17px;
@@ -730,7 +966,6 @@ label textarea {
   font-weight: 650;
 }
 
-
 .text-button {
   margin-top: 12px;
 
@@ -741,7 +976,22 @@ label textarea {
 }
 
 
-/* REGLAGES */
+/* =========================================================
+   BILAN HEBDOMADAIRE
+   ========================================================= */
+
+.weekly-card.locked {
+  opacity: .96;
+}
+
+.weekly-card.locked .journal-card-header {
+  margin-bottom: 4px;
+}
+
+
+/* =========================================================
+   REGLAGES
+   ========================================================= */
 
 .settings-card {
   border: 1px solid var(--border);
@@ -752,12 +1002,11 @@ label textarea {
   box-shadow: var(--shadow);
 }
 
-
 .setting-block {
   padding: 20px;
+
   border-bottom: 1px solid var(--border);
 }
-
 
 .setting-row {
   padding: 20px;
@@ -769,32 +1018,33 @@ label textarea {
   border-bottom: 1px solid var(--border);
 }
 
-
 .setting-row:last-child {
   border-bottom: 0;
 }
-
 
 .setting-row strong {
   font-size: 14px;
 }
 
-
 .setting-row p {
   margin-top: 4px;
+
   color: var(--text-light);
+
   font-size: 12px;
   line-height: 1.45;
 }
 
 
-/* DUO */
+/* =========================================================
+   DUO
+   ========================================================= */
 
 .duo-section {
   padding: 20px;
+
   border-bottom: 1px solid var(--border);
 }
-
 
 .duo-heading {
   display: flex;
@@ -804,20 +1054,19 @@ label textarea {
   margin-bottom: 20px;
 }
 
-
 .duo-divider {
   text-align: center;
+
   color: var(--text-light);
   font-size: 12px;
+
   margin: 14px 0;
 }
-
 
 .duo-join {
   display: flex;
   gap: 8px;
 }
-
 
 .duo-connected-box {
   display: flex;
@@ -831,17 +1080,18 @@ label textarea {
   background: #f2faf5;
 }
 
-
 .duo-connected-box p {
   margin-top: 3px;
+
   font-size: 11px;
   color: var(--text-light);
 }
 
-
 .duo-status {
   width: 10px;
   height: 10px;
+
+  flex-shrink: 0;
 
   border-radius: 50%;
 
@@ -849,7 +1099,9 @@ label textarea {
 }
 
 
-/* TOGGLE */
+/* =========================================================
+   TOGGLE
+   ========================================================= */
 
 .toggle {
   width: 47px;
@@ -858,9 +1110,9 @@ label textarea {
   padding: 3px;
 
   background: #dbe6ee;
+
   border-radius: 50px;
 }
-
 
 .toggle span {
   display: block;
@@ -869,23 +1121,24 @@ label textarea {
   height: 21px;
 
   border-radius: 50%;
+
   background: white;
 
   transition: .2s;
 }
 
-
 .toggle.on {
   background: var(--blue);
 }
-
 
 .toggle.on span {
   transform: translateX(20px);
 }
 
 
-/* NAVIGATION */
+/* =========================================================
+   NAVIGATION
+   ========================================================= */
 
 .bottom-nav {
   position: fixed;
@@ -910,7 +1163,6 @@ label textarea {
   z-index: 20;
 }
 
-
 .nav-item {
   background: transparent;
 
@@ -921,15 +1173,18 @@ label textarea {
   align-items: center;
   justify-content: center;
 
-  gap: 4px;
+  gap: 0;
 
   font-size: 11px;
 }
 
+.nav-item > span:not(.nav-icon) {
+  display: none;
+}
 
 .nav-icon {
-  width: 39px;
-  height: 31px;
+  width: 46px;
+  height: 42px;
 
   border-radius: 12px;
 
@@ -940,10 +1195,9 @@ label textarea {
   font-size: 19px;
 }
 
-
 .nav-icon svg {
-  width: 21px;
-  height: 21px;
+  width: 24px;
+  height: 24px;
 
   fill: none;
   stroke: currentColor;
@@ -953,18 +1207,59 @@ label textarea {
   stroke-linejoin: round;
 }
 
-
 .nav-item.active {
   color: var(--blue-dark);
 }
-
 
 .nav-item.active .nav-icon {
   background: var(--blue-light);
 }
 
+.journal-nav-icon {
+  width: 29px !important;
+  height: 29px !important;
 
-/* MODAL */
+  min-width: 29px;
+  min-height: 29px;
+
+  display: flex !important;
+
+  align-items: center;
+  justify-content: center;
+
+  flex-shrink: 0;
+
+  font-size: 29px !important;
+  line-height: 29px !important;
+
+  font-family:
+    -apple-system,
+    BlinkMacSystemFont,
+    "Segoe UI",
+    sans-serif;
+
+  transform: none !important;
+}
+
+
+/* =========================================================
+   PETIT TOURNESOL
+   ========================================================= */
+
+.sunflower-mini {
+  color: #F2C45C;
+
+  font-size: 20px;
+
+  transform: rotate(45deg);
+
+  display: inline-block;
+}
+
+
+/* =========================================================
+   MODAL
+   ========================================================= */
 
 .modal {
   position: fixed;
@@ -979,7 +1274,6 @@ label textarea {
   z-index: 50;
 }
 
-
 .modal-box {
   width: min(760px, 100%);
 
@@ -991,7 +1285,6 @@ label textarea {
 
   animation: modalIn .25s ease;
 }
-
 
 .modal-close {
   float: right;
@@ -1007,26 +1300,21 @@ label textarea {
   font-size: 22px;
 }
 
-
 .modal-box h2 {
   margin-bottom: 20px;
 }
-
 
 .modal-box > input {
   margin-bottom: 15px;
 }
 
-
 .modal-label {
   margin-bottom: 18px;
 }
 
-
 .modal-label select {
   margin-top: 8px;
 }
-
 
 @keyframes modalIn {
   from {
@@ -1040,13 +1328,40 @@ label textarea {
   }
 }
 
-
 .hidden {
   display: none !important;
 }
 
 
-/* MOBILE */
+/* =========================================================
+   ORDINATEUR
+   ========================================================= */
+
+@media (min-width: 601px) {
+
+  .app {
+    min-height: 100vh;
+  }
+
+  .page {
+    padding-left: 40px;
+    padding-right: 40px;
+  }
+
+  .habit-card {
+    padding: 22px;
+  }
+
+  .bottom-nav {
+    border-radius: 20px 20px 0 0;
+  }
+
+}
+
+
+/* =========================================================
+   MOBILE
+   ========================================================= */
 
 @media (max-width: 600px) {
 
@@ -1080,455 +1395,65 @@ label textarea {
     gap: 4px;
   }
 
-  .choice-grid {
-    grid-template-columns: 1fr 1fr;
-  }
-
-}
-
-
-/* ORDINATEUR */
-
-@media (min-width: 601px) {
-
-  .app {
-    min-height: 100vh;
-  }
-
-  .page {
-    padding-left: 40px;
-    padding-right: 40px;
-  }
-
-  .habit-card {
-    padding: 22px;
-  }
-
-  .bottom-nav {
-    border-radius: 20px 20px 0 0;
-  }
-
-/* =========================================================
-   ALIZETI — AJUSTEMENTS FINAUX
-   ========================================================= */
-
-
-/* ---------- Navigation : icônes uniquement ---------- */
-
-.bottom-nav .nav-item {
-  gap: 0;
-}
-
-.bottom-nav .nav-item > span:not(.nav-icon) {
-  display: none;
-}
-
-.bottom-nav .nav-icon {
-  width: 46px;
-  height: 42px;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-}
-
-.bottom-nav .nav-icon svg {
-  width: 24px;
-  height: 24px;
-}
-
-.journal-nav-icon {
-  font-size: 26px !important;
-  line-height: 1;
-}
-
-
-/* ---------- Roue dentée ---------- */
-
-.settings-icon {
-  width: 22px;
-  height: 22px;
-}
-
-.icon-button {
-  display: flex;
-  align-items: center;
-  justify-content: center;
-}
-
-
-/* ---------- Logo Alizeti ---------- */
-
-.logo {
-  width: 30px;
-  height: 30px;
-  flex-shrink: 0;
-}
-
-
-/* ---------- Sélecteur de jours ---------- */
-
-.goal-selector {
-  margin: 20px 0;
-}
-
-.goal-selector > p {
-  color: var(--text-light);
-  font-size: 13px;
-  margin-bottom: 12px;
-}
-
-.goal-options {
-  display: flex;
-  gap: 7px;
-  width: 100%;
-}
-
-.goal-options button {
-  flex: 1;
-  height: 42px;
-
-  border-radius: 13px;
-
-  border: 1px solid var(--border);
-  background: #fff;
-
-  color: var(--text-light);
-
-  font-weight: 650;
-
-  cursor: pointer;
-
-  transition:
-    background .2s ease,
-    color .2s ease,
-    border-color .2s ease,
-    transform .15s ease;
-}
-
-.goal-options button:active {
-  transform: scale(.95);
-}
-
-.goal-options button.selected {
-  background: var(--blue);
-  color: #fff;
-  border-color: var(--blue);
-
-  box-shadow:
-    0 4px 10px rgba(111,168,220,.22);
-}
-
-
-/* =========================================================
-   CALENDRIER PAR HABITUDE
-   ========================================================= */
-
-.calendar-habit-selector {
-  display: flex;
-  gap: 8px;
-
-  overflow-x: auto;
-
-  padding:
-    2px
-    2px
-    8px;
-
-  margin-bottom: 4px;
-
-  scrollbar-width: none;
-}
-
-.calendar-habit-selector::-webkit-scrollbar {
-  display: none;
-}
-
-
-.calendar-habit-tab {
-  flex-shrink: 0;
-
-  border: 1px solid var(--border);
-
-  background: #fff;
-
-  color: var(--text-light);
-
-  padding: 9px 14px;
-
-  border-radius: 999px;
-
-  font-size: 13px;
-  font-weight: 600;
-
-  cursor: pointer;
-
-  transition: .2s ease;
-}
-
-
-.calendar-habit-tab.selected {
-  background: var(--blue);
-  color: #fff;
-  border-color: var(--blue);
-
-  box-shadow:
-    0 3px 9px rgba(111,168,220,.18);
-}
-
-
-.calendar-habit-info {
-  min-height: 24px;
-
-  color: var(--text-light);
-
-  font-size: 13px;
-
-  margin:
-    0 3px
-    10px;
-}
-
-
-.calendar-habit-info strong {
-  color: var(--text);
-}
-
-
-.calendar-empty-message {
-  padding: 18px;
-
-  background: rgba(111,168,220,.07);
-
-  border-radius: 16px;
-
-  color: var(--text-light);
-
-  font-size: 14px;
-
-  line-height: 1.5;
-
-  text-align: center;
-}
-
-
-/* =========================================================
-   JOURNAL — SENTIMENTS
-   ========================================================= */
-
-.feeling-grid {
-  display: grid;
-
-  grid-template-columns:
-    repeat(2, minmax(0, 1fr));
-
-  gap: 8px;
-
-  margin:
-    16px 0
-    14px;
-}
-
-
-.feeling-option {
-  position: relative;
-}
-
-
-.feeling-option input {
-  position: absolute;
-  opacity: 0;
-  pointer-events: none;
-}
-
-
-.feeling-option span {
-  display: flex;
-
-  align-items: center;
-  justify-content: center;
-
-  min-height: 42px;
-
-  padding: 8px 10px;
-
-  border:
-    1px solid var(--border);
-
-  border-radius: 13px;
-
-  background: #fff;
-
-  color: var(--text-light);
-
-  font-size: 13px;
-
-  text-align: center;
-
-  cursor: pointer;
-
-  transition: .2s ease;
-}
-
-
-.feeling-option input:checked + span {
-  background: rgba(111,168,220,.13);
-
-  border-color: var(--blue);
-
-  color: var(--blue);
-
-  font-weight: 650;
-}
-
-
-/* ---------- Choix bilan ---------- */
-
-.choice-grid {
-  display: grid;
-
-  grid-template-columns:
-    repeat(2, minmax(0, 1fr));
-
-  gap: 8px;
-}
-
-
-.choice {
-  position: relative;
-}
-
-
-.choice input {
-  position: absolute;
-  opacity: 0;
-  pointer-events: none;
-}
-
-
-.choice span {
-  display: flex;
-
-  align-items: center;
-
-  min-height: 42px;
-
-  padding:
-    8px
-    10px;
-
-  border:
-    1px solid var(--border);
-
-  border-radius: 13px;
-
-  background: #fff;
-
-  color: var(--text-light);
-
-  font-size: 12px;
-
-  line-height: 1.25;
-
-  cursor: pointer;
-
-  transition: .2s ease;
-}
-
-
-.choice input:checked + span {
-  background: rgba(111,168,220,.13);
-
-  border-color: var(--blue);
-
-  color: var(--blue);
-
-  font-weight: 650;
-}
-
-
-/* ---------- Journal hebdomadaire ---------- */
-
-.weekly-card.locked {
-  opacity: .96;
-}
-
-
-.weekly-card.locked .journal-card-header {
-  margin-bottom: 4px;
-}
-
-
-/* ---------- Petit tournesol ---------- */
-
-.sunflower-mini {
-  color: #F2C45C;
-
-  font-size: 20px;
-
-  transform:
-    rotate(45deg);
-
-  display: inline-block;
-}
-
-
-/* =========================================================
-   RESPONSIVE IPHONE
-   ========================================================= */
-
-@media (max-width: 600px) {
-
   .bottom-nav .nav-icon {
     width: 50px;
     height: 44px;
   }
-
 
   .bottom-nav .nav-icon svg {
     width: 25px;
     height: 25px;
   }
 
-
   .journal-nav-icon {
-    font-size: 28px !important;
-  }
+    width: 29px !important;
+    height: 29px !important;
 
+    min-width: 29px;
+    min-height: 29px;
+
+    font-size: 29px !important;
+    line-height: 29px !important;
+  }
 
   .logo {
     width: 29px;
     height: 29px;
   }
 
-
   .goal-options {
+    grid-template-columns: repeat(7, minmax(0, 1fr));
     gap: 5px;
   }
 
-
   .goal-options button {
-    height: 44px;
-
-    border-radius: 12px;
+    height: 43px;
+    border-radius: 11px;
 
     font-size: 14px;
   }
-
 
   .calendar-habit-selector {
     margin-left: -2px;
     margin-right: -2px;
   }
 
-
   .calendar-habit-tab {
-    padding:
-      9px
-      13px;
-
+    padding: 9px 13px;
     font-size: 12px;
   }
 
+  .feeling-grid {
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+    gap: 8px;
+  }
+
+  .feeling-option span {
+    height: 43px;
+    min-height: 43px;
+
+    font-size: 12.5px;
+  }
 
   .choice-grid {
     grid-template-columns: 1fr;
@@ -1537,626 +1462,33 @@ label textarea {
 }
 
 
-@media (max-width: 360px) {
-
-  .feeling-grid {
-    grid-template-columns: 1fr;
-  }
-
-
-  .goal-options {
-    gap: 3px;
-  }
-
-
-  .goal-options button {
-    padding: 0;
-  }
-
 /* =========================================================
-   ALIZETI — DERNIERS AJUSTEMENTS
-   Ne modifie pas le reste du CSS.
-   ========================================================= */
-
-
-/* =========================================================
-   1. ACCUEIL — PRÉNOM
-   ========================================================= */
-
-.welcome .eyebrow {
-  display: block;
-  margin-bottom: 4px;
-  color: var(--blue);
-  font-size: 13px;
-  font-weight: 700;
-  letter-spacing: .08em;
-}
-
-.welcome h1 {
-  margin-top: 0;
-}
-
-
-/* =========================================================
-   2. ICÔNES — MÊME TAILLE PARTOUT
-   ========================================================= */
-
-/* On neutralise les différences de rendu entre
-   les différents boutons et navigateurs */
-
-.nav-item,
-.icon-button,
-.nav-icon,
-.nav-icon svg,
-.journal-nav-icon {
-  -webkit-tap-highlight-color: transparent;
-}
-
-
-/* Supprime le gros carré gris / contour natif
-   de certains navigateurs mobiles */
-
-button {
-  -webkit-appearance: none;
-  appearance: none;
-  outline: none;
-}
-
-button:focus,
-button:focus-visible,
-button:active {
-  outline: none;
-}
-
-
-/* Le petit carré bleu de l'application reste
-   géré par les styles existants */
-
-.nav-item {
-  -webkit-tap-highlight-color: transparent;
-}
-
-
-/* =========================================================
-   3. CRAYON JOURNAL
-   Même taille que les autres icônes
-   ========================================================= */
-
-.journal-nav-icon {
-  width: 25px !important;
-  height: 25px !important;
-
-  min-width: 25px;
-  min-height: 25px;
-
-  display: flex !important;
-
-  align-items: center;
-  justify-content: center;
-
-  font-size: 25px !important;
-
-  line-height: 25px !important;
-
-  font-family:
-    -apple-system,
-    BlinkMacSystemFont,
-    "Segoe UI",
-    sans-serif;
-
-  transform: none !important;
-}
-
-
-/* Sur iPhone, on ne réduit surtout pas le crayon */
-
-@media (max-width: 600px) {
-
-  .journal-nav-icon {
-    width: 25px !important;
-    height: 25px !important;
-
-    min-width: 25px;
-    min-height: 25px;
-
-    font-size: 25px !important;
-    line-height: 25px !important;
-  }
-
-}
-
-
-/* =========================================================
-   4. SÉLECTION 1–7 JOURS
-   Même rendu ordinateur + téléphone
-   ========================================================= */
-
-.goal-options {
-  display: flex !important;
-
-  gap: 7px !important;
-
-  width: 100% !important;
-}
-
-
-.goal-options button {
-  flex: 1 1 0 !important;
-
-  width: auto !important;
-  min-width: 0 !important;
-
-  height: 42px !important;
-
-  padding: 0 !important;
-
-  border-radius: 13px !important;
-
-  font-size: 14px !important;
-
-  font-weight: 650 !important;
-
-  box-sizing: border-box;
-
-  display: flex;
-
-  align-items: center;
-  justify-content: center;
-}
-
-
-/* Très important :
-   on annule les adaptations précédentes de l'iPhone */
-
-@media (max-width: 600px) {
-
-  .goal-options {
-    gap: 7px !important;
-  }
-
-  .goal-options button {
-    height: 42px !important;
-
-    padding: 0 !important;
-
-    border-radius: 13px !important;
-
-    font-size: 14px !important;
-  }
-
-}
-
-
-@media (max-width: 360px) {
-
-  .goal-options {
-    gap: 7px !important;
-  }
-
-  .goal-options button {
-    height: 42px !important;
-
-    padding: 0 !important;
-  }
-
-}
-
-
-/* =========================================================
-   5. JOURNAL — AUJOURD'HUI
-   Même présentation sur ordinateur et mobile
-   ========================================================= */
-
-.feeling-grid {
-  display: grid !important;
-
-  grid-template-columns:
-    repeat(2, minmax(0, 1fr)) !important;
-
-  gap: 8px !important;
-
-  width: 100%;
-
-  box-sizing: border-box;
-}
-
-
-.feeling-option {
-  width: 100%;
-
-  min-width: 0;
-}
-
-
-.feeling-option span {
-  width: 100%;
-
-  min-height: 42px !important;
-
-  height: 42px;
-
-  padding:
-    8px 10px !important;
-
-  box-sizing: border-box;
-
-  display: flex;
-
-  align-items: center;
-  justify-content: center;
-
-  border-radius: 13px !important;
-
-  font-size: 13px !important;
-
-  line-height: 1.2;
-
-  white-space: normal;
-}
-
-
-/* On annule l'ancienne adaptation mobile
-   qui transformait les choix en une colonne */
-
-@media (max-width: 600px) {
-
-  .feeling-grid {
-    grid-template-columns:
-      repeat(2, minmax(0, 1fr)) !important;
-
-    gap: 8px !important;
-  }
-
-  .feeling-option span {
-    min-height: 42px !important;
-    height: 42px !important;
-
-    padding:
-      8px 10px !important;
-
-    font-size: 13px !important;
-
-    border-radius: 13px !important;
-  }
-
-}
-
-
-/* Même chose sur les tout petits écrans */
-
-@media (max-width: 360px) {
-
-  .feeling-grid {
-    grid-template-columns:
-      repeat(2, minmax(0, 1fr)) !important;
-
-    gap: 6px !important;
-  }
-
-  .feeling-option span {
-    font-size: 12px !important;
-  }
-
-}
-
-
-/* =========================================================
-   6. EMPÊCHER IOS DE REDIMENSIONNER LES FORMULAIRES
-   ========================================================= */
-
-input,
-textarea,
-button {
-  font-family: inherit;
-}
-
-
-/* iOS peut modifier la taille du texte automatiquement */
-
-html {
-  -webkit-text-size-adjust: 100%;
-}
-
-
-/* =========================================================
-   7. TOUCHES MOBILES — PAS DE FLASH GRIS
-   ========================================================= */
-
-* {
-  -webkit-tap-highlight-color: transparent;
-}
-
-
-button::-moz-focus-inner {
-  border: 0;
-}
-
-
-/* Conserver le petit état bleu de l'application
-   sans laisser le navigateur ajouter son propre état */
-
-.nav-item:focus,
-.nav-item:active,
-.icon-button:focus,
-.icon-button:active {
-  outline: none;
-}
-
-
-/* =========================================================
-   FIN
-   ========================================================= */
-/* =========================================================
-   ALIZETI — B7 FINAL MOBILE / UI
-   ========================================================= */
-
-
-/* =========================================================
-   1. ACCUEIL — BIENVENUE
-   ========================================================= */
-
-.welcome h1 {
-  margin-top: 0;
-  line-height: 1.15;
-}
-
-.welcome .eyebrow {
-  margin-bottom: 5px;
-}
-
-
-/* =========================================================
-   2. RÉGLAGES — ÉTAT ACTIF CONSERVÉ
-   ========================================================= */
-
-#settingsBtn.active {
-  background: var(--blue-light);
-  color: var(--blue-dark);
-}
-
-#settingsBtn.active .settings-icon {
-  color: var(--blue-dark);
-}
-
-
-/* =========================================================
-   3. CRAYON DU JOURNAL — PLUS VISIBLE
-   ========================================================= */
-
-.journal-nav-icon {
-  width: 29px !important;
-  height: 29px !important;
-
-  min-width: 29px !important;
-  min-height: 29px !important;
-
-  font-size: 29px !important;
-  line-height: 29px !important;
-
-  display: flex !important;
-  align-items: center;
-  justify-content: center;
-
-  flex-shrink: 0;
-}
-
-
-/* =========================================================
-   4. SÉLECTION DU NOMBRE DE JOURS
-   ========================================================= */
-
-.goal-selector {
-  margin: 22px 0 24px;
-}
-
-.goal-selector > p {
-  margin-bottom: 12px;
-  color: var(--text);
-  font-size: 13px;
-  font-weight: 600;
-}
-
-.goal-options {
-  display: grid !important;
-
-  grid-template-columns:
-    repeat(7, minmax(0, 1fr)) !important;
-
-  gap: 6px !important;
-
-  width: 100% !important;
-}
-
-.goal-options button {
-  width: 100% !important;
-  min-width: 0 !important;
-
-  height: 44px !important;
-
-  padding: 0 !important;
-
-  display: flex;
-  align-items: center;
-  justify-content: center;
-
-  border: 1px solid var(--border);
-  border-radius: 12px !important;
-
-  background: #fff;
-  color: var(--text-light);
-
-  font-size: 14px !important;
-  font-weight: 650 !important;
-
-  box-shadow: none;
-
-  transition:
-    background .18s ease,
-    border-color .18s ease,
-    color .18s ease,
-    transform .12s ease;
-}
-
-.goal-options button.selected {
-  background: var(--blue);
-  border-color: var(--blue);
-
-  color: white;
-
-  box-shadow:
-    0 4px 10px rgba(111,168,220,.20);
-}
-
-.goal-options button:active {
-  transform: scale(.94);
-}
-
-
-/* =========================================================
-   5. JOURNAL — COMMENT TE SENS-TU ?
-   ========================================================= */
-
-.feeling-grid {
-  display: grid !important;
-
-  grid-template-columns:
-    repeat(2, minmax(0, 1fr)) !important;
-
-  gap: 9px !important;
-
-  width: 100%;
-  margin: 17px 0 16px;
-}
-
-.feeling-option {
-  width: 100%;
-  min-width: 0;
-
-  margin-bottom: 0 !important;
-}
-
-.feeling-option span {
-  width: 100%;
-
-  height: 44px !important;
-  min-height: 44px !important;
-
-  padding: 8px 9px !important;
-
-  display: flex;
-  align-items: center;
-  justify-content: center;
-
-  border: 1px solid var(--border);
-  border-radius: 13px !important;
-
-  background: #fff;
-
-  color: var(--text-light);
-
-  font-size: 13px !important;
-  font-weight: 500;
-
-  line-height: 1.15;
-  text-align: center;
-
-  white-space: normal;
-
-  cursor: pointer;
-
-  transition:
-    background .18s ease,
-    border-color .18s ease,
-    color .18s ease;
-}
-
-.feeling-option input:checked + span {
-  background: var(--blue-light);
-
-  border-color: var(--blue);
-
-  color: var(--blue-dark);
-
-  font-weight: 650;
-}
-
-
-/* =========================================================
-   6. MOBILE
-   ========================================================= */
-
-@media (max-width: 600px) {
-
-  .goal-options {
-    grid-template-columns:
-      repeat(7, minmax(0, 1fr)) !important;
-
-    gap: 5px !important;
-  }
-
-  .goal-options button {
-    height: 43px !important;
-
-    border-radius: 11px !important;
-
-    font-size: 14px !important;
-  }
-
-  .feeling-grid {
-    grid-template-columns:
-      repeat(2, minmax(0, 1fr)) !important;
-
-    gap: 8px !important;
-  }
-
-  .feeling-option span {
-    height: 43px !important;
-    min-height: 43px !important;
-
-    font-size: 12.5px !important;
-  }
-
-  .journal-nav-icon {
-    width: 29px !important;
-    height: 29px !important;
-
-    min-width: 29px !important;
-    min-height: 29px !important;
-
-    font-size: 29px !important;
-    line-height: 29px !important;
-  }
-
-}
-
-
-/* =========================================================
-   7. PETITS ÉCRANS
+   TRÈS PETITS ÉCRANS
    ========================================================= */
 
 @media (max-width: 360px) {
 
   .goal-options {
-    gap: 4px !important;
+    gap: 4px;
   }
 
   .goal-options button {
-    height: 42px !important;
-
-    font-size: 13px !important;
+    height: 42px;
+    font-size: 13px;
   }
 
   .feeling-grid {
-    gap: 6px !important;
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+    gap: 6px;
   }
 
   .feeling-option span {
-    height: 42px !important;
-    min-height: 42px !important;
+    height: 42px;
+    min-height: 42px;
 
-    padding: 7px 5px !important;
+    padding: 7px 5px;
 
-    font-size: 12px !important;
+    font-size: 12px;
   }
 
 }
