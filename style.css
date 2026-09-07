@@ -1499,7 +1499,43 @@ label textarea {
 }
 
 
-/* Journal — historique : ajout discret à la DA existante */
+/* =========================================================
+   JOURNAL — HISTORIQUE QUOTIDIEN / HEBDOMADAIRE
+   ========================================================= */
+
+.journal-history-nav {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 10px;
+  margin: -4px 0 18px;
+}
+
+.journal-history-nav button {
+  width: 34px;
+  height: 34px;
+  padding: 0;
+  border: 0;
+  border-radius: 50%;
+  background: var(--blue-light);
+  color: var(--blue-dark);
+  font-size: 22px;
+  line-height: 1;
+  cursor: pointer;
+}
+
+.journal-history-nav button:disabled {
+  opacity: .35;
+  cursor: default;
+}
+
+#journalDateLabel {
+  flex: 1;
+  text-align: center;
+  color: var(--text-light);
+  font-size: 13px;
+}
+
 .calendar-day {
   position: relative;
 }
@@ -1524,7 +1560,7 @@ label textarea {
   padding: 12px 14px;
   border: 1px solid var(--border);
   border-radius: 14px;
-  background: var(--soft);
+  background: var(--blue-pale);
 }
 
 .weekly-history-heading {
