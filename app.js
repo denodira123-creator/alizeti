@@ -1,26 +1,3 @@
-:::writing{variant="standard" id="74106" title="app.js"}
-/*
-  ALIZETI
-  --------------------------------------------------
-  Fonctionnalités :
-  - habitudes
-  - suivi quotidien
-  - calendrier
-  - point bleu / blanc dans le calendrier
-  - journal lié à chaque date
-  - journal quotidien
-  - bilan hebdomadaire
-  - réglages
-  - Duo local
-  - sauvegarde localStorage
-*/
-
-"use strict";
-
-/* ==================================================
-   DONNÉES
-================================================== */
-
 const STORAGE_KEY = "alizeti_data_v1";
 
 const defaultData = {
