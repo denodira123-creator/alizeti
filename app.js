@@ -190,11 +190,22 @@ const leaveDuo =
   );
 
 
+/* =========================================================
+   ETAT
+   ========================================================= */
+
 let selectedGoal = 3;
 
 let selectedCalendarHabitId = null;
 
 let calendarDate = new Date();
+
+/*
+   Date actuellement consultée dans le journal.
+   Par défaut : aujourd'hui.
+*/
+let selectedJournalDate =
+  dateKey(new Date());
 
 
 /* =========================================================
@@ -372,7 +383,9 @@ function showPage(pageId) {
     pageId === "journalPage"
   ) {
 
-    loadJournals();
+    loadJournals(
+      selectedJournalDate
+    );
 
     updateWeeklyJournalAvailability();
 
@@ -398,6 +411,23 @@ navItems.forEach(item => {
   item.addEventListener(
     "click",
     () => {
+
+      /*
+        Quand on clique directement
+        sur Journal dans la navigation,
+        on revient automatiquement
+        au journal d'aujourd'hui.
+      */
+
+      if (
+        item.dataset.page === "journalPage"
+      ) {
+
+        selectedJournalDate =
+          dateKey(new Date());
+
+      }
+
 
       showPage(
         item.dataset.page
@@ -1099,6 +1129,10 @@ function renderCalendarHabitSelector() {
 }
 
 
+/* =========================================================
+   CALENDRIER
+   ========================================================= */
+
 function renderCalendar() {
 
   renderCalendarHabitSelector();
@@ -1249,9 +1283,20 @@ function renderCalendar() {
       );
 
 
+    const hasJournal =
+      Boolean(
+        data.dailyJournal[key]
+      );
+
+
+    /*
+      On utilise maintenant un bouton
+      pour pouvoir cliquer sur la date.
+    */
+
     const cell =
       document.createElement(
-        "div"
+        "button"
       );
 
 
@@ -1266,11 +1311,45 @@ function renderCalendar() {
         isToday
           ? " today"
           : ""
+      ) +
+      (
+        hasJournal
+          ? " has-journal"
+          : ""
       );
 
 
     cell.textContent =
       day;
+
+
+    /*
+      Cliquer sur une date ouvre
+      directement le journal correspondant.
+    */
+
+    cell.addEventListener(
+      "click",
+      () => {
+
+        selectedJournalDate =
+          key;
+
+
+        showPage(
+          "journalPage"
+        );
+
+
+        loadJournals(
+          key
+        );
+
+
+        updateWeeklyJournalAvailability();
+
+      }
+    );
 
 
     calendarGrid.appendChild(
@@ -1281,6 +1360,8 @@ function renderCalendar() {
 
 }
 
+
+/* Mois précédent */
 
 document
   .getElementById(
@@ -1299,6 +1380,8 @@ document
     }
   );
 
+
+/* Mois suivant */
 
 document
   .getElementById(
@@ -1447,17 +1530,13 @@ function renderMonthlyRecap() {
    JOURNAL QUOTIDIEN
    ========================================================= */
 
-function loadDailyFeelings() {
-
-  const today =
-    dateKey(
-      new Date()
-    );
-
+function loadDailyFeelings(
+  date = selectedJournalDate
+) {
 
   const saved =
     data.dailyJournal[
-      today
+      date
     ];
 
 
@@ -1479,7 +1558,22 @@ function loadDailyFeelings() {
 }
 
 
-function loadJournals() {
+/*
+   Met à jour éventuellement le titre
+   de la section journal si un élément
+   avec cet ID existe dans le HTML.
+*/
+
+function updateJournalDateTitle() {
+
+  const title =
+    document.getElementById(
+      "dailyJournalTitle"
+    );
+
+
+  if (!title) return;
+
 
   const today =
     dateKey(
@@ -1487,9 +1581,47 @@ function loadJournals() {
     );
 
 
+  if (
+    selectedJournalDate === today
+  ) {
+
+    title.textContent =
+      "Aujourd'hui";
+
+    return;
+
+  }
+
+
+  const date =
+    new Date(
+      selectedJournalDate + "T00:00:00"
+    );
+
+
+  title.textContent =
+    `Journal du ${date.toLocaleDateString(
+      "fr-FR",
+      {
+        day: "numeric",
+        month: "long"
+      }
+    )}`;
+
+}
+
+
+function loadJournals(
+  date = selectedJournalDate
+) {
+
+  selectedJournalDate =
+    date;
+
+
   const savedDaily =
     data.dailyJournal[
-      today
+      date
     ];
 
 
@@ -1497,8 +1629,18 @@ function loadJournals() {
     savedDaily?.text || "";
 
 
-  loadDailyFeelings();
+  loadDailyFeelings(
+    date
+  );
 
+
+  updateJournalDateTitle();
+
+
+  /*
+     Le bilan hebdomadaire reste lié
+     à la semaine actuelle.
+  */
 
   const journal =
     data.weeklyJournals[
@@ -1565,14 +1707,16 @@ function loadJournals() {
 }
 
 
+/* =========================================================
+   ENREGISTREMENT JOURNAL QUOTIDIEN
+   ========================================================= */
+
 saveDaily.addEventListener(
   "click",
   () => {
 
-    const today =
-      dateKey(
-        new Date()
-      );
+    const date =
+      selectedJournalDate;
 
 
     const feelings =
@@ -1586,7 +1730,7 @@ saveDaily.addEventListener(
       );
 
 
-    data.dailyJournal[today] = {
+    data.dailyJournal[date] = {
 
       feelings,
 
@@ -1612,6 +1756,15 @@ saveDaily.addEventListener(
       },
       1500
     );
+
+
+    /*
+      On actualise le calendrier pour
+      afficher immédiatement le point
+      indiquant qu'un journal existe.
+    */
+
+    renderCalendar();
 
   }
 );
@@ -2168,6 +2321,15 @@ function initialize() {
     `${formatShortDate(monday)} — ${formatShortDate(sunday)}`;
 
 
+  /*
+    Le journal commence toujours
+    sur aujourd'hui.
+  */
+
+  selectedJournalDate =
+    dateKey(new Date());
+
+
   renderWelcome();
 
   renderChoiceLists();
@@ -2184,11 +2346,13 @@ function initialize() {
 
   updateWeeklyJournalAvailability();
 
-  loadJournals();
+  loadJournals(
+    selectedJournalDate
+  );
 
   renderDuo();
 
 }
 
 
-initialize()
+initialize();
