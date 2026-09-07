@@ -1,13 +1,13 @@
+```html
 <!DOCTYPE html>
 <html lang="fr">
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-
   <title>Alizeti</title>
 
   <meta name="theme-color" content="#6FA8DC">
-  <meta name="description" content="Alizeti — un espace doux pour suivre ses habitudes.">
+  <meta name="description" content="Alizeti — suivre ses habitudes doucement.">
 
   <link rel="manifest" href="manifest.json">
   <link rel="stylesheet" href="style.css">
@@ -15,316 +15,431 @@
 
 <body>
 
-  <div class="app">
+<div class="app">
 
-    <!-- HEADER -->
-    <header class="topbar">
-      <div class="brand">
-        <span class="sunflower">🌻</span>
-        <span>alizeti</span>
+  <!-- HEADER -->
+  <header class="topbar">
+
+    <div class="brand">
+      <svg class="logo" viewBox="0 0 64 64" aria-hidden="true">
+        <g fill="#F2C45C">
+          <ellipse cx="32" cy="10" rx="5" ry="13"/>
+          <ellipse cx="32" cy="54" rx="5" ry="13"/>
+          <ellipse cx="10" cy="32" rx="13" ry="5"/>
+          <ellipse cx="54" cy="32" rx="13" ry="5"/>
+          <ellipse transform="rotate(45 32 32)" cx="32" cy="10" rx="5" ry="13"/>
+          <ellipse transform="rotate(135 32 32)" cx="32" cy="10" rx="5" ry="13"/>
+          <ellipse transform="rotate(225 32 32)" cx="32" cy="10" rx="5" ry="13"/>
+          <ellipse transform="rotate(315 32 32)" cx="32" cy="10" rx="5" ry="13"/>
+        </g>
+        <circle cx="32" cy="32" r="10" fill="#6FA8DC"/>
+        <circle cx="32" cy="32" r="5" fill="#477FAF"/>
+      </svg>
+
+      <span>alizeti</span>
+    </div>
+
+    <button class="icon-button" id="settingsBtn" aria-label="Réglages">
+      <svg viewBox="0 0 24 24">
+        <path d="M12 8.5a3.5 3.5 0 1 0 0 7 3.5 3.5 0 0 0 0-7Z"/>
+        <path d="M19.4 13.5a7.9 7.9 0 0 0 0-3l2-1.5-2-3.4-2.4 1a8 8 0 0 0-2.5-1.5L14.2 2h-4.4l-.3 3.1A8 8 0 0 0 7 6.6l-2.4-1-2 3.4 2 1.5a7.9 7.9 0 0 0 0 3l-2 1.5 2 3.4 2.4-1a8 8 0 0 0 2.5 1.5l.3 3.1h4.4l.3-3.1a8 8 0 0 0 2.5-1.5l2.4 1 2-3.4-2-1.5Z"/>
+      </svg>
+    </button>
+
+  </header>
+
+
+  <main>
+
+    <!-- ACCUEIL -->
+    <section id="homePage" class="page active">
+
+      <div class="welcome">
+        <p class="eyebrow" id="welcomeName">ALIZETI</p>
+        <h1>Cette semaine</h1>
+        <p class="soft-text" id="weekDates"></p>
       </div>
 
-      <button class="icon-button" id="settingsBtn" aria-label="Réglages">
-        ⚙
+      <div id="habitsList" class="habits-list"></div>
+
+      <button id="addHabitBtn" class="add-habit">
+        <span>＋</span>
+        Ajouter une habitude
       </button>
-    </header>
 
-
-    <!-- CONTENU -->
-    <main>
-
-      <!-- ACCUEIL -->
-      <section id="homePage" class="page active">
-
-        <div class="welcome">
-          <p class="eyebrow">TES HABITUDES</p>
-          <h1>Cette semaine</h1>
-          <p class="soft-text" id="weekDates"></p>
+      <div class="month-card">
+        <div class="month-card-title">
+          <span>Ce mois-ci</span>
+          <span>🌻</span>
         </div>
 
+        <div id="monthlyRecap" class="monthly-recap"></div>
+      </div>
 
-        <!-- MESSAGE DE CELEBRATION -->
-        <div id="celebration" class="celebration hidden">
-          <div class="celebration-icon">🔥</div>
+    </section>
+
+
+    <!-- CALENDRIER -->
+    <section id="calendarPage" class="page">
+
+      <div class="page-heading">
+        <p class="eyebrow">TON SUIVI</p>
+        <h1>Calendrier</h1>
+      </div>
+
+      <div class="calendar-card">
+
+        <div class="calendar-header">
+          <button id="prevMonth">‹</button>
+          <strong id="calendarTitle"></strong>
+          <button id="nextMonth">›</button>
+        </div>
+
+        <div class="weekdays">
+          <span>L</span>
+          <span>M</span>
+          <span>M</span>
+          <span>J</span>
+          <span>V</span>
+          <span>S</span>
+          <span>D</span>
+        </div>
+
+        <div id="calendarGrid" class="calendar-grid"></div>
+
+      </div>
+
+      <div class="calendar-legend">
+        <span class="legend-dot completed"></span>
+        <span>Une habitude réalisée</span>
+      </div>
+
+    </section>
+
+
+    <!-- JOURNAL -->
+    <section id="journalPage" class="page">
+
+      <div class="page-heading">
+        <p class="eyebrow">PRENDRE UN PEU DE TEMPS</p>
+        <h1>Journal</h1>
+      </div>
+
+      <div class="journal-card">
+
+        <div class="journal-card-header">
           <div>
-            <strong>Tu t'es surpassé</strong>
-            <p>Tu as dépassé ton objectif cette semaine.</p>
+            <p class="eyebrow">AUJOURD'HUI</p>
+            <h2>Comment vas-tu ?</h2>
           </div>
+
+          <span class="journal-icon">✎</span>
         </div>
 
+        <textarea
+          id="dailyJournal"
+          placeholder="Écris ce que tu veux, si tu en as envie..."
+        ></textarea>
 
-        <!-- HABITUDES -->
-        <div id="habitsList" class="habits-list"></div>
-
-
-        <!-- AJOUT HABITUDE -->
-        <button id="addHabitBtn" class="add-habit">
-          <span>＋</span>
-          Ajouter une habitude
+        <button id="saveDaily" class="primary-button">
+          Enregistrer
         </button>
 
+      </div>
 
-        <!-- RECAP MOIS -->
-        <div class="month-card">
-          <div class="month-card-title">
-            <span>Ce mois-ci</span>
-            <span>🌻</span>
+
+      <!-- BILAN HEBDOMADAIRE -->
+
+      <div id="weeklyJournalCard" class="journal-card weekly-card">
+
+        <div class="journal-card-header">
+
+          <div>
+            <p class="eyebrow">BILAN DE LA SEMAINE</p>
+            <h2>Comment s'est passée ta semaine ?</h2>
           </div>
 
-          <div id="monthlyRecap" class="monthly-recap">
-            Ajoute une habitude pour commencer ton suivi.
-          </div>
-        </div>
-
-      </section>
-
-
-      <!-- CALENDRIER -->
-      <section id="calendarPage" class="page">
-
-        <div class="page-heading">
-          <p class="eyebrow">TON SUIVI</p>
-          <h1>Calendrier</h1>
-        </div>
-
-        <div class="calendar-card">
-
-          <div class="calendar-header">
-            <button id="prevMonth">‹</button>
-            <strong id="calendarTitle"></strong>
-            <button id="nextMonth">›</button>
-          </div>
-
-          <div class="weekdays">
-            <span>L</span>
-            <span>M</span>
-            <span>M</span>
-            <span>J</span>
-            <span>V</span>
-            <span>S</span>
-            <span>D</span>
-          </div>
-
-          <div id="calendarGrid" class="calendar-grid"></div>
+          <span class="journal-icon">☼</span>
 
         </div>
 
-        <div class="calendar-legend">
-          <span class="legend-dot completed"></span>
-          <span>Habitude réalisée</span>
-        </div>
+        <p id="weeklyAvailability" class="soft-text"></p>
 
-      </section>
+        <div id="weeklyContent">
 
+          <div class="choice-section">
 
-      <!-- JOURNAL -->
-      <section id="journalPage" class="page">
+            <h3>Ce qui a été positif</h3>
 
-        <div class="page-heading">
-          <p class="eyebrow">PRENDRE UN PEU DE TEMPS</p>
-          <h1>Journal</h1>
-        </div>
+            <div id="positiveChoices" class="choice-grid"></div>
 
-
-        <!-- JOURNAL QUOTIDIEN -->
-        <div class="journal-card">
-
-          <div class="journal-card-header">
-            <div>
-              <p class="eyebrow">AUJOURD'HUI</p>
-              <h2>Comment vas-tu ?</h2>
-            </div>
-
-            <span class="journal-icon">✎</span>
           </div>
 
-          <textarea
-            id="dailyJournal"
-            placeholder="Écris ce que tu veux, si tu en as envie..."
-          ></textarea>
 
-          <button id="saveDaily" class="primary-button">
+          <div class="choice-section">
+
+            <h3>Ce qui a été plus difficile</h3>
+
+            <div id="negativeChoices" class="choice-grid"></div>
+
+          </div>
+
+
+          <div class="positive-list">
+
+            <h3>3 choses positives de ta semaine</h3>
+
+            <input id="positive1" type="text" placeholder="1.">
+            <input id="positive2" type="text" placeholder="2.">
+            <input id="positive3" type="text" placeholder="3.">
+
+          </div>
+
+
+          <label>
+            Ton journal de la semaine
+
+            <textarea
+              id="weeklyText"
+              placeholder="Tu peux écrire librement ici..."
+            ></textarea>
+
+          </label>
+
+          <button id="saveWeekly" class="primary-button">
+            Enregistrer mon bilan
+          </button>
+
+        </div>
+
+      </div>
+
+    </section>
+
+
+    <!-- REGLAGES -->
+
+    <section id="settingsPage" class="page">
+
+      <div class="page-heading">
+        <p class="eyebrow">ALIZETI</p>
+        <h1>Réglages</h1>
+      </div>
+
+
+      <div class="settings-card">
+
+        <div class="setting-block">
+
+          <p class="eyebrow">TON NOM</p>
+
+          <input
+            id="userName"
+            type="text"
+            maxlength="30"
+            placeholder="Comment veux-tu qu'on t'appelle ?"
+          >
+
+          <button id="saveName" class="primary-button small-button">
             Enregistrer
           </button>
 
         </div>
 
 
-        <!-- BILAN HEBDOMADAIRE -->
-        <div id="weeklyJournalCard" class="journal-card weekly-card">
+        <!-- DUO -->
 
-          <div class="journal-card-header">
+        <div class="duo-section">
+
+          <div class="duo-heading">
+
             <div>
-              <p class="eyebrow">BILAN DE LA SEMAINE</p>
-              <h2>Comment s'est passée ta semaine ?</h2>
+              <p class="eyebrow">MODE DUO</p>
+              <h2>Partager certaines habitudes</h2>
+              <p class="soft-text">
+                Relie ton compte à celui d'une autre personne
+                pour créer des habitudes communes.
+              </p>
             </div>
 
-            <span class="journal-icon">☼</span>
+            <div class="duo-icon">♡</div>
+
           </div>
 
-          <p id="weeklyAvailability" class="soft-text"></p>
 
-          <div id="weeklyContent">
+          <div id="duoDisconnected">
 
-            <label>
-              Ce qui a été positif
-              <textarea
-                id="weeklyPositive"
-                placeholder="Qu'est-ce que tu as apprécié cette semaine ?"
-              ></textarea>
-            </label>
+            <button id="generateDuo" class="primary-button">
+              Créer un code Duo
+            </button>
 
-            <label>
-              Ce qui a été plus difficile
-              <textarea
-                id="weeklyNegative"
-                placeholder="Y a-t-il eu quelque chose de difficile ?"
-              ></textarea>
-            </label>
+            <div class="duo-divider">
+              <span>ou</span>
+            </div>
 
-            <div class="positive-list">
-
-              <h3>3 choses positives de ta semaine</h3>
-
+            <div class="duo-join">
               <input
-                id="positive1"
+                id="duoCodeInput"
                 type="text"
-                placeholder="1. "
+                maxlength="8"
+                placeholder="Entrer un code"
               >
 
-              <input
-                id="positive2"
-                type="text"
-                placeholder="2. "
-              >
+              <button id="joinDuo" class="secondary-button">
+                Rejoindre
+              </button>
+            </div>
 
-              <input
-                id="positive3"
-                type="text"
-                placeholder="3. "
-              >
+          </div>
+
+
+          <div id="duoConnected" class="hidden">
+
+            <div class="duo-connected-box">
+
+              <span class="duo-status"></span>
+
+              <div>
+                <strong>Duo activé</strong>
+                <p id="duoCodeDisplay"></p>
+              </div>
 
             </div>
 
-            <label>
-              Ton journal de la semaine
-              <textarea
-                id="weeklyText"
-                placeholder="Tu peux écrire librement ici..."
-              ></textarea>
-            </label>
-
-            <button id="saveWeekly" class="primary-button">
-              Enregistrer mon bilan
+            <button id="leaveDuo" class="text-button">
+              Quitter le Duo
             </button>
 
           </div>
 
         </div>
 
-      </section>
 
+        <div class="setting-row">
 
-      <!-- REGLAGES -->
-      <section id="settingsPage" class="page">
-
-        <div class="page-heading">
-          <p class="eyebrow">ALIZETI</p>
-          <h1>Réglages</h1>
-        </div>
-
-        <div class="settings-card">
-
-          <div class="setting-row">
-            <div>
-              <strong>Notifications</strong>
-              <p>Une petite pensée pour tes habitudes.</p>
-            </div>
-
-            <button class="toggle" id="notificationToggle">
-              <span></span>
-            </button>
+          <div>
+            <strong>Notifications</strong>
+            <p>Une petite pensée pour tes habitudes.</p>
           </div>
 
-          <div class="setting-row">
-            <div>
-              <strong>Données</strong>
-              <p>Tes habitudes sont actuellement enregistrées sur cet appareil.</p>
-            </div>
+          <button class="toggle" id="notificationToggle">
+            <span></span>
+          </button>
+
+        </div>
+
+
+        <div class="setting-row">
+
+          <div>
+            <strong>Données</strong>
+            <p>
+              Tes données sont actuellement enregistrées
+              sur cet appareil.
+            </p>
           </div>
 
         </div>
 
-      </section>
+      </div>
 
-    </main>
+    </section>
+
+  </main>
 
 
-    <!-- NAVIGATION -->
-    <nav class="bottom-nav">
+  <!-- NAVIGATION -->
 
-      <button class="nav-item active" data-page="homePage">
-        <span class="nav-icon">⌂</span>
-        <span>Accueil</span>
-      </button>
+  <nav class="bottom-nav">
 
-      <button class="nav-item" data-page="calendarPage">
-        <span class="nav-icon">▦</span>
-        <span>Calendrier</span>
-      </button>
+    <button class="nav-item active" data-page="homePage">
 
-      <button class="nav-item" data-page="journalPage">
-        <span class="nav-icon">✎</span>
-        <span>Journal</span>
-      </button>
+      <span class="nav-icon">
+        <svg viewBox="0 0 24 24">
+          <path d="M3 10.5 12 3l9 7.5"/>
+          <path d="M5.5 9.5V21h13V9.5"/>
+          <path d="M9.5 21v-6h5v6"/>
+        </svg>
+      </span>
 
-    </nav>
+      <span>Accueil</span>
+
+    </button>
+
+
+    <button class="nav-item" data-page="calendarPage">
+
+      <span class="nav-icon">
+        <svg viewBox="0 0 24 24">
+          <rect x="3" y="5" width="18" height="16" rx="3"/>
+          <path d="M7 3v4M17 3v4M3 10h18"/>
+          <path d="M7 14h.01M12 14h.01M17 14h.01M7 17h.01M12 17h.01"/>
+        </svg>
+      </span>
+
+      <span>Calendrier</span>
+
+    </button>
+
+
+    <button class="nav-item" data-page="journalPage">
+
+      <span class="nav-icon">✎</span>
+      <span>Journal</span>
+
+    </button>
+
+  </nav>
+
+</div>
+
+
+<!-- MODAL HABITUDE -->
+
+<div id="habitModal" class="modal hidden">
+
+  <div class="modal-box">
+
+    <button id="closeModal" class="modal-close">×</button>
+
+    <p class="eyebrow">NOUVELLE HABITUDE</p>
+
+    <h2>Qu'aimerais-tu mettre en place ?</h2>
+
+    <input
+      id="habitName"
+      type="text"
+      maxlength="60"
+      placeholder="Ex. Lire"
+    >
+
+    <label class="modal-label">
+
+      Combien de jours par semaine ?
+
+      <select id="habitGoal">
+        <option value="1">1 jour</option>
+        <option value="2">2 jours</option>
+        <option value="3" selected>3 jours</option>
+        <option value="4">4 jours</option>
+        <option value="5">5 jours</option>
+        <option value="6">6 jours</option>
+        <option value="7">7 jours</option>
+      </select>
+
+    </label>
+
+    <button id="saveHabit" class="primary-button">
+      Ajouter cette habitude
+    </button>
 
   </div>
 
-
-  <!-- MODAL AJOUT HABITUDE -->
-  <div id="habitModal" class="modal hidden">
-
-    <div class="modal-box">
-
-      <button id="closeModal" class="modal-close">×</button>
-
-      <p class="eyebrow">NOUVELLE HABITUDE</p>
-      <h2>Qu'aimerais-tu mettre en place ?</h2>
-
-      <input
-        id="habitName"
-        type="text"
-        maxlength="60"
-        placeholder="Ex. Lire"
-      >
-
-      <label class="modal-label">
-        Combien de jours par semaine ?
-
-        <select id="habitGoal">
-          <option value="1">1 jour</option>
-          <option value="2">2 jours</option>
-          <option value="3" selected>3 jours</option>
-          <option value="4">4 jours</option>
-          <option value="5">5 jours</option>
-          <option value="6">6 jours</option>
-          <option value="7">7 jours</option>
-        </select>
-
-      </label>
-
-      <button id="saveHabit" class="primary-button">
-        Ajouter cette habitude
-      </button>
-
-    </div>
-
-  </div>
+</div>
 
 
-  <script src="app.js"></script>
+<script src="app.js"></script>
 
 </body>
 </html>
+```
