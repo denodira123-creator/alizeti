@@ -1,0 +1,343 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover" />
+
+  <meta name="theme-color" content="#2563EB" />
+  <meta name="description" content="Alizeti — vos habitudes, à votre rythme." />
+
+  <link rel="manifest" href="manifest.json" />
+  <link rel="stylesheet" href="style.css" />
+
+  <title>Alizeti</title>
+</head>
+
+<body>
+
+  <div id="app">
+
+    <!-- HEADER -->
+    <header class="topbar">
+      <div class="brand">
+        <div class="brand-flower">✦</div>
+        <div>
+          <h1>Alizeti</h1>
+          <span>À ton rythme.</span>
+        </div>
+      </div>
+
+      <button class="icon-button" id="settingsButton" aria-label="Paramètres">
+        ⚙
+      </button>
+    </header>
+
+
+    <!-- MAIN -->
+    <main>
+
+      <!-- PAGE ACCUEIL -->
+      <section id="homePage" class="page active">
+
+        <div class="welcome">
+          <p class="eyebrow" id="todayLabel"></p>
+          <h2 id="greeting">Bonjour 👋</h2>
+          <p class="soft-text">Comment veux-tu prendre soin de tes habitudes aujourd'hui ?</p>
+        </div>
+
+        <div class="week-card">
+
+          <div class="week-header">
+            <div>
+              <span class="section-label">Cette semaine</span>
+              <strong id="weekProgressText">0 / 0</strong>
+            </div>
+
+            <div class="progress-circle">
+              <span id="weekProgressPercent">0%</span>
+            </div>
+          </div>
+
+          <div class="week-progress">
+            <div id="weekProgressBar"></div>
+          </div>
+
+        </div>
+
+
+        <div class="section-heading">
+          <div>
+            <span class="section-label">Mes habitudes</span>
+            <h3>Aujourd'hui</h3>
+          </div>
+
+          <span id="habitCount" class="habit-count">0 / 10</span>
+        </div>
+
+
+        <div id="habitsList" class="habits-list"></div>
+
+
+        <button id="addHabitButton" class="primary-button">
+          <span>＋</span>
+          Ajouter une habitude
+        </button>
+
+      </section>
+
+
+      <!-- PAGE CALENDRIER -->
+      <section id="calendarPage" class="page">
+
+        <div class="page-heading">
+          <span class="section-label">Historique</span>
+          <h2>Calendrier</h2>
+          <p>Regarde ton parcours, sans jugement.</p>
+        </div>
+
+        <div id="calendarHabitSelector" class="habit-selector"></div>
+
+        <div class="calendar-card">
+
+          <div class="calendar-header">
+            <button id="previousMonth">‹</button>
+            <h3 id="calendarMonth"></h3>
+            <button id="nextMonth">›</button>
+          </div>
+
+          <div class="calendar-weekdays">
+            <span>L</span>
+            <span>M</span>
+            <span>M</span>
+            <span>J</span>
+            <span>V</span>
+            <span>S</span>
+            <span>D</span>
+          </div>
+
+          <div id="calendarGrid" class="calendar-grid"></div>
+
+          <div class="calendar-legend">
+            <span><i class="legend-dot done"></i> Réalisée</span>
+            <span><i class="legend-dot empty"></i> Non réalisée</span>
+          </div>
+
+        </div>
+
+      </section>
+
+
+      <!-- PAGE REFLEXION -->
+      <section id="reflectionPage" class="page">
+
+        <div class="page-heading">
+          <span class="section-label">Ton espace</span>
+          <h2>Réflexion</h2>
+          <p>Quelques mots, si tu en as envie.</p>
+        </div>
+
+        <div class="reflection-card">
+
+          <label>
+            Comment s'est passée ta semaine ?
+          </label>
+
+          <div id="reflectionChoices" class="reflection-choices">
+
+            <button data-choice="Manque de temps">Manque de temps</button>
+            <button data-choice="Fatigue">Fatigue</button>
+            <button data-choice="Oubli">Oubli</button>
+            <button data-choice="Manque de motivation">Manque de motivation</button>
+            <button data-choice="Journées chargées">Journées chargées</button>
+            <button data-choice="Maladie">Maladie</button>
+            <button data-choice="Déplacement">Déplacement</button>
+            <button data-choice="Autre">Autre</button>
+
+          </div>
+
+          <label class="notes-label">
+            Quelques notes
+          </label>
+
+          <textarea
+            id="reflectionNotes"
+            placeholder="Écris ce que tu veux garder de cette semaine..."
+          ></textarea>
+
+          <button id="saveReflection" class="primary-button">
+            Enregistrer
+          </button>
+
+        </div>
+
+        <div class="reflection-history">
+          <div class="section-heading">
+            <div>
+              <span class="section-label">Ton journal</span>
+              <h3>Semaines précédentes</h3>
+            </div>
+          </div>
+
+          <div id="reflectionHistory"></div>
+        </div>
+
+      </section>
+
+
+      <!-- PAGE DUO -->
+      <section id="duoPage" class="page">
+
+        <div class="page-heading">
+          <span class="section-label">À deux</span>
+          <h2>Mode Duo</h2>
+          <p>Une fonctionnalité qui sera bientôt disponible.</p>
+        </div>
+
+        <div class="duo-card">
+
+          <div class="duo-icon">♡</div>
+
+          <h3>Partager certaines habitudes</h3>
+
+          <p>
+            Tu pourras bientôt associer ton compte à celui d'une autre personne
+            grâce à un code.
+          </p>
+
+          <div class="coming-soon">
+            Bientôt disponible
+          </div>
+
+        </div>
+
+      </section>
+
+
+      <!-- PAGE PARAMETRES -->
+      <section id="settingsPage" class="page">
+
+        <div class="page-heading">
+          <span class="section-label">Application</span>
+          <h2>Paramètres</h2>
+        </div>
+
+        <div class="settings-card">
+
+          <div class="setting-row">
+            <div>
+              <strong>Ton prénom</strong>
+              <span id="currentName">Non renseigné</span>
+            </div>
+
+            <button id="changeNameButton">Modifier</button>
+          </div>
+
+          <div class="setting-row">
+            <div>
+              <strong>Habitudes</strong>
+              <span id="settingsHabitCount">0 / 10</span>
+            </div>
+          </div>
+
+          <div class="setting-row danger">
+            <div>
+              <strong>Réinitialiser les données</strong>
+              <span>Supprimer toutes les données locales</span>
+            </div>
+
+            <button id="resetButton">Réinitialiser</button>
+          </div>
+
+        </div>
+
+        <div class="about">
+          <div class="brand-small">✦ Alizeti</div>
+          <p>Construire ses habitudes, à son rythme.</p>
+          <span>Version 0.1</span>
+        </div>
+
+      </section>
+
+    </main>
+
+
+    <!-- NAVIGATION -->
+    <nav class="bottom-nav">
+
+      <button class="nav-item active" data-page="homePage">
+        <span>○</span>
+        <small>Accueil</small>
+      </button>
+
+      <button class="nav-item" data-page="calendarPage">
+        <span>□</span>
+        <small>Calendrier</small>
+      </button>
+
+      <button class="nav-item" data-page="reflectionPage">
+        <span>✎</span>
+        <small>Réflexion</small>
+      </button>
+
+      <button class="nav-item" data-page="duoPage">
+        <span>♡</span>
+        <small>Duo</small>
+      </button>
+
+    </nav>
+
+  </div>
+
+
+  <!-- MODAL AJOUT HABITUDE -->
+  <div id="habitModal" class="modal hidden">
+
+    <div class="modal-overlay"></div>
+
+    <div class="modal-content">
+
+      <button class="modal-close" id="closeHabitModal">×</button>
+
+      <span class="section-label">Nouvelle habitude</span>
+      <h2 id="habitModalTitle">Créer une habitude</h2>
+
+      <label for="habitName">Nom de l'habitude</label>
+
+      <input
+        id="habitName"
+        type="text"
+        maxlength="50"
+        placeholder="Ex. Lire 20 minutes"
+      />
+
+      <label>Combien de jours par semaine ?</label>
+
+      <div id="frequencySelector" class="frequency-selector">
+
+        <button data-days="1">1</button>
+        <button data-days="2">2</button>
+        <button data-days="3">3</button>
+        <button data-days="4">4</button>
+        <button data-days="5">5</button>
+        <button data-days="6">6</button>
+        <button data-days="7" class="selected">7</button>
+
+      </div>
+
+      <span class="frequency-description">
+        jours par semaine
+      </span>
+
+      <button id="saveHabitButton" class="primary-button">
+        Ajouter
+      </button>
+
+    </div>
+
+  </div>
+
+
+  <script src="app.js"></script>
+
+</body>
+</html>
