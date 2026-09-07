@@ -1,11 +1,26 @@
 {
   "name": "Alizeti",
   "short_name": "Alizeti",
-  "description": "Construire ses habitudes, à son rythme.",
+  "description": "Suivre ses habitudes doucement.",
   "start_url": "./",
   "display": "standalone",
-  "background_color": "#f8fafc",
-  "theme_color": "#2563eb",
+  "background_color": "#FFFFFF",
+  "theme_color": "#6FA8DC",
   "orientation": "portrait",
-  "lang": "fr"
+
+  "icons": [
+    {
+      "src": "icon-192.png",
+      "sizes": "192x192",
+      "type": "image/png",
+      "purpose": "any maskable"
+    },
+    {
+      "src": "icon-512.png",
+      "sizes": "512x512",
+      "type": "image/png",
+      "purpose": "any maskable"
+    }
+  ]
 }
+
