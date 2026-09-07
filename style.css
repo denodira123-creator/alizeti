@@ -1497,3 +1497,75 @@ label textarea {
   }
 
 }
+
+
+/* Journal — historique : ajout discret à la DA existante */
+.calendar-day {
+  position: relative;
+}
+
+.calendar-day.has-journal::after {
+  content: "";
+  position: absolute;
+  right: 5px;
+  bottom: 5px;
+  width: 5px;
+  height: 5px;
+  border-radius: 50%;
+  background: var(--blue-dark);
+}
+
+.calendar-day.has-habit.has-journal::after {
+  background: #fff;
+}
+
+.weekly-history {
+  margin: 14px 0 18px;
+  padding: 12px 14px;
+  border: 1px solid var(--border);
+  border-radius: 14px;
+  background: var(--soft);
+}
+
+.weekly-history-heading {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 12px;
+}
+
+.weekly-history-heading strong {
+  display: block;
+  margin-top: 2px;
+}
+
+.weekly-history-nav {
+  display: flex;
+  gap: 6px;
+}
+
+.weekly-history-nav button {
+  width: 34px;
+  height: 34px;
+  padding: 0;
+  border: 0;
+  border-radius: 50%;
+  background: var(--blue-light);
+  color: var(--blue-dark);
+  font-size: 22px;
+  line-height: 1;
+  cursor: pointer;
+}
+
+.weekly-history-nav button:disabled {
+  opacity: .35;
+  cursor: default;
+}
+
+.weekly-history .soft-text {
+  margin-bottom: 0;
+}
+
+.weekly-card.locked {
+  opacity: .9;
+}
