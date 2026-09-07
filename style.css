@@ -1543,4 +1543,336 @@ label textarea {
     padding: 0;
   }
 
+/* =========================================================
+   ALIZETI — DERNIERS AJUSTEMENTS
+   Ne modifie pas le reste du CSS.
+   ========================================================= */
+
+
+/* =========================================================
+   1. ACCUEIL — PRÉNOM
+   ========================================================= */
+
+.welcome .eyebrow {
+  display: block;
+  margin-bottom: 4px;
+  color: var(--blue);
+  font-size: 13px;
+  font-weight: 700;
+  letter-spacing: .08em;
 }
+
+.welcome h1 {
+  margin-top: 0;
+}
+
+
+/* =========================================================
+   2. ICÔNES — MÊME TAILLE PARTOUT
+   ========================================================= */
+
+/* On neutralise les différences de rendu entre
+   les différents boutons et navigateurs */
+
+.nav-item,
+.icon-button,
+.nav-icon,
+.nav-icon svg,
+.journal-nav-icon {
+  -webkit-tap-highlight-color: transparent;
+}
+
+
+/* Supprime le gros carré gris / contour natif
+   de certains navigateurs mobiles */
+
+button {
+  -webkit-appearance: none;
+  appearance: none;
+  outline: none;
+}
+
+button:focus,
+button:focus-visible,
+button:active {
+  outline: none;
+}
+
+
+/* Le petit carré bleu de l'application reste
+   géré par les styles existants */
+
+.nav-item {
+  -webkit-tap-highlight-color: transparent;
+}
+
+
+/* =========================================================
+   3. CRAYON JOURNAL
+   Même taille que les autres icônes
+   ========================================================= */
+
+.journal-nav-icon {
+  width: 25px !important;
+  height: 25px !important;
+
+  min-width: 25px;
+  min-height: 25px;
+
+  display: flex !important;
+
+  align-items: center;
+  justify-content: center;
+
+  font-size: 25px !important;
+
+  line-height: 25px !important;
+
+  font-family:
+    -apple-system,
+    BlinkMacSystemFont,
+    "Segoe UI",
+    sans-serif;
+
+  transform: none !important;
+}
+
+
+/* Sur iPhone, on ne réduit surtout pas le crayon */
+
+@media (max-width: 600px) {
+
+  .journal-nav-icon {
+    width: 25px !important;
+    height: 25px !important;
+
+    min-width: 25px;
+    min-height: 25px;
+
+    font-size: 25px !important;
+    line-height: 25px !important;
+  }
+
+}
+
+
+/* =========================================================
+   4. SÉLECTION 1–7 JOURS
+   Même rendu ordinateur + téléphone
+   ========================================================= */
+
+.goal-options {
+  display: flex !important;
+
+  gap: 7px !important;
+
+  width: 100% !important;
+}
+
+
+.goal-options button {
+  flex: 1 1 0 !important;
+
+  width: auto !important;
+  min-width: 0 !important;
+
+  height: 42px !important;
+
+  padding: 0 !important;
+
+  border-radius: 13px !important;
+
+  font-size: 14px !important;
+
+  font-weight: 650 !important;
+
+  box-sizing: border-box;
+
+  display: flex;
+
+  align-items: center;
+  justify-content: center;
+}
+
+
+/* Très important :
+   on annule les adaptations précédentes de l'iPhone */
+
+@media (max-width: 600px) {
+
+  .goal-options {
+    gap: 7px !important;
+  }
+
+  .goal-options button {
+    height: 42px !important;
+
+    padding: 0 !important;
+
+    border-radius: 13px !important;
+
+    font-size: 14px !important;
+  }
+
+}
+
+
+@media (max-width: 360px) {
+
+  .goal-options {
+    gap: 7px !important;
+  }
+
+  .goal-options button {
+    height: 42px !important;
+
+    padding: 0 !important;
+  }
+
+}
+
+
+/* =========================================================
+   5. JOURNAL — AUJOURD'HUI
+   Même présentation sur ordinateur et mobile
+   ========================================================= */
+
+.feeling-grid {
+  display: grid !important;
+
+  grid-template-columns:
+    repeat(2, minmax(0, 1fr)) !important;
+
+  gap: 8px !important;
+
+  width: 100%;
+
+  box-sizing: border-box;
+}
+
+
+.feeling-option {
+  width: 100%;
+
+  min-width: 0;
+}
+
+
+.feeling-option span {
+  width: 100%;
+
+  min-height: 42px !important;
+
+  height: 42px;
+
+  padding:
+    8px 10px !important;
+
+  box-sizing: border-box;
+
+  display: flex;
+
+  align-items: center;
+  justify-content: center;
+
+  border-radius: 13px !important;
+
+  font-size: 13px !important;
+
+  line-height: 1.2;
+
+  white-space: normal;
+}
+
+
+/* On annule l'ancienne adaptation mobile
+   qui transformait les choix en une colonne */
+
+@media (max-width: 600px) {
+
+  .feeling-grid {
+    grid-template-columns:
+      repeat(2, minmax(0, 1fr)) !important;
+
+    gap: 8px !important;
+  }
+
+  .feeling-option span {
+    min-height: 42px !important;
+    height: 42px !important;
+
+    padding:
+      8px 10px !important;
+
+    font-size: 13px !important;
+
+    border-radius: 13px !important;
+  }
+
+}
+
+
+/* Même chose sur les tout petits écrans */
+
+@media (max-width: 360px) {
+
+  .feeling-grid {
+    grid-template-columns:
+      repeat(2, minmax(0, 1fr)) !important;
+
+    gap: 6px !important;
+  }
+
+  .feeling-option span {
+    font-size: 12px !important;
+  }
+
+}
+
+
+/* =========================================================
+   6. EMPÊCHER IOS DE REDIMENSIONNER LES FORMULAIRES
+   ========================================================= */
+
+input,
+textarea,
+button {
+  font-family: inherit;
+}
+
+
+/* iOS peut modifier la taille du texte automatiquement */
+
+html {
+  -webkit-text-size-adjust: 100%;
+}
+
+
+/* =========================================================
+   7. TOUCHES MOBILES — PAS DE FLASH GRIS
+   ========================================================= */
+
+* {
+  -webkit-tap-highlight-color: transparent;
+}
+
+
+button::-moz-focus-inner {
+  border: 0;
+}
+
+
+/* Conserver le petit état bleu de l'application
+   sans laisser le navigateur ajouter son propre état */
+
+.nav-item:focus,
+.nav-item:active,
+.icon-button:focus,
+.icon-button:active {
+  outline: none;
+}
+
+
+/* =========================================================
+   FIN
+   ========================================================= */
