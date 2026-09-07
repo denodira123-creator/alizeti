@@ -1,4 +1,3 @@
-```js
 const STORAGE_KEY = "alizeti_v02";
 
 let data = JSON.parse(
