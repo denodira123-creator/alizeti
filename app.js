@@ -1,20 +1,12 @@
-/* =========================================================
-   ALIZETI V0.1
-   ========================================================= */
-
-
-const STORAGE_KEY = "alizeti_v01";
-
-
-/* ---------------------------------------------------------
-   DONNEES
-   --------------------------------------------------------- */
+const STORAGE_KEY = "alizeti_v02";
 
 let data = JSON.parse(localStorage.getItem(STORAGE_KEY)) || {
   habits: [],
   dailyJournal: {},
   weeklyJournals: {},
-  notifications: false
+  notifications: false,
+  userName: "",
+  duo: null
 };
 
 
@@ -23,9 +15,9 @@ function saveData() {
 }
 
 
-/* ---------------------------------------------------------
+/* =========================================================
    ELEMENTS
-   --------------------------------------------------------- */
+   ========================================================= */
 
 const pages = document.querySelectorAll(".page");
 const navItems = document.querySelectorAll(".nav-item");
@@ -43,10 +35,7 @@ const saveHabitBtn = document.getElementById("saveHabit");
 const habitsList = document.getElementById("habitsList");
 
 const weekDates = document.getElementById("weekDates");
-
-const celebration = document.getElementById("celebration");
-
-const monthlyRecap = document.getElementById("monthlyRecap");
+const welcomeName = document.getElementById("welcomeName");
 
 const calendarTitle = document.getElementById("calendarTitle");
 const calendarGrid = document.getElementById("calendarGrid");
@@ -54,36 +43,64 @@ const calendarGrid = document.getElementById("calendarGrid");
 const dailyJournal = document.getElementById("dailyJournal");
 const saveDaily = document.getElementById("saveDaily");
 
-const weeklyJournalCard = document.getElementById("weeklyJournalCard");
-const weeklyAvailability = document.getElementById("weeklyAvailability");
-const weeklyContent = document.getElementById("weeklyContent");
+const weeklyJournalCard =
+  document.getElementById("weeklyJournalCard");
 
-const weeklyPositive = document.getElementById("weeklyPositive");
-const weeklyNegative = document.getElementById("weeklyNegative");
+const weeklyAvailability =
+  document.getElementById("weeklyAvailability");
+
+const weeklyContent =
+  document.getElementById("weeklyContent");
+
 const positive1 = document.getElementById("positive1");
 const positive2 = document.getElementById("positive2");
 const positive3 = document.getElementById("positive3");
-const weeklyText = document.getElementById("weeklyText");
-const saveWeekly = document.getElementById("saveWeekly");
+
+const weeklyText =
+  document.getElementById("weeklyText");
+
+const saveWeekly =
+  document.getElementById("saveWeekly");
+
+const monthlyRecap =
+  document.getElementById("monthlyRecap");
 
 const notificationToggle =
   document.getElementById("notificationToggle");
 
+const userName =
+  document.getElementById("userName");
 
-/* ---------------------------------------------------------
+const saveName =
+  document.getElementById("saveName");
+
+const generateDuo =
+  document.getElementById("generateDuo");
+
+const joinDuo =
+  document.getElementById("joinDuo");
+
+const duoCodeInput =
+  document.getElementById("duoCodeInput");
+
+const duoDisconnected =
+  document.getElementById("duoDisconnected");
+
+const duoConnected =
+  document.getElementById("duoConnected");
+
+const duoCodeDisplay =
+  document.getElementById("duoCodeDisplay");
+
+const leaveDuo =
+  document.getElementById("leaveDuo");
+
+
+/* =========================================================
    DATES
-   --------------------------------------------------------- */
+   ========================================================= */
 
-const dayNames = [
-  "L",
-  "M",
-  "M",
-  "J",
-  "V",
-  "S",
-  "D"
-];
-
+const dayNames = ["L","M","M","J","V","S","D"];
 
 const monthNames = [
   "Janvier",
@@ -106,24 +123,26 @@ let calendarDate = new Date();
 
 function dateKey(date) {
 
-  const year = date.getFullYear();
-  const month = String(date.getMonth() + 1).padStart(2, "0");
-  const day = String(date.getDate()).padStart(2, "0");
+  return [
+    date.getFullYear(),
+    String(date.getMonth() + 1).padStart(2, "0"),
+    String(date.getDate()).padStart(2, "0")
+  ].join("-");
 
-  return `${year}-${month}-${day}`;
 }
 
 
 function getMonday(date = new Date()) {
 
   const d = new Date(date);
+
   const day = d.getDay();
 
   const diff = day === 0 ? -6 : 1 - day;
 
   d.setDate(d.getDate() + diff);
 
-  d.setHours(0, 0, 0, 0);
+  d.setHours(0,0,0,0);
 
   return d;
 }
@@ -141,89 +160,174 @@ function getSunday(date = new Date()) {
 }
 
 
+function getWeekDays() {
+
+  const monday = getMonday();
+
+  return Array.from({length: 7}, (_, i) => {
+
+    const day = new Date(monday);
+
+    day.setDate(monday.getDate() + i);
+
+    return day;
+
+  });
+
+}
+
+
 function formatShortDate(date) {
 
   return date.toLocaleDateString("fr-FR", {
     day: "numeric",
     month: "short"
   });
+
 }
 
 
-/* ---------------------------------------------------------
+/* =========================================================
    NAVIGATION
-   --------------------------------------------------------- */
+   ========================================================= */
 
 function showPage(pageId) {
 
   pages.forEach(page => {
-    page.classList.toggle("active", page.id === pageId);
+
+    page.classList.toggle(
+      "active",
+      page.id === pageId
+    );
+
   });
 
+
   navItems.forEach(item => {
+
     item.classList.toggle(
       "active",
       item.dataset.page === pageId
     );
+
   });
+
 
   if (pageId === "calendarPage") {
     renderCalendar();
   }
 
+
   if (pageId === "journalPage") {
+
     loadJournals();
+
     updateWeeklyJournalAvailability();
+
   }
+
+
+  if (pageId === "settingsPage") {
+
+    userName.value = data.userName || "";
+
+    renderDuo();
+
+  }
+
 }
 
 
 navItems.forEach(item => {
 
   item.addEventListener("click", () => {
+
     showPage(item.dataset.page);
+
   });
 
 });
 
 
 settingsBtn.addEventListener("click", () => {
+
   showPage("settingsPage");
+
 });
 
 
-/* ---------------------------------------------------------
-   MODAL HABITUDE
-   --------------------------------------------------------- */
+/* =========================================================
+   NOM
+   ========================================================= */
+
+saveName.addEventListener("click", () => {
+
+  data.userName =
+    userName.value.trim();
+
+  saveData();
+
+  renderWelcome();
+
+  saveName.textContent = "Enregistré ✓";
+
+  setTimeout(() => {
+
+    saveName.textContent = "Enregistrer";
+
+  }, 1500);
+
+});
+
+
+function renderWelcome() {
+
+  welcomeName.textContent =
+    data.userName
+      ? data.userName.toUpperCase()
+      : "ALIZETI";
+
+}
+
+
+/* =========================================================
+   HABITUDES
+   ========================================================= */
 
 addHabitBtn.addEventListener("click", () => {
 
   if (data.habits.length >= 10) {
+
     alert("Tu peux avoir jusqu'à 10 habitudes.");
+
     return;
+
   }
 
   habitName.value = "";
+
   habitGoal.value = "3";
 
   habitModal.classList.remove("hidden");
 
-  setTimeout(() => {
-    habitName.focus();
-  }, 100);
+  setTimeout(() => habitName.focus(), 100);
 
 });
 
 
 closeModal.addEventListener("click", () => {
+
   habitModal.classList.add("hidden");
+
 });
 
 
 habitModal.addEventListener("click", event => {
 
   if (event.target === habitModal) {
+
     habitModal.classList.add("hidden");
+
   }
 
 });
@@ -231,63 +335,50 @@ habitModal.addEventListener("click", event => {
 
 saveHabitBtn.addEventListener("click", () => {
 
-  const name = habitName.value.trim();
+  const name =
+    habitName.value.trim();
 
   if (!name) {
+
     habitName.focus();
+
     return;
+
   }
 
-  const habit = {
-    id: Date.now(),
-    name,
-    goal: Number(habitGoal.value),
-    completed: {}
-  };
 
-  data.habits.push(habit);
+  data.habits.push({
+
+    id: Date.now(),
+
+    name,
+
+    goal: Number(habitGoal.value),
+
+    completed: {}
+
+  });
+
 
   saveData();
 
   habitModal.classList.add("hidden");
 
   renderHabits();
+
   renderMonthlyRecap();
 
 });
 
 
-/* ---------------------------------------------------------
-   HABITUDES
-   --------------------------------------------------------- */
-
-function getWeekDays() {
-
-  const monday = getMonday();
-
-  const days = [];
-
-  for (let i = 0; i < 7; i++) {
-
-    const day = new Date(monday);
-
-    day.setDate(monday.getDate() + i);
-
-    days.push(day);
-
-  }
-
-  return days;
-}
-
-
 function countWeekCompleted(habit) {
 
-  const days = getWeekDays();
+  return getWeekDays()
+    .filter(day =>
+      habit.completed[dateKey(day)]
+    )
+    .length;
 
-  return days.filter(day => {
-    return habit.completed[dateKey(day)];
-  }).length;
 }
 
 
@@ -295,23 +386,21 @@ function renderHabits() {
 
   habitsList.innerHTML = "";
 
-  if (data.habits.length === 0) {
+  if (!data.habits.length) {
 
     habitsList.innerHTML = `
       <div class="month-card">
         <div class="monthly-recap">
           Tu n'as pas encore ajouté d'habitude.
           <br><br>
-          Commence doucement, avec quelque chose
-          que tu aimerais simplement essayer de faire
-          régulièrement.
+          Commence simplement par quelque chose
+          que tu aimerais essayer de faire régulièrement.
         </div>
       </div>
     `;
 
-    celebration.classList.add("hidden");
-
     return;
+
   }
 
 
@@ -320,46 +409,58 @@ function renderHabits() {
 
   data.habits.forEach(habit => {
 
-    const completedCount = countWeekCompleted(habit);
+    const completed =
+      countWeekCompleted(habit);
 
-    const goalReached = completedCount >= habit.goal;
+    const goalReached =
+      completed >= habit.goal;
 
-    const card = document.createElement("div");
+    const surpassed =
+      completed > habit.goal;
+
+
+    const card =
+      document.createElement("div");
+
 
     card.className =
       "habit-card" +
       (goalReached ? " completed-goal" : "");
 
 
-    const daysHTML = days.map((day, index) => {
+    const daysHTML =
+      days.map((day, index) => {
 
-      const key = dateKey(day);
-      const checked = Boolean(habit.completed[key]);
+        const key =
+          dateKey(day);
 
-      const today =
-        key === dateKey(new Date());
+        const checked =
+          Boolean(habit.completed[key]);
 
-      return `
-        <div class="day">
+        const today =
+          key === dateKey(new Date());
 
-          <button
-            class="day-circle
-              ${checked ? "checked" : ""}
-              ${today ? "today" : ""}
-            "
-            data-habit="${habit.id}"
-            data-date="${key}"
-            aria-label="${dayNames[index]}"
-          >
-            ${checked ? "✓" : ""}
-          </button>
 
-          <span>${dayNames[index]}</span>
+        return `
+          <div class="day">
 
-        </div>
-      `;
+            <button
+              class="day-circle
+                ${checked ? "checked" : ""}
+                ${today ? "today" : ""}
+              "
+              data-habit="${habit.id}"
+              data-date="${key}"
+            >
+              ${checked ? "✓" : ""}
+            </button>
 
-    }).join("");
+            <span>${dayNames[index]}</span>
+
+          </div>
+        `;
+
+      }).join("");
 
 
     card.innerHTML = `
@@ -373,7 +474,7 @@ function renderHabits() {
           </div>
 
           <div class="habit-progress">
-            <strong>${completedCount}/${habit.goal}</strong>
+            <strong>${completed}/${habit.goal}</strong>
             jours cette semaine
           </div>
 
@@ -382,7 +483,6 @@ function renderHabits() {
         <button
           class="delete-habit"
           data-delete="${habit.id}"
-          aria-label="Supprimer"
         >
           ×
         </button>
@@ -400,14 +500,27 @@ function renderHabits() {
         ${
           goalReached
             ? "✓ Objectif de la semaine atteint"
-            : `${habit.goal - completedCount} jour${
-                habit.goal - completedCount > 1 ? "s" : ""
+            : `${habit.goal - completed} jour${
+                habit.goal - completed > 1 ? "s" : ""
               } restant${
-                habit.goal - completedCount > 1 ? "s" : ""
+                habit.goal - completed > 1 ? "s" : ""
               }`
         }
 
       </div>
+
+
+      ${
+        surpassed
+          ? `
+            <div class="habit-celebration">
+              🔥
+              Tu t'es surpassé sur cette habitude.
+            </div>
+          `
+          : ""
+      }
+
     `;
 
 
@@ -418,171 +531,159 @@ function renderHabits() {
 
   attachHabitEvents();
 
-  updateCelebration();
-
 }
 
 
 function attachHabitEvents() {
 
-  document.querySelectorAll(".day-circle").forEach(button => {
+  document.querySelectorAll(".day-circle")
+    .forEach(button => {
 
-    button.addEventListener("click", () => {
+      button.addEventListener("click", () => {
 
-      const habitId = Number(button.dataset.habit);
-      const date = button.dataset.date;
+        const habitId =
+          Number(button.dataset.habit);
 
-      const habit =
-        data.habits.find(h => h.id === habitId);
+        const date =
+          button.dataset.date;
 
-      if (!habit) return;
+        const habit =
+          data.habits.find(
+            h => h.id === habitId
+          );
 
-
-      habit.completed[date] =
-        !habit.completed[date];
-
-
-      saveData();
-
-      renderHabits();
-      renderCalendar();
-      renderMonthlyRecap();
-
-    });
-
-  });
+        if (!habit) return;
 
 
-  document.querySelectorAll(".delete-habit").forEach(button => {
+        habit.completed[date] =
+          !habit.completed[date];
 
-    button.addEventListener("click", () => {
 
-      const id = Number(button.dataset.delete);
+        saveData();
 
-      const confirmed =
-        confirm("Supprimer cette habitude ?");
+        renderHabits();
 
-      if (!confirmed) return;
+        renderCalendar();
 
-      data.habits =
-        data.habits.filter(h => h.id !== id);
+        renderMonthlyRecap();
 
-      saveData();
-
-      renderHabits();
-      renderMonthlyRecap();
+      });
 
     });
 
-  });
+
+  document.querySelectorAll(".delete-habit")
+    .forEach(button => {
+
+      button.addEventListener("click", () => {
+
+        const id =
+          Number(button.dataset.delete);
+
+        if (!confirm("Supprimer cette habitude ?")) {
+          return;
+        }
+
+        data.habits =
+          data.habits.filter(
+            habit => habit.id !== id
+          );
+
+        saveData();
+
+        renderHabits();
+
+        renderMonthlyRecap();
+
+      });
+
+    });
 
 }
 
 
-/* ---------------------------------------------------------
-   CELEBRATION
-   --------------------------------------------------------- */
-
-function updateCelebration() {
-
-  let surpassed = false;
-
-  data.habits.forEach(habit => {
-
-    const completed = countWeekCompleted(habit);
-
-    if (completed > habit.goal) {
-      surpassed = true;
-    }
-
-  });
-
-
-  celebration.classList.toggle(
-    "hidden",
-    !surpassed
-  );
-
-}
-
-
-/* ---------------------------------------------------------
-   RECAPITULATIF MENSUEL
-   --------------------------------------------------------- */
+/* =========================================================
+   RECAP MENSUEL
+   ========================================================= */
 
 function renderMonthlyRecap() {
 
-  if (data.habits.length === 0) {
+  if (!data.habits.length) {
 
     monthlyRecap.textContent =
       "Ajoute une habitude pour commencer ton suivi.";
 
     return;
+
   }
 
 
   const now = new Date();
 
   const year = now.getFullYear();
+
   const month = now.getMonth();
 
   const daysInMonth =
     new Date(year, month + 1, 0).getDate();
 
 
-  const habit = data.habits[0];
+  const summaries =
+    data.habits.slice(0, 3).map(habit => {
 
-  let completed = 0;
+      let completed = 0;
 
-  for (let day = 1; day <= daysInMonth; day++) {
+      for (let day = 1; day <= daysInMonth; day++) {
 
-    const date =
-      new Date(year, month, day);
+        const date =
+          new Date(year, month, day);
 
-    if (habit.completed[dateKey(date)]) {
-      completed++;
-    }
+        if (habit.completed[dateKey(date)]) {
+          completed++;
+        }
 
-  }
-
-
-  /*
-    On estime le nombre de jours fixés
-    à partir de l'objectif hebdomadaire.
-
-    Exemple :
-    objectif 3 jours/semaine
-    => environ 3/7 du mois.
-  */
-
-  const weeksEquivalent =
-    daysInMonth / 7;
-
-  const monthlyGoal =
-    Math.round(habit.goal * weeksEquivalent);
+      }
 
 
-  monthlyRecap.innerHTML = `
-    Ce mois-ci, tu as réussi à
-    <strong>${escapeHTML(habit.name)}</strong>
-    <strong>${completed} jour${completed > 1 ? "s" : ""}</strong>
-    sur environ
-    <strong>${monthlyGoal} fixé${
-      monthlyGoal > 1 ? "s" : ""
-    }</strong>.
-  `;
+      const monthlyGoal =
+        Math.round(
+          habit.goal * daysInMonth / 7
+        );
+
+
+      return `
+        <div style="margin-bottom:8px">
+          Ce mois-ci, tu as réussi à
+          <strong>${escapeHTML(habit.name)}</strong>
+          <strong>${completed}</strong>
+          jour${completed > 1 ? "s" : ""}
+          sur environ
+          <strong>${monthlyGoal}</strong>
+          fixé${monthlyGoal > 1 ? "s" : ""}.
+        </div>
+      `;
+
+    }).join("");
+
+
+  monthlyRecap.innerHTML =
+    summaries;
 
 }
 
 
-/* ---------------------------------------------------------
+/* =========================================================
    CALENDRIER
-   --------------------------------------------------------- */
+   ========================================================= */
 
 function renderCalendar() {
 
-  const year = calendarDate.getFullYear();
-  const month = calendarDate.getMonth();
+  const year =
+    calendarDate.getFullYear();
+
+  const month =
+    calendarDate.getMonth();
+
 
   calendarTitle.textContent =
     `${monthNames[month]} ${year}`;
@@ -594,30 +695,29 @@ function renderCalendar() {
   const firstDay =
     new Date(year, month, 1);
 
-  let startingDay =
+
+  let start =
     firstDay.getDay();
 
-  /*
-    JavaScript :
-    dimanche = 0
-    lundi = 1
 
-    Notre calendrier commence lundi.
-  */
-
-  startingDay =
-    startingDay === 0
+  start =
+    start === 0
       ? 6
-      : startingDay - 1;
+      : start - 1;
 
 
   const daysInMonth =
-    new Date(year, month + 1, 0).getDate();
+    new Date(
+      year,
+      month + 1,
+      0
+    ).getDate();
 
 
-  for (let i = 0; i < startingDay; i++) {
+  for (let i = 0; i < start; i++) {
 
-    const empty = document.createElement("div");
+    const empty =
+      document.createElement("div");
 
     empty.className =
       "calendar-day empty";
@@ -637,8 +737,8 @@ function renderCalendar() {
 
 
     const hasHabit =
-      data.habits.some(habit =>
-        habit.completed[key]
+      data.habits.some(
+        habit => habit.completed[key]
       );
 
 
@@ -657,7 +757,6 @@ function renderCalendar() {
 
 
     cell.textContent = day;
-
 
     calendarGrid.appendChild(cell);
 
@@ -690,45 +789,38 @@ document.getElementById("nextMonth")
   });
 
 
-/* ---------------------------------------------------------
+/* =========================================================
    JOURNAL QUOTIDIEN
-   --------------------------------------------------------- */
+   ========================================================= */
 
 function loadJournals() {
 
-  const today = dateKey(new Date());
+  const today =
+    dateKey(new Date());
 
   dailyJournal.value =
     data.dailyJournal[today] || "";
 
 
-  const weekKey =
-    getWeekKey();
-
   const journal =
-    data.weeklyJournals[weekKey];
+    data.weeklyJournals[getWeekKey()];
 
 
   if (!journal) {
 
-    weeklyPositive.value = "";
-    weeklyNegative.value = "";
-
     positive1.value = "";
     positive2.value = "";
     positive3.value = "";
-
     weeklyText.value = "";
 
+    document
+      .querySelectorAll(".choice input")
+      .forEach(input => input.checked = false);
+
     return;
+
   }
 
-
-  weeklyPositive.value =
-    journal.positive || "";
-
-  weeklyNegative.value =
-    journal.negative || "";
 
   positive1.value =
     journal.positive1 || "";
@@ -742,12 +834,29 @@ function loadJournals() {
   weeklyText.value =
     journal.text || "";
 
+
+  document
+    .querySelectorAll(".choice input")
+    .forEach(input => {
+
+      const category =
+        input.dataset.category;
+
+      const value =
+        input.value;
+
+      input.checked =
+        journal[category]?.includes(value) || false;
+
+    });
+
 }
 
 
 saveDaily.addEventListener("click", () => {
 
-  const today = dateKey(new Date());
+  const today =
+    dateKey(new Date());
 
   data.dailyJournal[today] =
     dailyJournal.value;
@@ -767,38 +876,110 @@ saveDaily.addEventListener("click", () => {
 });
 
 
-/* ---------------------------------------------------------
-   JOURNAL HEBDOMADAIRE
-   --------------------------------------------------------- */
+/* =========================================================
+   BILAN HEBDOMADAIRE
+   ========================================================= */
 
-function getWeekKey() {
+const positiveOptions = [
+  "Je me suis senti bien",
+  "J'ai pris du temps pour moi",
+  "J'ai bien dormi",
+  "J'ai fait quelque chose que j'aime",
+  "J'ai été fier de moi",
+  "J'ai passé du temps avec quelqu'un",
+  "J'ai avancé sur un projet",
+  "J'ai pris soin de moi",
+  "J'ai découvert quelque chose",
+  "Autre"
+];
 
-  return dateKey(getMonday());
+
+const negativeOptions = [
+  "Fatigue",
+  "Manque de temps",
+  "Stress",
+  "Manque de motivation",
+  "Sommeil difficile",
+  "Trop de choses à gérer",
+  "Difficulté à m'organiser",
+  "Baisse d'énergie",
+  "Imprévu",
+  "Autre"
+];
+
+
+function renderChoiceLists() {
+
+  const positiveContainer =
+    document.getElementById("positiveChoices");
+
+  const negativeContainer =
+    document.getElementById("negativeChoices");
+
+
+  positiveContainer.innerHTML =
+    positiveOptions.map((option, index) => `
+
+      <label class="choice">
+
+        <input
+          type="checkbox"
+          data-category="positiveChoices"
+          value="${escapeHTML(option)}"
+        >
+
+        <span>
+          ${index + 1}. ${escapeHTML(option)}
+        </span>
+
+      </label>
+
+    `).join("");
+
+
+  negativeContainer.innerHTML =
+    negativeOptions.map((option, index) => `
+
+      <label class="choice">
+
+        <input
+          type="checkbox"
+          data-category="negativeChoices"
+          value="${escapeHTML(option)}"
+        >
+
+        <span>
+          ${index + 1}. ${escapeHTML(option)}
+        </span>
+
+      </label>
+
+    `).join("");
 
 }
 
 
 function isWeeklyJournalAvailable() {
 
-  const now = new Date();
+  const now =
+    new Date();
 
-  const day = now.getDay();
+  const day =
+    now.getDay();
 
-  const hour = now.getHours();
+  const hour =
+    now.getHours();
 
-  /*
-    Dimanche à partir de 19h
-    OU
-    Lundi jusqu'à 23h59.
-  */
 
   if (day === 0 && hour >= 19) {
     return true;
   }
 
+
   if (day === 1) {
     return true;
   }
+
 
   return false;
 
@@ -807,11 +988,7 @@ function isWeeklyJournalAvailable() {
 
 function updateWeeklyJournalAvailability() {
 
-  const available =
-    isWeeklyJournalAvailable();
-
-
-  if (available) {
+  if (isWeeklyJournalAvailable()) {
 
     weeklyContent.classList.remove("hidden");
 
@@ -827,9 +1004,16 @@ function updateWeeklyJournalAvailability() {
     weeklyJournalCard.classList.add("locked");
 
     weeklyAvailability.textContent =
-      "Le bilan de la semaine s'ouvre le dimanche à 19h et reste disponible jusqu'au lundi soir.";
+      "Le bilan s'ouvre le dimanche à 19h et reste disponible jusqu'au lundi soir.";
 
   }
+
+}
+
+
+function getWeekKey() {
+
+  return dateKey(getMonday());
 
 }
 
@@ -840,11 +1024,6 @@ saveWeekly.addEventListener("click", () => {
     return;
   }
 
-
-  /*
-    Les trois choses positives
-    sont obligatoires.
-  */
 
   if (
     !positive1.value.trim() ||
@@ -857,22 +1036,29 @@ saveWeekly.addEventListener("click", () => {
     );
 
     return;
+
   }
 
 
-  const key = getWeekKey();
+  const positiveChoices =
+    [...document.querySelectorAll(
+      '[data-category="positiveChoices"]:checked'
+    )].map(input => input.value);
 
 
-  data.weeklyJournals[key] = {
+  const negativeChoices =
+    [...document.querySelectorAll(
+      '[data-category="negativeChoices"]:checked'
+    )].map(input => input.value);
 
-    positive: weeklyPositive.value,
 
-    negative: weeklyNegative.value,
+  data.weeklyJournals[getWeekKey()] = {
+
+    positiveChoices,
+    negativeChoices,
 
     positive1: positive1.value,
-
     positive2: positive2.value,
-
     positive3: positive3.value,
 
     text: weeklyText.value
@@ -897,46 +1083,156 @@ saveWeekly.addEventListener("click", () => {
 });
 
 
-/* ---------------------------------------------------------
-   NOTIFICATIONS
-   --------------------------------------------------------- */
+/* =========================================================
+   MODE DUO
+   ========================================================= */
 
-notificationToggle.addEventListener("click", async () => {
+function generateCode() {
 
-  data.notifications =
-    !data.notifications;
+  const characters =
+    "ABCDEFGHJKLMNPQRSTUVWXYZ23456789";
 
+  let code = "";
 
-  if (
-    data.notifications &&
-    "Notification" in window
-  ) {
+  for (let i = 0; i < 6; i++) {
 
-    try {
-
-      const permission =
-        await Notification.requestPermission();
-
-      if (permission !== "granted") {
-
-        data.notifications = false;
-
-      }
-
-    } catch (error) {
-
-      data.notifications = false;
-
-    }
+    code +=
+      characters[
+        Math.floor(
+          Math.random() * characters.length
+        )
+      ];
 
   }
+
+  return code;
+
+}
+
+
+generateDuo.addEventListener("click", () => {
+
+  const code =
+    generateCode();
+
+
+  data.duo = {
+    code,
+    status: "waiting"
+  };
 
 
   saveData();
 
-  updateNotificationToggle();
+  renderDuo();
 
 });
+
+
+joinDuo.addEventListener("click", () => {
+
+  const code =
+    duoCodeInput.value
+      .trim()
+      .toUpperCase();
+
+
+  if (code.length !== 6) {
+
+    alert("Le code doit contenir 6 caractères.");
+
+    return;
+
+  }
+
+
+  data.duo = {
+    code,
+    status: "connected"
+  };
+
+
+  saveData();
+
+  renderDuo();
+
+});
+
+
+leaveDuo.addEventListener("click", () => {
+
+  data.duo = null;
+
+  saveData();
+
+  renderDuo();
+
+});
+
+
+function renderDuo() {
+
+  if (!data.duo) {
+
+    duoDisconnected.classList.remove("hidden");
+
+    duoConnected.classList.add("hidden");
+
+    return;
+
+  }
+
+
+  duoDisconnected.classList.add("hidden");
+
+  duoConnected.classList.remove("hidden");
+
+
+  duoCodeDisplay.textContent =
+    `Code : ${data.duo.code}`;
+
+}
+
+
+/* =========================================================
+   NOTIFICATIONS
+   ========================================================= */
+
+notificationToggle.addEventListener(
+  "click",
+  async () => {
+
+    data.notifications =
+      !data.notifications;
+
+
+    if (
+      data.notifications &&
+      "Notification" in window
+    ) {
+
+      try {
+
+        const permission =
+          await Notification.requestPermission();
+
+        if (permission !== "granted") {
+          data.notifications = false;
+        }
+
+      } catch {
+        data.notifications = false;
+      }
+
+    }
+
+
+    saveData();
+
+    updateNotificationToggle();
+
+  }
+);
 
 
 function updateNotificationToggle() {
@@ -949,9 +1245,9 @@ function updateNotificationToggle() {
 }
 
 
- /* ---------------------------------------------------------
-    SECURITE HTML
-    --------------------------------------------------------- */
+/* =========================================================
+   SECURITE
+   ========================================================= */
 
 function escapeHTML(value) {
 
@@ -965,18 +1261,26 @@ function escapeHTML(value) {
 }
 
 
-/* ---------------------------------------------------------
+/* =========================================================
    INITIALISATION
-   --------------------------------------------------------- */
+   ========================================================= */
 
 function initialize() {
 
-  const monday = getMonday();
-  const sunday = getSunday();
+  const monday =
+    getMonday();
+
+  const sunday =
+    getSunday();
+
 
   weekDates.textContent =
     `${formatShortDate(monday)} — ${formatShortDate(sunday)}`;
 
+
+  renderWelcome();
+
+  renderChoiceLists();
 
   renderHabits();
 
@@ -989,6 +1293,8 @@ function initialize() {
   updateWeeklyJournalAvailability();
 
   loadJournals();
+
+  renderDuo();
 
 }
 
