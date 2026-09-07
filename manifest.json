@@ -1,0 +1,11 @@
+{
+  "name": "Alizeti",
+  "short_name": "Alizeti",
+  "description": "Construire ses habitudes, à son rythme.",
+  "start_url": "./",
+  "display": "standalone",
+  "background_color": "#f8fafc",
+  "theme_color": "#2563eb",
+  "orientation": "portrait",
+  "lang": "fr"
+}
