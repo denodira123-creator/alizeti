@@ -1098,4 +1098,449 @@ label textarea {
     border-radius: 20px 20px 0 0;
   }
 
+/* =========================================================
+   ALIZETI — AJUSTEMENTS FINAUX
+   ========================================================= */
+
+
+/* ---------- Navigation : icônes uniquement ---------- */
+
+.bottom-nav .nav-item {
+  gap: 0;
+}
+
+.bottom-nav .nav-item > span:not(.nav-icon) {
+  display: none;
+}
+
+.bottom-nav .nav-icon {
+  width: 46px;
+  height: 42px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.bottom-nav .nav-icon svg {
+  width: 24px;
+  height: 24px;
+}
+
+.journal-nav-icon {
+  font-size: 26px !important;
+  line-height: 1;
+}
+
+
+/* ---------- Roue dentée ---------- */
+
+.settings-icon {
+  width: 22px;
+  height: 22px;
+}
+
+.icon-button {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+
+/* ---------- Logo Alizeti ---------- */
+
+.logo {
+  width: 30px;
+  height: 30px;
+  flex-shrink: 0;
+}
+
+
+/* ---------- Sélecteur de jours ---------- */
+
+.goal-selector {
+  margin: 20px 0;
+}
+
+.goal-selector > p {
+  color: var(--text-light);
+  font-size: 13px;
+  margin-bottom: 12px;
+}
+
+.goal-options {
+  display: flex;
+  gap: 7px;
+  width: 100%;
+}
+
+.goal-options button {
+  flex: 1;
+  height: 42px;
+
+  border-radius: 13px;
+
+  border: 1px solid var(--border);
+  background: #fff;
+
+  color: var(--text-light);
+
+  font-weight: 650;
+
+  cursor: pointer;
+
+  transition:
+    background .2s ease,
+    color .2s ease,
+    border-color .2s ease,
+    transform .15s ease;
+}
+
+.goal-options button:active {
+  transform: scale(.95);
+}
+
+.goal-options button.selected {
+  background: var(--blue);
+  color: #fff;
+  border-color: var(--blue);
+
+  box-shadow:
+    0 4px 10px rgba(111,168,220,.22);
+}
+
+
+/* =========================================================
+   CALENDRIER PAR HABITUDE
+   ========================================================= */
+
+.calendar-habit-selector {
+  display: flex;
+  gap: 8px;
+
+  overflow-x: auto;
+
+  padding:
+    2px
+    2px
+    8px;
+
+  margin-bottom: 4px;
+
+  scrollbar-width: none;
+}
+
+.calendar-habit-selector::-webkit-scrollbar {
+  display: none;
+}
+
+
+.calendar-habit-tab {
+  flex-shrink: 0;
+
+  border: 1px solid var(--border);
+
+  background: #fff;
+
+  color: var(--text-light);
+
+  padding: 9px 14px;
+
+  border-radius: 999px;
+
+  font-size: 13px;
+  font-weight: 600;
+
+  cursor: pointer;
+
+  transition: .2s ease;
+}
+
+
+.calendar-habit-tab.selected {
+  background: var(--blue);
+  color: #fff;
+  border-color: var(--blue);
+
+  box-shadow:
+    0 3px 9px rgba(111,168,220,.18);
+}
+
+
+.calendar-habit-info {
+  min-height: 24px;
+
+  color: var(--text-light);
+
+  font-size: 13px;
+
+  margin:
+    0 3px
+    10px;
+}
+
+
+.calendar-habit-info strong {
+  color: var(--text);
+}
+
+
+.calendar-empty-message {
+  padding: 18px;
+
+  background: rgba(111,168,220,.07);
+
+  border-radius: 16px;
+
+  color: var(--text-light);
+
+  font-size: 14px;
+
+  line-height: 1.5;
+
+  text-align: center;
+}
+
+
+/* =========================================================
+   JOURNAL — SENTIMENTS
+   ========================================================= */
+
+.feeling-grid {
+  display: grid;
+
+  grid-template-columns:
+    repeat(2, minmax(0, 1fr));
+
+  gap: 8px;
+
+  margin:
+    16px 0
+    14px;
+}
+
+
+.feeling-option {
+  position: relative;
+}
+
+
+.feeling-option input {
+  position: absolute;
+  opacity: 0;
+  pointer-events: none;
+}
+
+
+.feeling-option span {
+  display: flex;
+
+  align-items: center;
+  justify-content: center;
+
+  min-height: 42px;
+
+  padding: 8px 10px;
+
+  border:
+    1px solid var(--border);
+
+  border-radius: 13px;
+
+  background: #fff;
+
+  color: var(--text-light);
+
+  font-size: 13px;
+
+  text-align: center;
+
+  cursor: pointer;
+
+  transition: .2s ease;
+}
+
+
+.feeling-option input:checked + span {
+  background: rgba(111,168,220,.13);
+
+  border-color: var(--blue);
+
+  color: var(--blue);
+
+  font-weight: 650;
+}
+
+
+/* ---------- Choix bilan ---------- */
+
+.choice-grid {
+  display: grid;
+
+  grid-template-columns:
+    repeat(2, minmax(0, 1fr));
+
+  gap: 8px;
+}
+
+
+.choice {
+  position: relative;
+}
+
+
+.choice input {
+  position: absolute;
+  opacity: 0;
+  pointer-events: none;
+}
+
+
+.choice span {
+  display: flex;
+
+  align-items: center;
+
+  min-height: 42px;
+
+  padding:
+    8px
+    10px;
+
+  border:
+    1px solid var(--border);
+
+  border-radius: 13px;
+
+  background: #fff;
+
+  color: var(--text-light);
+
+  font-size: 12px;
+
+  line-height: 1.25;
+
+  cursor: pointer;
+
+  transition: .2s ease;
+}
+
+
+.choice input:checked + span {
+  background: rgba(111,168,220,.13);
+
+  border-color: var(--blue);
+
+  color: var(--blue);
+
+  font-weight: 650;
+}
+
+
+/* ---------- Journal hebdomadaire ---------- */
+
+.weekly-card.locked {
+  opacity: .96;
+}
+
+
+.weekly-card.locked .journal-card-header {
+  margin-bottom: 4px;
+}
+
+
+/* ---------- Petit tournesol ---------- */
+
+.sunflower-mini {
+  color: #F2C45C;
+
+  font-size: 20px;
+
+  transform:
+    rotate(45deg);
+
+  display: inline-block;
+}
+
+
+/* =========================================================
+   RESPONSIVE IPHONE
+   ========================================================= */
+
+@media (max-width: 600px) {
+
+  .bottom-nav .nav-icon {
+    width: 50px;
+    height: 44px;
+  }
+
+
+  .bottom-nav .nav-icon svg {
+    width: 25px;
+    height: 25px;
+  }
+
+
+  .journal-nav-icon {
+    font-size: 28px !important;
+  }
+
+
+  .logo {
+    width: 29px;
+    height: 29px;
+  }
+
+
+  .goal-options {
+    gap: 5px;
+  }
+
+
+  .goal-options button {
+    height: 44px;
+
+    border-radius: 12px;
+
+    font-size: 14px;
+  }
+
+
+  .calendar-habit-selector {
+    margin-left: -2px;
+    margin-right: -2px;
+  }
+
+
+  .calendar-habit-tab {
+    padding:
+      9px
+      13px;
+
+    font-size: 12px;
+  }
+
+
+  .choice-grid {
+    grid-template-columns: 1fr;
+  }
+
+}
+
+
+@media (max-width: 360px) {
+
+  .feeling-grid {
+    grid-template-columns: 1fr;
+  }
+
+
+  .goal-options {
+    gap: 3px;
+  }
+
+
+  .goal-options button {
+    padding: 0;
+  }
+
 }
