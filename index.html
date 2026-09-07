@@ -25,6 +25,7 @@
 
     <div class="brand">
 
+      <!-- Tournesol graphique Alizeti -->
       <svg class="logo" viewBox="0 0 64 64" aria-hidden="true">
 
         <g fill="#F2C45C">
@@ -88,6 +89,8 @@
 
     </div>
 
+
+    <!-- Roue dentée graphique -->
     <button
       class="icon-button"
       id="settingsBtn"
@@ -144,10 +147,12 @@
 
       </div>
 
+
       <div
         id="habitsList"
         class="habits-list"
       ></div>
+
 
       <button
         id="addHabitBtn"
@@ -159,6 +164,7 @@
         Ajouter une habitude
 
       </button>
+
 
       <div class="month-card">
 
@@ -197,15 +203,20 @@
 
       </div>
 
+
+      <!-- Choix de l'habitude -->
+
       <div
         id="calendarHabitSelector"
         class="calendar-habit-selector"
       ></div>
 
+
       <div
         id="calendarHabitInfo"
         class="calendar-habit-info"
       ></div>
+
 
       <div class="calendar-card">
 
@@ -229,6 +240,7 @@
 
         </div>
 
+
         <div class="weekdays">
 
           <span>L</span>
@@ -240,6 +252,7 @@
           <span>D</span>
 
         </div>
+
 
         <div
           id="calendarGrid"
@@ -254,42 +267,6 @@
         <span class="legend-dot completed"></span>
 
         <span>Habitude réalisée</span>
-
-      </div>
-
-
-      <!-- ==================== JOURNAL DU JOUR ==================== -->
-
-      <div
-        id="calendarJournalCard"
-        class="calendar-journal-card hidden"
-      >
-
-        <div class="calendar-journal-header">
-
-          <div>
-
-            <p class="eyebrow">
-              JOURNAL DU JOUR
-            </p>
-
-            <h2 id="calendarJournalTitle">
-              Journal
-            </h2>
-
-          </div>
-
-          <span class="journal-icon">
-            ✎
-          </span>
-
-        </div>
-
-
-        <div
-          id="calendarJournalContent"
-          class="calendar-journal-content"
-        ></div>
 
       </div>
 
@@ -313,6 +290,9 @@
 
       </div>
 
+
+      <!-- Journal quotidien -->
+
       <div class="journal-card">
 
         <div class="journal-card-header">
@@ -334,6 +314,7 @@
           </span>
 
         </div>
+
 
         <div class="feeling-grid">
 
@@ -403,10 +384,12 @@
 
         </div>
 
+
         <textarea
           id="dailyJournal"
           placeholder="Écris ce que tu veux, si tu en as envie..."
         ></textarea>
+
 
         <button
           id="saveDaily"
@@ -417,6 +400,8 @@
 
       </div>
 
+
+      <!-- Bilan hebdomadaire -->
 
       <div
         id="weeklyJournalCard"
@@ -443,10 +428,12 @@
 
         </div>
 
+
         <p
           id="weeklyAvailability"
           class="soft-text"
         ></p>
+
 
         <div
           id="weeklyContent"
@@ -466,6 +453,7 @@
 
           </div>
 
+
           <div class="choice-section">
 
             <h3>
@@ -478,6 +466,7 @@
             ></div>
 
           </div>
+
 
           <div class="positive-list">
 
@@ -505,6 +494,7 @@
 
           </div>
 
+
           <label class="weekly-text-label">
 
             Ton journal de la semaine
@@ -515,6 +505,7 @@
             ></textarea>
 
           </label>
+
 
           <button
             id="saveWeekly"
@@ -547,6 +538,7 @@
 
       </div>
 
+
       <div class="settings-card">
 
         <div class="setting-block">
@@ -571,6 +563,9 @@
 
         </div>
 
+
+        <!-- DUO -->
+
         <div class="duo-section">
 
           <div class="duo-heading">
@@ -592,11 +587,13 @@
 
             </div>
 
+
             <div class="duo-icon">
               ♡
             </div>
 
           </div>
+
 
           <div id="duoDisconnected">
 
@@ -607,9 +604,11 @@
               Créer un code Duo
             </button>
 
+
             <div class="duo-divider">
               <span>ou</span>
             </div>
+
 
             <div class="duo-join">
 
@@ -630,6 +629,7 @@
             </div>
 
           </div>
+
 
           <div
             id="duoConnected"
@@ -652,6 +652,7 @@
 
             </div>
 
+
             <button
               id="leaveDuo"
               class="text-button"
@@ -662,6 +663,9 @@
           </div>
 
         </div>
+
+
+        <!-- NOTIFICATIONS -->
 
         <div class="setting-row">
 
@@ -677,6 +681,7 @@
 
           </div>
 
+
           <button
             class="toggle"
             id="notificationToggle"
@@ -688,6 +693,9 @@
           </button>
 
         </div>
+
+
+        <!-- DONNEES -->
 
         <div class="setting-row">
 
@@ -717,6 +725,8 @@
 
   <nav class="bottom-nav">
 
+    <!-- Accueil -->
+
     <button
       class="nav-item active"
       data-page="homePage"
@@ -738,6 +748,9 @@
       </span>
 
     </button>
+
+
+    <!-- Calendrier -->
 
     <button
       class="nav-item"
@@ -766,6 +779,9 @@
       </span>
 
     </button>
+
+
+    <!-- Journal -->
 
     <button
       class="nav-item"
@@ -820,13 +836,16 @@
       ×
     </button>
 
+
     <p class="eyebrow">
       NOUVELLE HABITUDE
     </p>
 
+
     <h2>
       Qu'aimerais-tu mettre en place ?
     </h2>
+
 
     <input
       id="habitName"
@@ -835,11 +854,13 @@
       placeholder="Ex. Lire"
     >
 
+
     <div class="goal-selector">
 
       <p>
         Combien de jours par semaine ?
       </p>
+
 
       <div class="goal-options">
 
@@ -854,6 +875,7 @@
       </div>
 
     </div>
+
 
     <button
       id="saveHabit"
