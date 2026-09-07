@@ -222,6 +222,11 @@ const calendarSaveDaily =
     "calendarSaveDaily"
   );
 
+const weeklyHistoryList =
+  document.getElementById(
+    "weeklyHistoryList"
+  );
+
 
 /* =========================================================
    ETAT
@@ -245,6 +250,12 @@ let selectedJournalDate =
    (page Calendrier). null = rien n'est ouvert.
 */
 let calendarSelectedJournalDate = null;
+
+/*
+   Semaine actuellement dépliée dans
+   l'historique des bilans. null = tout replié.
+*/
+let openHistoryWeekKey = null;
 
 
 /* =========================================================
@@ -395,6 +406,26 @@ function formatShortDate(date) {
 }
 
 
+function getWeekRangeLabel(mondayKey) {
+
+  const monday =
+    new Date(mondayKey + "T00:00:00");
+
+
+  const sunday =
+    new Date(monday);
+
+
+  sunday.setDate(
+    monday.getDate() + 6
+  );
+
+
+  return `${formatShortDate(monday)} — ${formatShortDate(sunday)}`;
+
+}
+
+
 function formatJournalTitle(key) {
 
   if (
@@ -465,6 +496,8 @@ function showPage(pageId) {
     );
 
     updateWeeklyJournalAvailability();
+
+    renderWeeklyHistory();
 
   }
 
@@ -2334,8 +2367,226 @@ saveWeekly.addEventListener(
       1800
     );
 
+
+    renderWeeklyHistory();
+
   }
 );
+
+
+/* =========================================================
+   HISTORIQUE DES BILANS HEBDOMADAIRES
+   ========================================================= */
+
+function renderWeeklyHistory() {
+
+  const weekKeys =
+    Object.keys(
+      data.weeklyJournals
+    ).sort(
+      (a, b) =>
+        b.localeCompare(a)
+    );
+
+
+  if (
+    !weekKeys.length
+  ) {
+
+    weeklyHistoryList.innerHTML = `
+
+      <p class="soft-text">
+
+        Tu n'as pas encore de bilan
+        hebdomadaire enregistré.
+
+      </p>
+
+    `;
+
+    return;
+
+  }
+
+
+  weeklyHistoryList.innerHTML =
+    weekKeys
+      .map(
+        weekKey => {
+
+          const journal =
+            data.weeklyJournals[
+              weekKey
+            ];
+
+
+          const isOpen =
+            weekKey ===
+            openHistoryWeekKey;
+
+
+          const positives =
+            [
+              journal.positive1,
+              journal.positive2,
+              journal.positive3
+            ].filter(Boolean);
+
+
+          return `
+
+            <div
+              class="
+                history-item
+                ${isOpen ? "open" : ""}
+              "
+            >
+
+              <button
+                class="history-item-header"
+                data-week="${weekKey}"
+              >
+
+                <span>
+                  ${getWeekRangeLabel(weekKey)}
+                </span>
+
+                <span class="history-chevron">
+                  ${isOpen ? "−" : "+"}
+                </span>
+
+              </button>
+
+
+              ${
+                isOpen
+
+                  ? `
+
+                    <div class="history-item-body">
+
+                      ${
+                        journal.positiveChoices?.length
+
+                          ? `
+                            <div class="history-tags">
+                              ${
+                                journal.positiveChoices
+                                  .map(
+                                    item =>
+                                      `<span class="history-tag positive">${escapeHTML(item)}</span>`
+                                  )
+                                  .join("")
+                              }
+                            </div>
+                          `
+
+                          : ""
+                      }
+
+                      ${
+                        journal.negativeChoices?.length
+
+                          ? `
+                            <div class="history-tags">
+                              ${
+                                journal.negativeChoices
+                                  .map(
+                                    item =>
+                                      `<span class="history-tag negative">${escapeHTML(item)}</span>`
+                                  )
+                                  .join("")
+                              }
+                            </div>
+                          `
+
+                          : ""
+                      }
+
+                      ${
+                        positives.length
+
+                          ? `
+                            <ul class="history-positives">
+                              ${
+                                positives
+                                  .map(
+                                    item =>
+                                      `<li>${escapeHTML(item)}</li>`
+                                  )
+                                  .join("")
+                              }
+                            </ul>
+                          `
+
+                          : ""
+                      }
+
+                      ${
+                        journal.text?.trim()
+
+                          ? `<p class="history-text">${escapeHTML(journal.text)}</p>`
+
+                          : ""
+                      }
+
+                      ${
+                        !journal.positiveChoices?.length &&
+                        !journal.negativeChoices?.length &&
+                        !positives.length &&
+                        !journal.text?.trim()
+
+                          ? `<p class="soft-text">Ce bilan est vide.</p>`
+
+                          : ""
+                      }
+
+                    </div>
+
+                  `
+
+                  : ""
+              }
+
+            </div>
+
+          `;
+
+        }
+      )
+      .join("");
+
+
+  document
+    .querySelectorAll(
+      ".history-item-header"
+    )
+    .forEach(
+      button => {
+
+        button.addEventListener(
+          "click",
+          () => {
+
+            const week =
+              button.dataset.week;
+
+
+            openHistoryWeekKey =
+              openHistoryWeekKey === week
+                ? null
+                : week;
+
+
+            renderWeeklyHistory();
+
+          }
+        );
+
+      }
+    );
+
+}
 
 
 /* =========================================================
@@ -2629,6 +2880,8 @@ function initialize() {
   loadJournals(
     selectedJournalDate
   );
+
+  renderWeeklyHistory();
 
   renderDuo();
 
