@@ -599,6 +599,61 @@
     </section>
 
 
+    <!-- ==================== DUO ==================== -->
+
+    <section
+      id="duoPage"
+      class="page"
+    >
+
+      <div class="page-heading">
+
+        <p class="eyebrow">
+          VOUS DEUX
+        </p>
+
+        <h1>Duo</h1>
+
+      </div>
+
+
+      <!-- Encart de reconnaissance quotidien -->
+
+      <div
+        id="duoRecapCard"
+        class="journal-card duo-recap-card hidden"
+      ></div>
+
+
+      <div
+        id="duoHabitsList"
+        class="habits-list duo-habits-list"
+      ></div>
+
+
+      <button
+        id="addDuoHabitBtn"
+        class="add-habit"
+      >
+
+        <span>＋</span>
+
+        Ajouter une habitude commune
+
+      </button>
+
+
+      <p
+        id="duoEmptyState"
+        class="soft-text hidden"
+      >
+        Connecte-toi avec ton/ta partenaire depuis
+        les Réglages pour accéder à cet onglet.
+      </p>
+
+    </section>
+
+
     <!-- ==================== REGLAGES ==================== -->
 
     <section
@@ -659,8 +714,8 @@
               </h2>
 
               <p class="soft-text">
-                Relie ton compte à celui d'une autre personne
-                pour créer des habitudes communes.
+                Crée un compte pour relier ton suivi
+                à celui d'une autre personne.
               </p>
 
             </div>
@@ -673,35 +728,84 @@
           </div>
 
 
-          <div id="duoDisconnected">
+          <!-- Connexion / inscription -->
 
-            <button
-              id="generateDuo"
-              class="primary-button"
-            >
-              Créer un code Duo
-            </button>
+          <div id="duoAuthSection">
 
+            <div id="duoLoginForm">
 
-            <div class="duo-divider">
-              <span>ou</span>
+              <input
+                id="loginUsername"
+                type="text"
+                maxlength="24"
+                placeholder="Nom d'utilisateur"
+                autocapitalize="none"
+              >
+
+              <input
+                id="loginPassword"
+                type="password"
+                placeholder="Mot de passe"
+              >
+
+              <p
+                id="loginError"
+                class="form-error hidden"
+              ></p>
+
+              <button
+                id="loginBtn"
+                class="primary-button"
+              >
+                Se connecter
+              </button>
+
+              <button
+                id="showSignup"
+                class="text-button"
+              >
+                Créer un compte
+              </button>
+
             </div>
 
 
-            <div class="duo-join">
+            <div
+              id="duoSignupForm"
+              class="hidden"
+            >
 
               <input
-                id="duoCodeInput"
+                id="signupUsername"
                 type="text"
-                maxlength="6"
-                placeholder="Entrer un code"
+                maxlength="24"
+                placeholder="Choisis un nom d'utilisateur"
+                autocapitalize="none"
               >
 
-              <button
-                id="joinDuo"
-                class="secondary-button"
+              <input
+                id="signupPassword"
+                type="password"
+                placeholder="Choisis un mot de passe (6 caractères min.)"
               >
-                Rejoindre
+
+              <p
+                id="signupError"
+                class="form-error hidden"
+              ></p>
+
+              <button
+                id="signupBtn"
+                class="primary-button"
+              >
+                Créer mon compte
+              </button>
+
+              <button
+                id="showLogin"
+                class="text-button"
+              >
+                J'ai déjà un compte
               </button>
 
             </div>
@@ -709,34 +813,152 @@
           </div>
 
 
+          <!-- Compte connecté -->
+
           <div
-            id="duoConnected"
+            id="duoAccountSection"
             class="hidden"
           >
 
-            <div class="duo-connected-box">
+            <p class="soft-text duo-account-line">
 
-              <span class="duo-status"></span>
+              Connecté·e en tant que
+              <strong id="duoAccountUsername"></strong>
 
-              <div>
+            </p>
 
-                <strong>
-                  Duo activé
-                </strong>
+            <button
+              id="logoutBtn"
+              class="text-button"
+            >
+              Se déconnecter
+            </button>
 
-                <p id="duoCodeDisplay"></p>
+
+            <div id="duoDisconnected">
+
+              <button
+                id="generateDuo"
+                class="primary-button"
+              >
+                Créer un code Duo
+              </button>
+
+
+              <div
+                id="duoCodeGenerated"
+                class="duo-code-generated hidden"
+              >
+
+                <p class="soft-text">
+                  Ton code, à partager :
+                </p>
+
+                <p id="duoGeneratedCode" class="duo-code-value"></p>
+
+                <p class="soft-text">
+                  En attente que l'autre personne le rejoigne...
+                </p>
 
               </div>
+
+
+              <div class="duo-divider">
+                <span>ou</span>
+              </div>
+
+
+              <div class="duo-join">
+
+                <input
+                  id="duoCodeInput"
+                  type="text"
+                  maxlength="6"
+                  placeholder="Entrer un code"
+                  autocapitalize="characters"
+                >
+
+                <button
+                  id="joinDuo"
+                  class="secondary-button"
+                >
+                  Rejoindre
+                </button>
+
+              </div>
+
+
+              <p
+                id="duoJoinError"
+                class="form-error hidden"
+              ></p>
 
             </div>
 
 
-            <button
-              id="leaveDuo"
-              class="text-button"
+            <div
+              id="duoConnected"
+              class="hidden"
             >
-              Quitter le Duo
-            </button>
+
+              <div class="duo-connected-box">
+
+                <span class="duo-status"></span>
+
+                <div>
+
+                  <strong>
+                    Duo activé avec
+                    <span id="duoPartnerName"></span>
+                  </strong>
+
+                  <p>
+                    Rendez-vous dans l'onglet Duo
+                    pour vos habitudes communes.
+                  </p>
+
+                </div>
+
+              </div>
+
+
+              <div class="color-picker">
+
+                <p class="soft-text">
+                  Ta couleur dans le duo
+                </p>
+
+                <div class="color-options">
+
+                  <button
+                    type="button"
+                    data-color="blue"
+                    class="color-swatch blue"
+                  >
+                    Bleu
+                  </button>
+
+                  <button
+                    type="button"
+                    data-color="yellow"
+                    class="color-swatch yellow"
+                  >
+                    Jaune
+                  </button>
+
+                </div>
+
+              </div>
+
+
+              <button
+                id="leaveDuo"
+                class="text-button"
+              >
+                Quitter le Duo
+              </button>
+
+            </div>
 
           </div>
 
@@ -892,6 +1114,30 @@
 
     </button>
 
+
+    <!-- Duo -->
+
+    <button
+      class="nav-item hidden"
+      data-page="duoPage"
+      aria-label="Duo"
+      id="duoNavItem"
+    >
+
+      <span class="nav-icon">
+
+        <svg viewBox="0 0 24 24">
+
+          <path
+            d="M12 21s-7.2-4.4-9.7-8.9C.8 8.4 2.2 4.6 5.8 4.6c2.1 0 3.6 1.3 4.4 2.6.8-1.3 2.3-2.6 4.4-2.6 3.6 0 5 3.8 3.5 7.5C19.2 16.6 12 21 12 21Z"
+          />
+
+        </svg>
+
+      </span>
+
+    </button>
+
   </nav>
 
 </div>
@@ -915,12 +1161,12 @@
     </button>
 
 
-    <p class="eyebrow">
+    <p class="eyebrow" id="habitModalEyebrow">
       NOUVELLE HABITUDE
     </p>
 
 
-    <h2>
+    <h2 id="habitModalTitle">
       Qu'aimerais-tu mettre en place ?
     </h2>
 
@@ -966,6 +1212,12 @@
 
 </div>
 
+
+<!-- Firebase (mode Duo) -->
+<script src="https://www.gstatic.com/firebasejs/10.13.0/firebase-app-compat.js"></script>
+<script src="https://www.gstatic.com/firebasejs/10.13.0/firebase-auth-compat.js"></script>
+<script src="https://www.gstatic.com/firebasejs/10.13.0/firebase-firestore-compat.js"></script>
+<script src="firebase-config.js"></script>
 
 <script src="app.js"></script>
 
