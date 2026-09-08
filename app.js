@@ -2898,6 +2898,11 @@ signupBtn.addEventListener(
 
     } catch (error) {
 
+      console.error(
+        "Erreur d'inscription :",
+        error
+      );
+
       showAuthError(
         signupError,
         translateAuthError(error)
@@ -2955,6 +2960,11 @@ loginBtn.addEventListener(
 
     } catch (error) {
 
+      console.error(
+        "Erreur de connexion :",
+        error
+      );
+
       showAuthError(
         loginError,
         translateAuthError(error)
@@ -3001,14 +3011,35 @@ function translateAuthError(error) {
       "Nom d'utilisateur ou mot de passe incorrect.",
 
     "auth/too-many-requests":
-      "Trop de tentatives, réessaie dans un instant."
+      "Trop de tentatives, réessaie dans un instant.",
+
+    "auth/operation-not-allowed":
+      "La connexion par mot de passe n'est pas activée sur le projet Firebase (Authentication → Sign-in method).",
+
+    "auth/invalid-api-key":
+      "La configuration Firebase (firebase-config.js) est incorrecte ou incomplète.",
+
+    "auth/api-key-not-valid":
+      "La configuration Firebase (firebase-config.js) est incorrecte ou incomplète.",
+
+    "auth/network-request-failed":
+      "Problème de connexion internet, réessaie.",
+
+    "permission-denied":
+      "Accès refusé par Firestore : vérifie que les règles de sécurité ont bien été publiées."
 
   };
 
 
+  /*
+     On garde le code brut en secours pour
+     pouvoir diagnostiquer les cas non prévus
+     (voir la console du navigateur pour le détail).
+  */
+
   return (
     map[error.code] ||
-    "Une erreur est survenue, réessaie."
+    `Une erreur est survenue (${error.code || error.message || "inconnue"}).`
   );
 
 }
