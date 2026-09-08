@@ -7,8 +7,7 @@ let data = JSON.parse(
   dailyJournal: {},
   weeklyJournals: {},
   notifications: false,
-  userName: "",
-  duo: null
+  userName: ""
 };
 
 
@@ -177,11 +176,6 @@ const duoDisconnected =
 const duoConnected =
   document.getElementById(
     "duoConnected"
-  );
-
-const duoCodeDisplay =
-  document.getElementById(
-    "duoCodeDisplay"
   );
 
 const leaveDuo =
@@ -509,7 +503,13 @@ function showPage(pageId) {
     userName.value =
       data.userName || "";
 
-    renderDuo();
+    renderAuthState();
+
+    if (duoState) {
+
+      renderDuoAccountUI();
+
+    }
 
   }
 
@@ -628,6 +628,20 @@ addHabitBtn.addEventListener(
 
     selectedGoal = 3;
 
+    habitModalContext = "solo";
+
+
+    document.getElementById(
+      "habitModalEyebrow"
+    ).textContent =
+      "NOUVELLE HABITUDE";
+
+
+    document.getElementById(
+      "habitModalTitle"
+    ).textContent =
+      "Qu'aimerais-tu mettre en place ?";
+
 
     goalButtons.forEach(
       button => {
@@ -663,6 +677,8 @@ closeModal.addEventListener(
       "hidden"
     );
 
+    habitModalContext = "solo";
+
   }
 );
 
@@ -678,6 +694,8 @@ habitModal.addEventListener(
       habitModal.classList.add(
         "hidden"
       );
+
+      habitModalContext = "solo";
 
     }
 
@@ -722,7 +740,7 @@ goalButtons.forEach(
 
 saveHabitBtn.addEventListener(
   "click",
-  () => {
+  async () => {
 
     const name =
       habitName.value.trim();
@@ -736,6 +754,49 @@ saveHabitBtn.addEventListener(
 
     }
 
+
+    /* ===== Habitude commune (Duo) ===== */
+
+    if (habitModalContext === "duo") {
+
+      if (!duoState || !currentUser) return;
+
+
+      saveHabitBtn.disabled = true;
+
+
+      await db.collection("duos")
+        .doc(duoState.duoId)
+        .collection("habits")
+        .add({
+
+          name,
+
+          goal: selectedGoal,
+
+          createdBy: currentUser.uid,
+
+          completed: {},
+
+          createdAt:
+            firebase.firestore.FieldValue.serverTimestamp()
+
+        });
+
+
+      saveHabitBtn.disabled = false;
+
+
+      habitModal.classList.add("hidden");
+
+      habitModalContext = "solo";
+
+      return;
+
+    }
+
+
+    /* ===== Habitude individuelle (solo) ===== */
 
     const habit = {
 
@@ -2590,7 +2651,475 @@ function renderWeeklyHistory() {
 
 
 /* =========================================================
-   MODE DUO
+   ELEMENTS — COMPTE / DUO (FIRESTORE)
+   ========================================================= */
+
+const duoAuthSection =
+  document.getElementById("duoAuthSection");
+
+const duoLoginForm =
+  document.getElementById("duoLoginForm");
+
+const duoSignupForm =
+  document.getElementById("duoSignupForm");
+
+const loginUsername =
+  document.getElementById("loginUsername");
+
+const loginPassword =
+  document.getElementById("loginPassword");
+
+const loginError =
+  document.getElementById("loginError");
+
+const loginBtn =
+  document.getElementById("loginBtn");
+
+const showSignup =
+  document.getElementById("showSignup");
+
+const signupUsername =
+  document.getElementById("signupUsername");
+
+const signupPassword =
+  document.getElementById("signupPassword");
+
+const signupError =
+  document.getElementById("signupError");
+
+const signupBtn =
+  document.getElementById("signupBtn");
+
+const showLogin =
+  document.getElementById("showLogin");
+
+const duoAccountSection =
+  document.getElementById("duoAccountSection");
+
+const duoAccountUsername =
+  document.getElementById("duoAccountUsername");
+
+const logoutBtn =
+  document.getElementById("logoutBtn");
+
+const duoCodeGenerated =
+  document.getElementById("duoCodeGenerated");
+
+const duoGeneratedCode =
+  document.getElementById("duoGeneratedCode");
+
+const duoJoinError =
+  document.getElementById("duoJoinError");
+
+const duoPartnerName =
+  document.getElementById("duoPartnerName");
+
+const duoNavItem =
+  document.getElementById("duoNavItem");
+
+const duoRecapCard =
+  document.getElementById("duoRecapCard");
+
+const duoHabitsList =
+  document.getElementById("duoHabitsList");
+
+const addDuoHabitBtn =
+  document.getElementById("addDuoHabitBtn");
+
+const duoEmptyState =
+  document.getElementById("duoEmptyState");
+
+const colorButtons =
+  document.querySelectorAll(
+    ".color-swatch"
+  );
+
+
+/* =========================================================
+   ETAT — COMPTE / DUO
+   ========================================================= */
+
+let currentUser = null;
+
+/*
+   Profil Firestore de l'utilisateur connecté :
+   { username, duoId, color }
+*/
+let currentProfile = null;
+
+/*
+   Infos sur le duo actif une fois connecté :
+   { duoId, partnerUid, partnerUsername, myColor, partnerColor }
+*/
+let duoState = null;
+
+let duoHabitsUnsub = null;
+let duoDocUnsub = null;
+let duoReactionsUnsub = null;
+
+let sharedHabits = [];
+
+let sharedReactions = [];
+
+/*
+   Contexte du modal d'ajout d'habitude :
+   "solo" (par défaut) ou "duo".
+*/
+let habitModalContext = "solo";
+
+const REACTION_TYPES = [
+  { type: "heart", icon: "❤️" },
+  { type: "applause", icon: "👏" },
+  { type: "fire", icon: "🔥" },
+  { type: "flex", icon: "💪" }
+];
+
+
+/* =========================================================
+   AUTHENTIFICATION
+   ========================================================= */
+
+function showAuthError(element, message) {
+
+  element.textContent = message;
+
+  element.classList.remove("hidden");
+
+}
+
+
+function hideAuthError(element) {
+
+  element.classList.add("hidden");
+
+}
+
+
+showSignup.addEventListener(
+  "click",
+  () => {
+
+    duoLoginForm.classList.add("hidden");
+
+    duoSignupForm.classList.remove("hidden");
+
+  }
+);
+
+
+showLogin.addEventListener(
+  "click",
+  () => {
+
+    duoSignupForm.classList.add("hidden");
+
+    duoLoginForm.classList.remove("hidden");
+
+  }
+);
+
+
+signupBtn.addEventListener(
+  "click",
+  async () => {
+
+    hideAuthError(signupError);
+
+    const username =
+      signupUsername.value.trim();
+
+    const password =
+      signupPassword.value;
+
+
+    if (
+      !username ||
+      username.length < 3
+    ) {
+
+      showAuthError(
+        signupError,
+        "Choisis un nom d'utilisateur d'au moins 3 caractères."
+      );
+
+      return;
+
+    }
+
+
+    if (
+      !password ||
+      password.length < 6
+    ) {
+
+      showAuthError(
+        signupError,
+        "Le mot de passe doit contenir au moins 6 caractères."
+      );
+
+      return;
+
+    }
+
+
+    signupBtn.disabled = true;
+
+    signupBtn.textContent = "Création...";
+
+
+    try {
+
+      const credential =
+        await auth.createUserWithEmailAndPassword(
+          usernameToEmail(username),
+          password
+        );
+
+
+      await db.collection("users")
+        .doc(credential.user.uid)
+        .set({
+
+          username,
+
+          duoId: null,
+
+          color: "blue",
+
+          createdAt:
+            firebase.firestore.FieldValue.serverTimestamp()
+
+        });
+
+
+      signupUsername.value = "";
+
+      signupPassword.value = "";
+
+    } catch (error) {
+
+      showAuthError(
+        signupError,
+        translateAuthError(error)
+      );
+
+    }
+
+
+    signupBtn.disabled = false;
+
+    signupBtn.textContent = "Créer mon compte";
+
+  }
+);
+
+
+loginBtn.addEventListener(
+  "click",
+  async () => {
+
+    hideAuthError(loginError);
+
+    const username =
+      loginUsername.value.trim();
+
+    const password =
+      loginPassword.value;
+
+
+    if (!username || !password) {
+
+      showAuthError(
+        loginError,
+        "Renseigne ton nom d'utilisateur et ton mot de passe."
+      );
+
+      return;
+
+    }
+
+
+    loginBtn.disabled = true;
+
+    loginBtn.textContent = "Connexion...";
+
+
+    try {
+
+      await auth.signInWithEmailAndPassword(
+        usernameToEmail(username),
+        password
+      );
+
+      loginPassword.value = "";
+
+    } catch (error) {
+
+      showAuthError(
+        loginError,
+        translateAuthError(error)
+      );
+
+    }
+
+
+    loginBtn.disabled = false;
+
+    loginBtn.textContent = "Se connecter";
+
+  }
+);
+
+
+logoutBtn.addEventListener(
+  "click",
+  () => {
+
+    auth.signOut();
+
+  }
+);
+
+
+function translateAuthError(error) {
+
+  const map = {
+
+    "auth/email-already-in-use":
+      "Ce nom d'utilisateur est déjà pris.",
+
+    "auth/invalid-email":
+      "Ce nom d'utilisateur n'est pas valide.",
+
+    "auth/wrong-password":
+      "Mot de passe incorrect.",
+
+    "auth/user-not-found":
+      "Ce nom d'utilisateur n'existe pas.",
+
+    "auth/invalid-credential":
+      "Nom d'utilisateur ou mot de passe incorrect.",
+
+    "auth/too-many-requests":
+      "Trop de tentatives, réessaie dans un instant."
+
+  };
+
+
+  return (
+    map[error.code] ||
+    "Une erreur est survenue, réessaie."
+  );
+
+}
+
+
+/*
+   Point d'entrée : réagit à chaque changement
+   de session (connexion, déconnexion, ou
+   reconnexion automatique sur un appareil
+   déjà utilisé auparavant).
+*/
+
+auth.onAuthStateChanged(
+  async user => {
+
+    /* On se détache des anciens écouteurs Firestore */
+
+    if (duoHabitsUnsub) duoHabitsUnsub();
+
+    if (duoDocUnsub) duoDocUnsub();
+
+    if (duoReactionsUnsub) duoReactionsUnsub();
+
+    duoHabitsUnsub = null;
+
+    duoDocUnsub = null;
+
+    duoReactionsUnsub = null;
+
+
+    currentUser = user;
+
+
+    if (!user) {
+
+      currentProfile = null;
+
+      duoState = null;
+
+      renderAuthState();
+
+      renderDuoNav();
+
+      return;
+
+    }
+
+
+    const profileSnap =
+      await db.collection("users")
+        .doc(user.uid)
+        .get();
+
+
+    currentProfile =
+      profileSnap.data();
+
+
+    renderAuthState();
+
+
+    if (currentProfile?.duoId) {
+
+      subscribeToDuo(
+        currentProfile.duoId
+      );
+
+    } else {
+
+      duoState = null;
+
+      renderDuoAccountUI();
+
+      renderDuoNav();
+
+    }
+
+  }
+);
+
+
+function renderAuthState() {
+
+  const loggedIn =
+    Boolean(currentUser);
+
+
+  duoAuthSection.classList.toggle(
+    "hidden",
+    loggedIn
+  );
+
+
+  duoAccountSection.classList.toggle(
+    "hidden",
+    !loggedIn
+  );
+
+
+  if (loggedIn) {
+
+    duoAccountUsername.textContent =
+      currentProfile?.username || "";
+
+  }
+
+}
+
+
+/* =========================================================
+   CREATION / JONCTION DU DUO
    ========================================================= */
 
 function generateCode() {
@@ -2602,17 +3131,12 @@ function generateCode() {
   let code = "";
 
 
-  for (
-    let i = 0;
-    i < 6;
-    i++
-  ) {
+  for (let i = 0; i < 6; i++) {
 
     code +=
       characters[
         Math.floor(
-          Math.random() *
-          characters.length
+          Math.random() * characters.length
         )
       ];
 
@@ -2626,24 +3150,53 @@ function generateCode() {
 
 generateDuo.addEventListener(
   "click",
-  () => {
+  async () => {
+
+    if (!currentUser) return;
+
+
+    generateDuo.disabled = true;
+
 
     const code =
       generateCode();
 
 
-    data.duo = {
+    const duoRef =
+      await db.collection("duos").add({
 
-      code,
+        code,
 
-      status: "waiting"
+        member1: currentUser.uid,
 
-    };
+        member2: null,
+
+        status: "waiting",
+
+        createdAt:
+          firebase.firestore.FieldValue.serverTimestamp()
+
+      });
 
 
-    saveData();
+    await db.collection("users")
+      .doc(currentUser.uid)
+      .update({ duoId: duoRef.id });
 
-    renderDuo();
+
+    duoGeneratedCode.textContent =
+      code;
+
+
+    duoCodeGenerated.classList.remove(
+      "hidden"
+    );
+
+
+    generateDuo.disabled = false;
+
+
+    subscribeToDuo(duoRef.id);
 
   }
 );
@@ -2651,7 +3204,13 @@ generateDuo.addEventListener(
 
 joinDuo.addEventListener(
   "click",
-  () => {
+  async () => {
+
+    if (!currentUser) return;
+
+
+    hideAuthError(duoJoinError);
+
 
     const code =
       duoCodeInput.value
@@ -2659,11 +3218,10 @@ joinDuo.addEventListener(
         .toUpperCase();
 
 
-    if (
-      code.length !== 6
-    ) {
+    if (code.length !== 6) {
 
-      alert(
+      showAuthError(
+        duoJoinError,
         "Le code doit contenir 6 caractères."
       );
 
@@ -2672,18 +3230,112 @@ joinDuo.addEventListener(
     }
 
 
-    data.duo = {
-
-      code,
-
-      status: "connected"
-
-    };
+    joinDuo.disabled = true;
 
 
-    saveData();
+    try {
 
-    renderDuo();
+      const results =
+        await db.collection("duos")
+          .where("code", "==", code)
+          .where("status", "==", "waiting")
+          .limit(1)
+          .get();
+
+
+      if (results.empty) {
+
+        showAuthError(
+          duoJoinError,
+          "Ce code n'est pas valide ou a déjà été utilisé."
+        );
+
+        joinDuo.disabled = false;
+
+        return;
+
+      }
+
+
+      const duoDoc =
+        results.docs[0];
+
+
+      if (
+        duoDoc.data().member1 ===
+        currentUser.uid
+      ) {
+
+        showAuthError(
+          duoJoinError,
+          "Tu ne peux pas rejoindre ton propre code."
+        );
+
+        joinDuo.disabled = false;
+
+        return;
+
+      }
+
+
+      /*
+        La personne qui rejoint prend
+        automatiquement la couleur opposée
+        à celle du premier membre.
+      */
+
+      const inviterSnap =
+        await db.collection("users")
+          .doc(duoDoc.data().member1)
+          .get();
+
+
+      const inviterColor =
+        inviterSnap.data()?.color || "blue";
+
+
+      const myColor =
+        inviterColor === "blue"
+          ? "yellow"
+          : "blue";
+
+
+      await duoDoc.ref.update({
+
+        member2: currentUser.uid,
+
+        status: "connected"
+
+      });
+
+
+      await db.collection("users")
+        .doc(currentUser.uid)
+        .update({
+
+          duoId: duoDoc.id,
+
+          color: myColor
+
+        });
+
+
+      duoCodeInput.value = "";
+
+
+      subscribeToDuo(duoDoc.id);
+
+    } catch (error) {
+
+      showAuthError(
+        duoJoinError,
+        "Une erreur est survenue, réessaie."
+      );
+
+    }
+
+
+    joinDuo.disabled = false;
 
   }
 );
@@ -2691,27 +3343,257 @@ joinDuo.addEventListener(
 
 leaveDuo.addEventListener(
   "click",
-  () => {
+  async () => {
 
-    data.duo = null;
+    if (
+      !currentUser ||
+      !duoState
+    ) {
 
-    saveData();
+      return;
 
-    renderDuo();
+    }
+
+
+    if (
+      !confirm(
+        "Quitter le Duo ? Vos habitudes communes resteront visibles pour l'autre personne."
+      )
+    ) {
+
+      return;
+
+    }
+
+
+    await db.collection("users")
+      .doc(currentUser.uid)
+      .update({ duoId: null });
+
+
+    if (duoHabitsUnsub) duoHabitsUnsub();
+
+    if (duoDocUnsub) duoDocUnsub();
+
+    if (duoReactionsUnsub) duoReactionsUnsub();
+
+
+    duoState = null;
+
+    currentProfile.duoId = null;
+
+
+    renderDuoAccountUI();
+
+    renderDuoNav();
 
   }
 );
 
 
-function renderDuo() {
+/*
+   Choix de sa couleur dans le duo. On empêche
+   les deux personnes d'avoir la même couleur.
+*/
 
-  if (!data.duo) {
+colorButtons.forEach(button => {
+
+  button.addEventListener(
+    "click",
+    async () => {
+
+      if (!currentUser || !duoState) return;
+
+
+      const color =
+        button.dataset.color;
+
+
+      if (
+        color === duoState.partnerColor
+      ) {
+
+        alert(
+          "Ton/ta partenaire a déjà choisi cette couleur."
+        );
+
+        return;
+
+      }
+
+
+      await db.collection("users")
+        .doc(currentUser.uid)
+        .update({ color });
+
+
+      currentProfile.color = color;
+
+      duoState.myColor = color;
+
+
+      renderColorButtons();
+
+      renderDuoHabits();
+
+    }
+  );
+
+});
+
+
+function renderColorButtons() {
+
+  colorButtons.forEach(button => {
+
+    button.classList.toggle(
+      "selected",
+      button.dataset.color ===
+      (currentProfile?.color || "blue")
+    );
+
+  });
+
+}
+
+
+/* =========================================================
+   SOUSCRIPTION AU DUO ACTIF
+   ========================================================= */
+
+function subscribeToDuo(duoId) {
+
+  duoDocUnsub =
+    db.collection("duos")
+      .doc(duoId)
+      .onSnapshot(async docSnap => {
+
+        const duoData =
+          docSnap.data();
+
+
+        if (
+          !duoData ||
+          duoData.status !== "connected"
+        ) {
+
+          duoState = null;
+
+          renderDuoAccountUI();
+
+          renderDuoNav();
+
+          return;
+
+        }
+
+
+        const partnerUid =
+          duoData.member1 === currentUser.uid
+            ? duoData.member2
+            : duoData.member1;
+
+
+        const partnerSnap =
+          await db.collection("users")
+            .doc(partnerUid)
+            .get();
+
+
+        const partnerData =
+          partnerSnap.data() || {};
+
+
+        duoState = {
+
+          duoId,
+
+          partnerUid,
+
+          partnerUsername:
+            partnerData.username || "Ton/ta partenaire",
+
+          myColor:
+            currentProfile?.color || "blue",
+
+          partnerColor:
+            partnerData.color === "blue"
+              ? "blue"
+              : "yellow"
+
+        };
+
+
+        renderDuoAccountUI();
+
+        renderDuoNav();
+
+      });
+
+
+  if (duoHabitsUnsub) duoHabitsUnsub();
+
+
+  duoHabitsUnsub =
+    db.collection("duos")
+      .doc(duoId)
+      .collection("habits")
+      .onSnapshot(snapshot => {
+
+        sharedHabits =
+          snapshot.docs.map(doc => ({
+
+            id: doc.id,
+
+            ...doc.data()
+
+          }));
+
+
+        renderDuoHabits();
+
+      });
+
+
+  if (duoReactionsUnsub) duoReactionsUnsub();
+
+
+  duoReactionsUnsub =
+    db.collection("duos")
+      .doc(duoId)
+      .collection("reactions")
+      .onSnapshot(snapshot => {
+
+        sharedReactions =
+          snapshot.docs.map(doc => ({
+
+            id: doc.id,
+
+            ...doc.data()
+
+          }));
+
+
+        renderDuoRecap();
+
+      });
+
+}
+
+
+function renderDuoAccountUI() {
+
+  if (!duoState) {
 
     duoDisconnected.classList.remove(
       "hidden"
     );
 
     duoConnected.classList.add(
+      "hidden"
+    );
+
+    duoCodeGenerated.classList.add(
       "hidden"
     );
 
@@ -2724,14 +3606,711 @@ function renderDuo() {
     "hidden"
   );
 
-
   duoConnected.classList.remove(
     "hidden"
   );
 
 
-  duoCodeDisplay.textContent =
-    `Code : ${data.duo.code}`;
+  duoPartnerName.textContent =
+    duoState.partnerUsername;
+
+
+  renderColorButtons();
+
+}
+
+
+function renderDuoNav() {
+
+  const connected =
+    Boolean(duoState);
+
+
+  duoNavItem.classList.toggle(
+    "hidden",
+    !connected
+  );
+
+
+  document
+    .querySelector(".bottom-nav")
+    .classList.toggle(
+      "four-items",
+      connected
+    );
+
+
+  duoHabitsList.classList.toggle(
+    "hidden",
+    !connected
+  );
+
+
+  addDuoHabitBtn.classList.toggle(
+    "hidden",
+    !connected
+  );
+
+
+  duoEmptyState.classList.toggle(
+    "hidden",
+    connected
+  );
+
+
+  if (!connected) {
+
+    duoRecapCard.classList.add(
+      "hidden"
+    );
+
+  }
+
+}
+
+
+/* =========================================================
+   HABITUDES COMMUNES
+   ========================================================= */
+
+addDuoHabitBtn.addEventListener(
+  "click",
+  () => {
+
+    if (!duoState) return;
+
+
+    habitModalContext = "duo";
+
+
+    document.getElementById(
+      "habitModalEyebrow"
+    ).textContent =
+      "HABITUDE COMMUNE";
+
+
+    document.getElementById(
+      "habitModalTitle"
+    ).textContent =
+      "Que voulez-vous suivre à deux ?";
+
+
+    habitName.value = "";
+
+    selectedGoal = 3;
+
+
+    goalButtons.forEach(button => {
+
+      button.classList.toggle(
+        "selected",
+        button.dataset.goal === "3"
+      );
+
+    });
+
+
+    habitModal.classList.remove(
+      "hidden"
+    );
+
+
+    setTimeout(
+      () => habitName.focus(),
+      100
+    );
+
+  }
+);
+
+
+function countWeekCompletedShared(
+  habit,
+  uid
+) {
+
+  return getWeekDays()
+    .filter(day => {
+
+      const key =
+        dateKey(day);
+
+      return Boolean(
+        habit.completed?.[key]?.[uid]
+      );
+
+    })
+    .length;
+
+}
+
+
+function renderDuoHabits() {
+
+  if (!duoState) return;
+
+
+  duoHabitsList.innerHTML = "";
+
+
+  if (!sharedHabits.length) {
+
+    duoHabitsList.innerHTML = `
+
+      <div class="month-card">
+
+        <div class="monthly-recap">
+
+          Vous n'avez pas encore d'habitude commune.
+          <br><br>
+          Ajoutez-en une pour suivre vos progrès
+          à deux.
+
+        </div>
+
+      </div>
+
+    `;
+
+    return;
+
+  }
+
+
+  const days =
+    getWeekDays();
+
+
+  const myUid =
+    currentUser.uid;
+
+
+  const partnerUid =
+    duoState.partnerUid;
+
+
+  sharedHabits.forEach(habit => {
+
+    const myCompleted =
+      countWeekCompletedShared(habit, myUid);
+
+    const partnerCompleted =
+      countWeekCompletedShared(habit, partnerUid);
+
+
+    const card =
+      document.createElement("div");
+
+
+    card.className = "habit-card duo-habit-card";
+
+
+    function buildRow(uid, colorClass, label) {
+
+      const daysHTML =
+        days.map((day, index) => {
+
+          const key =
+            dateKey(day);
+
+          const checked =
+            Boolean(habit.completed?.[key]?.[uid]);
+
+          const today =
+            key === dateKey(new Date());
+
+          const canToggle =
+            uid === myUid;
+
+
+          return `
+
+            <div class="day">
+
+              <button
+                class="
+                  day-circle
+                  duo-circle
+                  ${colorClass}
+                  ${checked ? "checked" : ""}
+                  ${today ? "today" : ""}
+                  ${canToggle ? "" : "readonly"}
+                "
+                data-habit="${habit.id}"
+                data-date="${key}"
+                data-uid="${uid}"
+                ${canToggle ? "" : "disabled"}
+              >
+
+                ${checked ? "✓" : ""}
+
+              </button>
+
+              <span>${dayNames[index]}</span>
+
+            </div>
+
+          `;
+
+        }).join("");
+
+
+      return `
+
+        <div class="duo-row">
+
+          <span class="duo-row-label">
+            ${escapeHTML(label)}
+          </span>
+
+          <div class="days">
+            ${daysHTML}
+          </div>
+
+        </div>
+
+      `;
+
+    }
+
+
+    card.innerHTML = `
+
+      <div class="habit-top">
+
+        <div>
+
+          <div class="habit-name">
+            ${escapeHTML(habit.name)}
+          </div>
+
+          <div class="habit-progress">
+            Objectif : ${habit.goal}
+            jour${habit.goal > 1 ? "s" : ""} / semaine
+          </div>
+
+        </div>
+
+
+        ${
+          habit.createdBy === myUid
+            ? `<button class="delete-habit" data-delete-shared="${habit.id}">×</button>`
+            : ""
+        }
+
+      </div>
+
+
+      ${buildRow(myUid, duoState.myColor, "Toi")}
+
+      ${buildRow(partnerUid, duoState.partnerColor, duoState.partnerUsername)}
+
+
+      <div class="duo-progress-line">
+
+        Toi : ${myCompleted}/${habit.goal}
+        · ${duoState.partnerUsername} : ${partnerCompleted}/${habit.goal}
+
+      </div>
+
+    `;
+
+
+    duoHabitsList.appendChild(card);
+
+  });
+
+
+  attachDuoHabitEvents();
+
+  renderDuoRecap();
+
+}
+
+
+function attachDuoHabitEvents() {
+
+  document
+    .querySelectorAll(
+      ".duo-circle:not(.readonly)"
+    )
+    .forEach(button => {
+
+      button.addEventListener(
+        "click",
+        async () => {
+
+          const habitId =
+            button.dataset.habit;
+
+          const date =
+            button.dataset.date;
+
+          const uid =
+            button.dataset.uid;
+
+
+          const habit =
+            sharedHabits.find(
+              h => h.id === habitId
+            );
+
+          if (!habit) return;
+
+
+          const current =
+            Boolean(
+              habit.completed?.[date]?.[uid]
+            );
+
+
+          await db.collection("duos")
+            .doc(duoState.duoId)
+            .collection("habits")
+            .doc(habitId)
+            .update({
+
+              [`completed.${date}.${uid}`]:
+                !current
+
+            });
+
+        }
+      );
+
+    });
+
+
+  document
+    .querySelectorAll(
+      "[data-delete-shared]"
+    )
+    .forEach(button => {
+
+      button.addEventListener(
+        "click",
+        async () => {
+
+          const id =
+            button.dataset.deleteShared;
+
+
+          if (
+            !confirm(
+              "Supprimer cette habitude commune ?"
+            )
+          ) {
+
+            return;
+
+          }
+
+
+          await db.collection("duos")
+            .doc(duoState.duoId)
+            .collection("habits")
+            .doc(id)
+            .delete();
+
+        }
+      );
+
+    });
+
+}
+
+
+/* =========================================================
+   ENCART DE RECONNAISSANCE + REACTIONS
+   ========================================================= */
+
+/*
+   Détermine quelle "journée" mettre en avant et
+   son libellé, selon la fenêtre 20h → 10h du
+   lendemain matin. En dehors de cette fenêtre,
+   l'encart reste caché.
+*/
+
+function getRecapWindow() {
+
+  const now =
+    new Date();
+
+  const hour =
+    now.getHours();
+
+
+  /* Entre 20h et minuit : on parle du jour même */
+
+  if (hour >= 20) {
+
+    return {
+
+      visible: true,
+
+      label: "Aujourd'hui",
+
+      dateKey: dateKey(now)
+
+    };
+
+  }
+
+
+  /* Entre minuit et 10h : on parle de la veille */
+
+  if (hour < 10) {
+
+    const yesterday =
+      new Date(now);
+
+    yesterday.setDate(
+      now.getDate() - 1
+    );
+
+
+    return {
+
+      visible: true,
+
+      label: "Hier",
+
+      dateKey: dateKey(yesterday)
+
+    };
+
+  }
+
+
+  return {
+
+    visible: false,
+
+    label: "",
+
+    dateKey: null
+
+  };
+
+}
+
+
+function getHabitsCompletedOn(uid, dayKey) {
+
+  return sharedHabits.filter(
+    habit =>
+      Boolean(habit.completed?.[dayKey]?.[uid])
+  );
+
+}
+
+
+function renderDuoRecap() {
+
+  if (!duoState) return;
+
+
+  const window =
+    getRecapWindow();
+
+
+  if (!window.visible) {
+
+    duoRecapCard.classList.add("hidden");
+
+    return;
+
+  }
+
+
+  duoRecapCard.classList.remove("hidden");
+
+
+  const myUid =
+    currentUser.uid;
+
+  const partnerUid =
+    duoState.partnerUid;
+
+
+  function buildBlock(uid, name) {
+
+    const habits =
+      getHabitsCompletedOn(uid, window.dateKey);
+
+
+    const habitsText =
+      habits.length
+
+        ? habits
+            .map(h => escapeHTML(h.name))
+            .join(", ")
+
+        : "rien réalisé pour l'instant";
+
+
+    const reactionsForThisDay =
+      sharedReactions.filter(
+        reaction =>
+          reaction.toUid === uid &&
+          reaction.dateKey === window.dateKey
+      );
+
+
+    const reactionButtons =
+      REACTION_TYPES
+        .map(reaction => {
+
+          const count =
+            reactionsForThisDay.filter(
+              r => r.type === reaction.type
+            ).length;
+
+
+          const iSent =
+            reactionsForThisDay.some(
+              r =>
+                r.type === reaction.type &&
+                r.fromUid === myUid
+            );
+
+
+          const disabled =
+            uid === myUid
+              ? "disabled"
+              : "";
+
+
+          return `
+
+            <button
+              class="reaction-button ${iSent ? "sent" : ""}"
+              data-reaction="${reaction.type}"
+              data-to="${uid}"
+              ${disabled}
+            >
+              ${reaction.icon}
+              ${count > 0 ? `<span>${count}</span>` : ""}
+            </button>
+
+          `;
+
+        })
+        .join("");
+
+
+    return `
+
+      <div class="duo-recap-block">
+
+        <p>
+
+          <strong>${window.label}</strong>,
+          ${escapeHTML(name)} a
+          ${habits.length ? "réalisé" : ""}
+          ${habits.length ? `<strong>${habitsText}</strong>` : habitsText}
+
+        </p>
+
+
+        <div class="reaction-row">
+          ${reactionButtons}
+        </div>
+
+      </div>
+
+    `;
+
+  }
+
+
+  duoRecapCard.innerHTML = `
+
+    <div class="journal-card-header">
+
+      <div>
+
+        <p class="eyebrow">RECONNAISSANCE</p>
+
+        <h2>Comment s'est passée la journée ?</h2>
+
+      </div>
+
+      <span class="journal-icon">✦</span>
+
+    </div>
+
+    ${buildBlock(myUid, "toi")}
+
+    <div class="duo-recap-divider"></div>
+
+    ${buildBlock(partnerUid, duoState.partnerUsername)}
+
+  `;
+
+
+  document
+    .querySelectorAll(
+      "#duoRecapCard .reaction-button:not([disabled])"
+    )
+    .forEach(button => {
+
+      button.addEventListener(
+        "click",
+        async () => {
+
+          const reactionType =
+            button.dataset.reaction;
+
+          const toUid =
+            button.dataset.to;
+
+
+          const alreadySent =
+            sharedReactions.find(
+              r =>
+                r.type === reactionType &&
+                r.toUid === toUid &&
+                r.fromUid === myUid &&
+                r.dateKey === window.dateKey
+            );
+
+
+          if (alreadySent) {
+
+            await db.collection("duos")
+              .doc(duoState.duoId)
+              .collection("reactions")
+              .doc(alreadySent.id)
+              .delete();
+
+            return;
+
+          }
+
+
+          await db.collection("duos")
+            .doc(duoState.duoId)
+            .collection("reactions")
+            .add({
+
+              fromUid: myUid,
+
+              toUid,
+
+              type: reactionType,
+
+              dateKey: window.dateKey,
+
+              createdAt:
+                firebase.firestore.FieldValue.serverTimestamp()
+
+            });
+
+        }
+      );
+
+    });
 
 }
 
@@ -2882,8 +4461,6 @@ function initialize() {
   );
 
   renderWeeklyHistory();
-
-  renderDuo();
 
 }
 
