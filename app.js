@@ -2748,8 +2748,11 @@ let currentUser = null;
 let currentProfile = null;
 
 /*
-   Infos sur le duo actif une fois connecté :
-   { duoId, partnerUid, partnerUsername, myColor, partnerColor }
+   Infos sur le duo actif une fois connecté.
+   La couleur du partenaire affichée est toujours calculée
+   comme l'opposé de MA couleur sur cet écran.
+   La couleur réellement choisie par l'autre utilisateur
+   n'est jamais utilisée pour l'affichage.
 */
 let duoState = null;
 
@@ -3310,26 +3313,12 @@ joinDuo.addEventListener(
 
 
       /*
-        La personne qui rejoint prend
-        automatiquement la couleur opposée
-        à celle du premier membre.
+        La couleur est strictement personnelle.
+        On ne lit jamais la couleur du premier membre
+        et on ne modifie pas la couleur du membre qui rejoint.
+        Chacun garde donc son propre choix, indépendamment
+        de celui de l'autre.
       */
-
-      const inviterSnap =
-        await db.collection("users")
-          .doc(duoDoc.data().member1)
-          .get();
-
-
-      const inviterColor =
-        inviterSnap.data()?.color || "blue";
-
-
-      const myColor =
-        inviterColor === "blue"
-          ? "yellow"
-          : "blue";
-
 
       await duoDoc.ref.update({
 
@@ -3344,9 +3333,7 @@ joinDuo.addEventListener(
         .doc(currentUser.uid)
         .update({
 
-          duoId: duoDoc.id,
-
-          color: myColor
+          duoId: duoDoc.id
 
         });
 
@@ -3428,9 +3415,20 @@ leaveDuo.addEventListener(
 
 
 /*
-   Choix de sa couleur dans le duo. On empêche
-   les deux personnes d'avoir la même couleur.
+   Choix de sa couleur dans le duo.
+   La couleur est strictement personnelle à cet écran :
+   aucune contrainte n'est appliquée par rapport au choix
+   de l'autre personne.
 */
+
+function getOppositeColor(color) {
+
+  return color === "blue"
+    ? "yellow"
+    : "blue";
+
+}
+
 
 colorButtons.forEach(button => {
 
@@ -3445,19 +3443,6 @@ colorButtons.forEach(button => {
         button.dataset.color;
 
 
-      if (
-        color === duoState.partnerColor
-      ) {
-
-        alert(
-          "Ton/ta partenaire a déjà choisi cette couleur."
-        );
-
-        return;
-
-      }
-
-
       await db.collection("users")
         .doc(currentUser.uid)
         .update({ color });
@@ -3466,6 +3451,7 @@ colorButtons.forEach(button => {
       currentProfile.color = color;
 
       duoState.myColor = color;
+      duoState.partnerColor = getOppositeColor(color);
 
 
       renderColorButtons();
@@ -3553,9 +3539,9 @@ function subscribeToDuo(duoId) {
             currentProfile?.color || "blue",
 
           partnerColor:
-            partnerData.color === "blue"
-              ? "blue"
-              : "yellow"
+            getOppositeColor(
+              currentProfile?.color || "blue"
+            )
 
         };
 
