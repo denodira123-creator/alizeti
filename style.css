@@ -1685,6 +1685,17 @@ label textarea {
   stroke-linejoin: round;
 }
 
+/*
+  Le cœur est une forme pleine : la contourner
+  avec des jonctions arrondies déformait la pointe
+  du creux. On le remplit à la place.
+*/
+
+.heart-icon-svg {
+  fill: currentColor;
+  stroke: none;
+}
+
 .nav-item.active {
   color: var(--blue-dark);
 }
