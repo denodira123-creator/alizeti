@@ -3414,6 +3414,11 @@ leaveDuo.addEventListener(
     currentProfile.duoId = null;
 
 
+    duoCodeGenerated.classList.add(
+      "hidden"
+    );
+
+
     renderDuoAccountUI();
 
     renderDuoNav();
@@ -3624,9 +3629,15 @@ function renderDuoAccountUI() {
       "hidden"
     );
 
-    duoCodeGenerated.classList.add(
-      "hidden"
-    );
+    /*
+      On ne cache surtout pas duoCodeGenerated
+      ici : cette fonction est aussi appelée
+      juste après avoir généré un code, tant que
+      personne ne l'a encore rejoint (duoState
+      reste null pendant toute l'attente). Le
+      masquer ici faisait disparaître le code
+      presque instantanément.
+    */
 
     return;
 
@@ -3638,6 +3649,17 @@ function renderDuoAccountUI() {
   );
 
   duoConnected.classList.remove(
+    "hidden"
+  );
+
+
+  /*
+    Une fois réellement connecté, on peut
+    cacher le bloc "code généré" : il n'a
+    plus lieu d'être affiché.
+  */
+
+  duoCodeGenerated.classList.add(
     "hidden"
   );
 
